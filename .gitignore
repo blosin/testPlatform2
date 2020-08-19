@@ -1,0 +1,22 @@
+# Coverage directory used by tools like istanbul
+api/coverage
+*.lcov
+
+# nyc test coverage
+api/.nyc_output
+
+# sonarqube
+api/.scannerwork
+
+# Dependency directories
+api/node_modules/
+
+.vscode
+api/dist/
+
+api/package-lock.json
+api/src/platforms/sdk/pedidosYa/node_modules/
+api/src/platforms/sdk/pedidosYa/package-lock.json
+
+# Data seed
+api/seeders/data/*

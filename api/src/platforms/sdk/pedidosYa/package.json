@@ -1,0 +1,70 @@
+{
+  "name": "reception-system-sdk",
+  "version": "1.6.0",
+  "description": "SDK for the PedidosYa reception systems API",
+  "homepage": "http://stg-orders-api.pedidosya.com",
+  "author": {
+    "email": "it.ordertransmission@pedidosya.com"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/ApiClient.js",
+  "dependencies": {
+    "axios": "0.18.0",
+    "node-schedule": "1.3.0",
+    "sqs-consumer": "3.8.0"
+  },
+  "devDependencies": {
+    "eslint": "4.19.1",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-config-xo": "0.20.1",
+    "eslint-plugin-prettier": "2.6.0",
+    "husky": "0.14.3",
+    "lint-staged": "6.1.1",
+    "mocha": "5.2.0",
+    "nsp": "2.8.0",
+    "prettier": "1.14.0"
+  },
+  "engines": {
+    "node": ">= 6.14.3"
+  },
+  "scripts": {
+    "prepublishOnly": "nsp check",
+    "pretest": "eslint .",
+    "precommit": "lint-staged",
+    "test": "mocha"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.json": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "xo",
+      "prettier"
+    ],
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "printWidth": 90
+        }
+      ]
+    },
+    "plugins": [
+      "prettier"
+    ]
+  },
+  "license": "MIT"
+}

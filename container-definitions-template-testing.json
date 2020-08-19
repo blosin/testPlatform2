@@ -1,0 +1,46 @@
+{
+  "containerDefinitions": [
+    {
+      "portMappings": [
+        {
+          "hostPort": 0,
+          "protocol": "tcp",
+          "containerPort": 3085
+        }
+      ],
+      "cpu": 0,
+      "memory": 256,
+      "image": "265556570017.dkr.ecr.us-west-2.amazonaws.com/smartfran/api:${IMG_TAG}",
+      "essential": true,
+      "name": "smartfran-api",
+      "entryPoint": [
+        "npm",
+        "run"
+      ],
+      "command": [
+        "serve"
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "testing"
+        }
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "key": "Customer",
+      "value": "Smartfran"
+    },
+    {
+      "key": "Environment",
+      "value": "Testing"
+    },
+    {
+      "key": "Project",
+      "value": "Concentrador"
+    }
+  ],
+  "family": "smartfran-api-testing-task"
+}

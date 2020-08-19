@@ -1,0 +1,8 @@
+node_modules/
+dist/
+test/
+seeders/data/*
+scripts/
+.nyc_output/
+.scannerwork/
+coverage/
