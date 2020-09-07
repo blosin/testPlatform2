@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-       DOCKER_REPOSITORY = "265556570017.dkr.ecr.us-west-2.amazonaws.com"
+       DOCKER_REPOSITORY = "382381053403.dkr.ecr.us-east-2.amazonaws.com"
        PROJ_REPO = "smartfran/platform-service"
     }
 
