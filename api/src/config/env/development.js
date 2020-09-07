@@ -1,8 +1,8 @@
 'use strict'
-const path = require('path');
+import path from 'path';
 
 module.exports = {
-    token: {
+	token: {
 		secret: 'ts$s38*jsjmjnT1',
 		expires: '1d', // expires in 24 hours
 		noexpires: '100y', // expires in 100 years
@@ -14,12 +14,21 @@ module.exports = {
 	},
 	path: path.normalize(path.join(__dirname, '..')),
 	database: {
-		logging: 'console.log',
-		timezone: '-03:00',
 		username: 'smartfran',
 		password: 'smartfraN_123',
 		host: 'cluster0-ucici.mongodb.net',
 		name: 'smartfran',
 		port: 27017
+	},
+	AWS: {
+		REGION: 'us-east-2',
+		SQS: {
+			ORDER_PRODUCER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesDEV.fifo'
+			},
+			ORDER_CONSUMER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/BranchMessagesDEV.fifo'
+			},
+		}
 	},
 };

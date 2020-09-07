@@ -4,6 +4,7 @@ import RejectedMessagesSingleton from './rejectedMessages';
 import PlatformSingleton from './platforms';
 import UUID from './errors/utils';
 
+import Aws from '../platforms/provider/aws';
 import PlatformFactory from '../platforms/management/factory_platform';
 
 module.exports.initUtils = () => {
@@ -17,6 +18,7 @@ module.exports.initUtils = () => {
 
         /* Load all platforms after getting them */
         loadPlatforms();
+        initPollingQueue();
         resolve();
     });
 
@@ -30,4 +32,9 @@ const loadPlatforms = () => {
         let uuid = UUID();
         platformFactory.createPlatform(platform, uuid);
     });
+}
+
+const initPollingQueue = () => {
+    const aws = new Aws();
+    aws.pollFromQueue();
 }

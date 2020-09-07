@@ -8,7 +8,7 @@ export AWS_SESSION_TOKEN=$(echo $response | jq .Credentials.SessionToken -r)
 env | grep AWS
 
 aws ecs register-task-definition \
-        --cli-input-json file://${WORKSPACE}/container-definitions.json \
+        --cli-input-json file://${WORKSPACE}/ecs-task.json \
         --region ${ECS_REGION}
 
 aws ecs update-service \

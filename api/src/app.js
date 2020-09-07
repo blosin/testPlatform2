@@ -14,13 +14,13 @@ import UUID from './utils/errors/utils';
 const settings = require('./config/settings');
 const logger = require('./config/logger');
 
-const urlPrefix = '/api/ms2';
+const urlPrefix = `/api`;
 
 const exceptions = [
   { url: `${urlPrefix}/thirdParties/login`, methods: ['POST'] },
+  { url: `${urlPrefix}/uberEats/tracking`, methods: ['POST'] },
+  { url: `${urlPrefix}` + /\/glovo\/orders(\/?.*)/, methods: ['GET', 'POST'] },
   { url: `/` },
-  { url: /\/api\/ms2\/glovo\/orders(\/?.*)/, methods: ['GET', 'POST'] },
-  { url: '/api/uberEats/tracking', methods: ['POST'] },
 ];
 
 const cors = require('cors');

@@ -636,8 +636,8 @@ describe('PEDIDOSYA management.', function () {
                     reception: () => Promise.resolve('Receive')
                 }
             }
+            sandbox.stub(branchModel, 'findOne').resolves(branches);
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.receiveOrder(order, branches[0]);
@@ -652,8 +652,8 @@ describe('PEDIDOSYA management.', function () {
                     reception: () => Promise.reject('Receive')
                 }
             }
-            const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
+            sandbox.stub(branchModel, 'findOne').resolves(branches[0]);
+            sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
                 .returns(branches[0].platforms[0]);
 
             const res = await py.receiveOrder(order, branches[0]);
@@ -665,7 +665,7 @@ describe('PEDIDOSYA management.', function () {
         const stateCod = 'view';
         const state = 'VIEWED';
 
-        it('should receive order correctly', async function () {
+        it('should view order correctly', async function () {
             const py = new PedidosYa();
             py._platform = platform;
             py._api = {
@@ -679,8 +679,8 @@ describe('PEDIDOSYA management.', function () {
 
             const updOrderStateStub = sandbox.stub(PedidosYa.prototype, 'updateOrderState')
                 .resolves(newOrders[0]);
+                sandbox.stub(branchModel, 'findOne').resolves(branches[0]);
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.viewOrder(order, branches[0]);
@@ -707,8 +707,8 @@ describe('PEDIDOSYA management.', function () {
 
             const updOrderStateStub = sandbox.stub(PedidosYa.prototype, 'updateOrderState')
                 .resolves(newOrders[0]);
+                sandbox.stub(branchModel, 'findOne').resolves(branches[0]);
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.viewOrder(order, branches[0]);
@@ -733,7 +733,6 @@ describe('PEDIDOSYA management.', function () {
             }
 
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.callHeartBeat(branches[0]);
@@ -750,7 +749,6 @@ describe('PEDIDOSYA management.', function () {
             }
 
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.callHeartBeat();
@@ -767,7 +765,6 @@ describe('PEDIDOSYA management.', function () {
             }
 
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             const res = await py.callHeartBeat(branches[0]);
@@ -777,6 +774,7 @@ describe('PEDIDOSYA management.', function () {
 
     describe('fn(): closeRestaurant()', function () {
         beforeEach(function () {
+            sandbox.stub(branchModel, 'findOne').resolves(branches[0]);
             sandbox.stub(branchModel, 'updateOne').resolves();
             sandbox.stub(branchModel, 'validateNewProgClosed').returns('');
         });
@@ -790,10 +788,9 @@ describe('PEDIDOSYA management.', function () {
                 }
             }
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
-            const res = await py.closeRestaurant(branches[0], branches[0].platforms[0], 5, 'Test close');
+            const res = await  py.closeRestaurant(branches[0].branchId, branches[0].platforms[0], 5, 'Test close');
             expect(res).to.eql('Closed');
         });
 
@@ -805,11 +802,11 @@ describe('PEDIDOSYA management.', function () {
                     close: () => Promise.reject('Closed')
                 }
             }
+            
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
             try {
-                await py.closeRestaurant(branches[0], branches[0].platforms[0], 5, 'Test close');
+                await  py.closeRestaurant(branches[0].branchId, branches[0].platforms[0], 5, 'Test close');
             } catch (error) {
                 expect(error).to.eql(`Failed to closeRestaurant. RestaurantCode: ${branches[0].branchId}.`);
             }
@@ -818,6 +815,7 @@ describe('PEDIDOSYA management.', function () {
 
     describe('fn(): openRestaurant()', function () {
         beforeEach(function () {
+            sandbox.stub(branchModel, 'findOne').resolves(branches[0]);
             sandbox.stub(branchModel, 'updateOne').resolves();
             sandbox.stub(branchModel, 'findProgClosedToOpen').returns({});
         });
@@ -830,10 +828,9 @@ describe('PEDIDOSYA management.', function () {
                 }
             }
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
-            const res = await py.openRestaurant(branches[0]);
+            const res = await py.openRestaurant(branches[0].branchId);
             expect(res).to.eql('Open');
         });
 
@@ -846,11 +843,10 @@ describe('PEDIDOSYA management.', function () {
                 }
             }
             const getBranchPlatformsStub = sandbox.stub(PedidosYa.prototype, 'getBranchPlatform')
-                .withArgs(branches[0].platforms, py._platform._id)
                 .returns(branches[0].platforms[0]);
 
             try {
-                await py.openRestaurant(branches[0]);
+                await py.openRestaurant(branches[0].branchId);
             } catch (error) {
                 expect(error).to.eql(`Failed to openRestaurant. RestaurantCode: ${branches[0].branchId}.`);
             }

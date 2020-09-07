@@ -2,9 +2,8 @@ import NewsTypeStrategy from '../newsTypeStrategy';
 import logger from '../../../../config/logger';
 
 class WarningRestaurantStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet) {
         super(newToSet);
-        this.token = token;
         this.entity = 'BRANCH';
     }
 

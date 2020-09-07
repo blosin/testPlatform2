@@ -5,10 +5,9 @@ import news from '../../../../models/news';
 import NewsTypeSingleton from '../../../../utils/newsType';
 
 class PlatformRejectStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet) {
         super(newToSet);
         this.order = newToSet.order;
-        this.token = token;
         this.entity = 'PLATFORM';
         this.typeId = NewsTypeSingleton.idByCod('platform_rej_ord');
         this.statusId = NewsStateSingleton.idByCod('rej');

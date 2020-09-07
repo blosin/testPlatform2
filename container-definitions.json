@@ -10,7 +10,7 @@
       ],
       "cpu": 0,
       "memory": 256,
-      "image": "265556570017.dkr.ecr.us-west-2.amazonaws.com/smartfran/api:${IMG_TAG}",
+      "image": "${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}",
       "essential": true,
       "name": "smartfran-api",
       "entryPoint": [
@@ -23,7 +23,7 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "testing"
+          "value": "${BRANCH_NAME}"
         }
       ]
     }
@@ -35,12 +35,12 @@
     },
     {
       "key": "Environment",
-      "value": "Testing"
+      "value": "${BRANCH_NAME}"
     },
     {
       "key": "Project",
       "value": "Concentrador"
     }
   ],
-  "family": "smartfran-api-testing-task"
+  "family": "platforms-service-${BRANCH_NAME}-task"
 }

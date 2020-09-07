@@ -1,9 +1,9 @@
 import NewsTypeStrategy from '../newsTypeStrategy';
 
 class CloseRestaurantStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet, branchId) {
         super(newToSet);
-        this.token = token;
+        this.branchId = branchId;
         this.entity = 'BRANCH';
     }
 
@@ -11,7 +11,7 @@ class CloseRestaurantStrategy extends NewsTypeStrategy {
         this.createPlatform(this.newToSet.platformId);
         return this.platform
             .closeRestaurant(
-                this.token,
+                this.branchId,
                 this.newToSet.timeToClose,
                 this.newToSet.description);
     }

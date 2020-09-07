@@ -1,7 +1,7 @@
 # 
 # Build stage 1.
 #
-FROM node:14-alpine
+FROM node:12-alpine
 WORKDIR /usr/src/app
 COPY package.json .
 RUN npm install
@@ -11,7 +11,7 @@ RUN npm run build
 #
 # Build stage 2.
 #
-FROM node:14-alpine
+FROM node:12-alpine
 WORKDIR /usr/src/app
 COPY package.json .
 RUN npm install --only=production

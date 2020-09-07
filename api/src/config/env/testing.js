@@ -14,12 +14,21 @@ module.exports = {
 	},
 	path: path.normalize(path.join(__dirname, '..')),
 	database: {
-		logging: 'console.log',
-		timezone: '-03:00',
 		username: 'smartfran',
 		password: '9hc7Jm9Y3YhBAmLf',
 		host: 'cluster0-a4ki3.mongodb.net',
 		name: 'test',
 		port: 27017
+	},
+	AWS: {
+		REGION: 'us-east-2',
+		SQS: {
+			ORDER_PRODUCER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesTST.fifo'
+			},
+			ORDER_CONSUMER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/BranchMessagesTST.fifo'
+			},
+		}
 	},
 };

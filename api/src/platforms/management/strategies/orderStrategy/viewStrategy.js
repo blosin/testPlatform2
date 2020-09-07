@@ -21,19 +21,15 @@ class ViewStrategy extends NewsTypeStrategy {
     manageNewType() {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log('----', this.newToSet);
                 this.savedNew = await this.findNew(this.newToSet.id);
                 const isValid = this.validateTransition();
-                console.log(isValid);
 
                 let platformResult = null;
                 if (isValid) {
                     platformResult = await this.platform
                         .viewOrder(
-                            this.savedNew.order,
-                            this.token);
+                            this.savedNew.order);
                 }
-                console.log(',,,', platformResult);
                 const { findQuery, updateQuery, options } =
                     this.createObjectsUpdate(platformResult, isValid);
                 console.log({ findQuery, updateQuery, options });

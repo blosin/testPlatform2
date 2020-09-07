@@ -166,7 +166,54 @@ class PedidosYa extends Platform {
     }
 
     /**
-     * 
+   * @param {*} order
+   * @override
+   */
+    receiveOrder(order) {
+        return new Promise(async (resolve) => {
+            try {
+                const branch = await branchModel.findOne({ branchId: order.branchId });
+                const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
+                const idRef = platformBranch.branchReference.toString();
+                let res = await this._api.event.reception(order.id, idRef);
+                if (!res) res = true;
+                return resolve(res)
+            } catch (error) {
+                if (!error) error = '';
+                const msg = 'Failed to send the received status.';
+                const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, { error: error.toString() });
+                resolve(err);
+            }
+        });
+    }
+
+    /**
+     * @param {*} order
+     * @override
+     */
+    viewOrder(order) {
+        return new Promise(async (resolve) => {
+            try {
+                const branch = await branchModel.findOne({ branchId: order.branchId });
+                const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
+                const idRef = platformBranch.branchReference.toString();
+                const state = NewsStateSingleton.stateByCod('view');
+                await this.updateOrderState(order, state);
+                this.updateLastContact();
+
+                let res = await this._api.event.acknowledgement(order.id, idRef);
+                if (!res) res = true;
+                return resolve(res);
+            } catch (error) {
+                if (!error) error = '';
+                const msg = 'Failed to send the viewed status.';
+                const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, { error: error.toString() });
+                resolve(err);
+            }
+        });
+    }
+
+    /**
      * @param {*} order 
      * @param {*} deliveryTimeId 
      * @override
@@ -192,8 +239,8 @@ class PedidosYa extends Platform {
             }
         });
     }
+
     /**
-     * 
      * @param {*} orderId 
      * @param {*} rejectMessageId 
      * @param {*} rejectMessageNote 
@@ -216,8 +263,8 @@ class PedidosYa extends Platform {
             }
         });
     }
+
     /**
-     * 
      * @param {*} order 
      * @override
      */
@@ -235,56 +282,6 @@ class PedidosYa extends Platform {
                 const msg = 'Failed to send the dispatched status.';
                 const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, { error: error.toString() });
                 return resolve(err);
-            }
-        });
-    }
-    /**
-     * 
-     * @param {*} order
-     * @param {*} branchId 
-     * @override
-     */
-    receiveOrder(order, branch) {
-        return new Promise(async (resolve) => {
-            try {
-                const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
-                const idRef = platformBranch.branchReference.toString();
-
-                let res = await this._api.event.reception(order.id, idRef);
-                if (!res) res = true;
-                return resolve(res)
-            } catch (error) {
-                if (!error) error = '';
-                const msg = 'Failed to send the received status.';
-                const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, { error: error.toString() });
-                resolve(err);
-            }
-        });
-    }
-
-    /**
-     * 
-     * @param {*} order
-     * @param {*} branchId 
-     * @override
-     */
-    viewOrder(order, branch) {
-        return new Promise(async (resolve) => {
-            try {
-                const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
-                const idRef = platformBranch.branchReference.toString();
-                const state = NewsStateSingleton.stateByCod('view');
-                await this.updateOrderState(order, state);
-                this.updateLastContact();
-
-                let res = await this._api.event.acknowledgement(order.id, idRef);
-                if (!res) res = true;
-                return resolve(res);
-            } catch (error) {
-                if (!error) error = '';
-                const msg = 'Failed to send the viewed status.';
-                const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, { error: error.toString() });
-                resolve(err);
             }
         });
     }
@@ -318,14 +315,14 @@ class PedidosYa extends Platform {
     }
 
     /**
-     * 
-     * @param {*} branch
+     * @param {*} branchId
      * @override
      */
-    openRestaurant(branch) {
+    openRestaurant(branchId) {
         const dateNow = new Date();
         return new Promise(async (resolve, reject) => {
             try {
+                const branch = await branchModel.findOne({ branchId });
                 const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
                 const closedProg = branchModel.findProgClosedToOpen(platformBranch, dateNow);
 
@@ -357,7 +354,7 @@ class PedidosYa extends Platform {
             } catch (error) {
                 if (!error) error = '';
                 error = { error: error.toString() };
-                const msg = `Failed to openRestaurant. RestaurantCode: ${branch.branchId}.`;
+                const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
                 logger.error({ message: msg, meta: { error } });
                 reject(msg);
             }
@@ -366,14 +363,15 @@ class PedidosYa extends Platform {
 
     /**
      * 
-     * @param {*} branch 
+     * @param {*} branchId 
      * @param {*} timeToClose 
      * @param {*} description 
      * @override
      */
-    closeRestaurant(branch, timeToClose, description) {
+    closeRestaurant(branchId, timeToClose, description) {
         return new Promise(async (resolve, reject) => {
             try {
+                const branch = await branchModel.findOne({ branchId });
                 let dateNow = new Date();
                 const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
                 const validatedClosed = branchModel.validateNewProgClosed(platformBranch, dateNow, timeToClose);
@@ -406,8 +404,8 @@ class PedidosYa extends Platform {
                 resolve(closed);
             } catch (error) {
                 if (!error) error = '';
-                error = { error: error.toString(), branch, timeToClose, description };
-                const msg = `Failed to closeRestaurant. RestaurantCode: ${branch.branchId}.`;
+                error = { error: error.toString(), branchId, timeToClose, description };
+                const msg = `Failed to closeRestaurant. RestaurantCode: ${branchId}.`;
                 logger.error({ message: msg, meta: error });
                 reject(msg);
             }

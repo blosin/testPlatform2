@@ -1,15 +1,16 @@
 {
-  "name": "smartfran",
-  "description": "Concentrador Proyecto Pedidos Smartfran",
-  "main": "index.js",
+  "name": "platforms-service",
+  "description": "Platform service for SmartfranPedidos Project",
+  "main": "src/index.js",
   "author": "Ross",
   "scripts": {
+    "preinstall": "rm -rf node_modules package-lock.json",
     "build": "npm-run-all clean transpile",
     "serve": "node dist/index.js",
     "serve:tst": "NODE_ENV=testing npm run serve",
     "serve:stg": "NODE_ENV=staging npm run serve",
     "serve:prd": "NODE_ENV=production npm run serve",
-    "start": "nodemon --inspect=127.0.0.1:9229  src/index.js --watch src --exec babel-node",
+    "start": "AWS_PROFILE=smartfran nodemon --inspect=127.0.0.1:9230  src/index.js --watch src --exec babel-node",
     "start:dev": "NODE_ENV=development npm run start",
     "start:tst": "NODE_ENV=testing npm run start",
     "start:stg": "NODE_ENV=staging npm run start",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "@meanie/mongoose-to-json": "^2.4.0",
+    "aws-sdk": "^2.738.0",
     "axios": "^0.19.0",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",

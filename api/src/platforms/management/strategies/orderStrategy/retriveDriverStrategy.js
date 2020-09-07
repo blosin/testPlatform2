@@ -5,9 +5,8 @@ import CustomError from '../../../../utils/errors/customError';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
 
 class RetrieveDriverStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet) {
         super(newToSet);
-        this.token = token;
         this.savedNew = { _id: newToSet.id };
     }
 
@@ -49,8 +48,7 @@ class RetrieveDriverStrategy extends NewsTypeStrategy {
                 if (isValid) {
                     platformResult = await this.platform
                         .retriveDriver(
-                            this.savedNew.order,
-                            this.token);
+                            this.savedNew.order);
                 }
 
                 const { findQuery, updateQuery, options } =

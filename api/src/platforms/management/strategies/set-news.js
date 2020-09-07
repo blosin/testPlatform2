@@ -16,22 +16,23 @@ import NewStrategy from './orderStrategy/newStrategy';
 import PlatformRejectStrategy from './orderStrategy/platformRejectStrategy';
 
 class SetNews {
-    constructor(token, uuid) {
-        this.token = token;
+    constructor(branchId, uuid) {
+        this.branchId = branchId;
         this.uuid = uuid;
     }
 
     setNews(newToSet, data) {
         try {
+            console.log('aaa', newToSet);
             switch (newToSet.typeId) {
                 /* Branch Received order */
                 case NewsTypeSingleton.idByCod('receive_ord'):
-                    this.strategy = new ReceiveStrategy(newToSet, this.token);
+                    this.strategy = new ReceiveStrategy(newToSet);
                     break;
 
                 /* Branch Viewed order */
                 case NewsTypeSingleton.idByCod('view_ord'):
-                    this.strategy = new ViewStrategy(newToSet, this.token);
+                    this.strategy = new ViewStrategy(newToSet);
                     break;
 
                 /* Branch Confirmed order */
@@ -56,34 +57,34 @@ class SetNews {
 
                 /* Branch Retrive driver */
                 case NewsTypeSingleton.idByCod('driver_ord'):
-                    this.strategy = new RetrieveDriverStrategy(newToSet, this.token);
+                    this.strategy = new RetrieveDriverStrategy(newToSet);
                     break;
 
                 /* Branch closed */
                 case NewsTypeSingleton.idByCod('close_branch'):
-                    this.strategy = new CloseRestaurantStrategy(newToSet, this.token);
+                    this.strategy = new CloseRestaurantStrategy(newToSet, this.branchId);
                     break;
 
                 /* Branch opened */
                 case NewsTypeSingleton.idByCod('open_branch'):
-                    this.strategy = new OpenRestaurantStrategy(newToSet, this.token);
+                    this.strategy = new OpenRestaurantStrategy(newToSet, this.branchId);
                     break;
 
                 /* Branch warning */
                 case NewsTypeSingleton.idByCod('warning'):
-                    this.strategy = new WarningRestaurantStrategy(newToSet, this.token);
+                    this.strategy = new WarningRestaurantStrategy(newToSet);
                     break;
 
                 /* Platform new order */
                 case NewsTypeSingleton.idByCod('new_ord'):
                     newToSet.order = data;
-                    this.strategy = new NewStrategy(newToSet, this.token);
+                    this.strategy = new NewStrategy(newToSet);
                     break;
 
                 /* Platform reject order */
                 case NewsTypeSingleton.idByCod('platform_rej_ord'):
                     newToSet.order = { id: data };
-                    this.strategy = new PlatformRejectStrategy(newToSet, this.token);
+                    this.strategy = new PlatformRejectStrategy(newToSet);
                     break;
                 default:
                     const msg = 'No se encontró el tipo de novedad.';

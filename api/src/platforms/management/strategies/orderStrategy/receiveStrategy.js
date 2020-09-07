@@ -4,9 +4,8 @@ import { APP_BRANCH } from '../../../../utils/errors/codeError';
 import NewsTypeSingleton from '../../../../utils/newsType';
 
 class ReceiveStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet) {
         super(newToSet);
-        this.token = token;
         this.savedNew = { _id: newToSet.id };
         this.typeId = NewsTypeSingleton.idByCod('receive_ord');
     }
@@ -20,7 +19,7 @@ class ReceiveStrategy extends NewsTypeStrategy {
 
     createObjectsUpdate(platformResult, isValid) {
         try {
-            
+
             this.createTrace(platformResult, isValid);
             this.trace.update.typeIdPrev = this.newToSet.typeIdPrev;
             const findQuery = { _id: this.savedNew._id };
@@ -42,15 +41,14 @@ class ReceiveStrategy extends NewsTypeStrategy {
         }
     }
 
-    async  manageNewType() {
+    async manageNewType() {
         return new Promise(async (resolve, reject) => {
             try {
                 this.savedNew = await this.findNew(this.newToSet.id);
                 const isValid = true;
                 const platformResult = await this.platform
                     .receiveOrder(
-                        this.savedNew.order,
-                        this.token);
+                        this.savedNew.order);
                 const { findQuery, updateQuery, options } =
                     this.createObjectsUpdate(platformResult, isValid);
 

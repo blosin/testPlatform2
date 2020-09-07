@@ -91,7 +91,7 @@ const setNews = (req, res) => {
             let newsToSet = newsForFilter.filter((n) => n.id == id);
             for (let newToSet of newsToSet) {
                 try {
-                    let setNews = new SetNews(req.token, req.uuid);
+                    let setNews = new SetNews(req.token.branchId, req.uuid);
                     await setNews.setNews(newToSet);
                 } catch (error) {
                     const msg = 'No se pudo procesar la novedad.';
@@ -105,7 +105,7 @@ const setNews = (req, res) => {
     /* Can be process in parallel */
     for (let newToSet of newsNoIds) {
         try {
-            let setNews = new SetNews(req.token, req.uuid);
+            let setNews = new SetNews(req.token.branchId, req.uuid);
             let res = setNews.setNews(newToSet);
         } catch (error) {
             const msg = 'No se pudo procesar la novedad.';

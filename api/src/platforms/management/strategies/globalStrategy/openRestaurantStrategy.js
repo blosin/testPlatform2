@@ -1,17 +1,18 @@
 import NewsTypeStrategy from '../newsTypeStrategy';
 
 class OpenRestaurantStrategy extends NewsTypeStrategy {
-    constructor(newToSet, token) {
+    constructor(newToSet, branchId) {
         super(newToSet);
-        this.token = token;
+        this.branchId = branchId;
         this.entity = 'BRANCH';
     }
 
     manageNewType() {
         this.createPlatform(this.newToSet.platformId);
+
         return this.platform
             .openRestaurant(
-                this.token);
+                this.branchId);
     }
 }
 
