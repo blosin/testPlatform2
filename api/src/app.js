@@ -14,7 +14,7 @@ import UUID from './utils/errors/utils';
 const settings = require('./config/settings');
 const logger = require('./config/logger');
 
-const urlPrefix = `/api`;
+const urlPrefix = `/${process.env.NODE_ENV}`;
 
 const exceptions = [
   { url: `${urlPrefix}/thirdParties/login`, methods: ['POST'] },
@@ -58,7 +58,7 @@ const morganParser = (tokens, req, res) => {
   )
     return undefined;
 
-  if (!log.path.includes('/api/')) {
+  if (!log.path.includes(urlPrefix)) {
     new CustomError(CORE.NOTAPI, 'No api endpoint', req.uuid, log);
     return undefined;
   }

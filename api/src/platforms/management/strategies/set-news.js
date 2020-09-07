@@ -23,7 +23,6 @@ class SetNews {
 
     setNews(newToSet, data) {
         try {
-            console.log('aaa', newToSet);
             switch (newToSet.typeId) {
                 /* Branch Received order */
                 case NewsTypeSingleton.idByCod('receive_ord'):

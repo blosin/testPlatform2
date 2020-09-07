@@ -16,7 +16,10 @@ const required = (req, res, next) => {
           req.token = token.user;
           if (!req.token.permissions) req.token.permissions = [];
           req.path.replace(process.env.NODE_ENV, 'api');
-          if (!req.token.permissions.some((p) => req.path.includes(p)))
+          if (!req.token.permissions.some((p) => {
+            p = p.replace('api', process.env.NODE_ENV);
+            return req.path.includes(p);
+          }))
             throw 'El token no tiene permisos de acceso a la ruta.';
         });
     }
