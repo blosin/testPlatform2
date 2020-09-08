@@ -108,7 +108,7 @@ pipeline {
             steps {
                 dir("${WORKSPACE}/api") {
                     script {
-                        sh "\$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
+                        sh "$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
                         sh "docker push ${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}"
                     }
                 }
