@@ -51,5 +51,7 @@
       "value": "Concentrador"
     }
   ],
-  "family": "concentrador-pedidos-production-task"
+  "family": "concentrador-pedidos-production-task",
+  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+
 }
