@@ -70,7 +70,6 @@ pipeline {
                 }
             }
         }
-       /// 
        /*  stage ('Test: Integration [TESTING]') {
             when { anyOf { branch 'testing'; branch 'hotfixing' } }
             steps {
@@ -118,10 +117,10 @@ pipeline {
         stage('Deploy [TESTING]') {
             when { branch 'testing'}
             environment {
-                    ECS_CLUSTER = "smartfran-pedidos-common"
-                    ECS_SERVICE = "platforms-service-${BRANCH_NAME}-service"
-                    ECS_TASK = "platforms-service-${BRANCH_NAME}-task"
-                    ECS_REGION = "us-east-1"
+                    ECS_CLUSTER = "VPC-smartfran-tst-stg-cluster-Public"
+                    ECS_SERVICE = "platform-service-tst-service"
+                    ECS_TASK = "platform-service-tst-task"
+                    ECS_REGION = "us-east-2"
                 }
 
             steps {

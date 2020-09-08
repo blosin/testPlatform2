@@ -9,11 +9,13 @@ env | grep AWS
 
 aws ecs register-task-definition \
         --cli-input-json file://${WORKSPACE}/ecs-task.json \
-        --region ${ECS_REGION}
+        --region ${ECS_REGION}\
+        --profile ${PROFILE}
 
 aws ecs update-service \
         --cluster ${ECS_CLUSTER} \
         --service ${ECS_SERVICE} \
         --task-definition ${ECS_TASK} \
         --region ${ECS_REGION} \
+        --profile ${PROFILE}\
         --force-new-deployment
