@@ -70,7 +70,7 @@ pipeline {
                 }
             }
         }
-        
+       /// 
        /*  stage ('Test: Integration [TESTING]') {
             when { anyOf { branch 'testing'; branch 'hotfixing' } }
             steps {
