@@ -8,7 +8,7 @@ pipeline {
     environment {
        DOCKER_REPOSITORY = "382381053403.dkr.ecr.us-east-2.amazonaws.com"
        PROJ_REPO = "smartfran/platform-service"
-       PROFILE="smartfran"
+       PROFILE ="smartfran"
        REGION="us-east-2"
     }
 
@@ -108,7 +108,7 @@ pipeline {
             steps {
                 dir("${WORKSPACE}/api") {
                     script {
-                        sh "/$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
+                        sh "\$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
                         sh "docker push ${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}"
                     }
                 }
