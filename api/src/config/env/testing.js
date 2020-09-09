@@ -8,7 +8,7 @@ module.exports = {
 		noexpires: '100y', // expires in 100 years
 	},
 	baseUrl: process.env.BASE_URL || 'http://localhost',
-	port: process.env.NODE_PORT || 3085,
+	port: process.env.NODE_PORT || 3087,
 	url: function () {
 		return this.baseUrl + ':' + this.port
 	},
