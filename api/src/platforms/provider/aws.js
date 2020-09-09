@@ -5,9 +5,9 @@ import SetNews from '../management/strategies/set-news';
 class Aws {
     constructor() {
         AWS.config.setPromisesDependency();
-        AWS.config.update({
+       /*  AWS.config.update({
             region: config.AWS.REGION
-        });
+        }); */
     }
 
     retriveKey({
