@@ -118,8 +118,8 @@ pipeline {
             when { branch 'testing'}
             environment {
                     ECS_CLUSTER = "smartfran-pedidos-common"
-                    ECS_SERVICE = "concentrador-pedidos-${BRANCH_NAME}-service"
-                    ECS_TASK = "concentrador-pedidos-${BRANCH_NAME}-task"
+                    ECS_SERVICE = "platform-service-${BRANCH_NAME}-service"
+                    ECS_TASK = "platform-service-${BRANCH_NAME}-task"
                     ECS_REGION = "us-east-2"
                 }
 
