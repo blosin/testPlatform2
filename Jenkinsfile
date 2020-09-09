@@ -7,9 +7,10 @@ pipeline {
 
     environment {
        DOCKER_REPOSITORY = "382381053403.dkr.ecr.us-east-2.amazonaws.com"
-       PROJ_REPO = "smartfran/platform-service"
-       PROFILE ="smartfran"
-       REGION="us-east-2"
+       SERVICE_NAME = "platform-service"
+       PROJ_REPO = "smartfran/${SERVICE_NAME}"
+       PROFILE = "smartfran"
+       REGION = "us-east-2"
     }
 
     stages {
@@ -118,8 +119,8 @@ pipeline {
             when { branch 'testing'}
             environment {
                     ECS_CLUSTER = "smartfran-pedidos-common"
-                    ECS_SERVICE = "platform-service-${BRANCH_NAME}-service"
-                    ECS_TASK = "platform-service-${BRANCH_NAME}-task"
+                    ECS_SERVICE = "${SERVICE_NAME}-${BRANCH_NAME}-service"
+                    ECS_TASK = "${SERVICE_NAME}-${BRANCH_NAME}-task"
                     ECS_REGION = "us-east-2"
                 }
 
