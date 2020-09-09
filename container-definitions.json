@@ -42,7 +42,7 @@
       "value": "Concentrador"
     }
   ],
-  "family": "platforms-service-${BRANCH_NAME}-task",
+  "family": "platform-service-${BRANCH_NAME}-task",
   "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
 
 }
