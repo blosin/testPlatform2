@@ -12,7 +12,7 @@
       "memory": 256,
       "image": "${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}",
       "essential": true,
-      "name": "platforms-service-${BRANCH_NAME}-container",
+      "name": "platform-service-${BRANCH_NAME}-container",
       "entryPoint": [
         "npm",
         "run"
