@@ -117,9 +117,9 @@ pipeline {
         stage('Deploy [TESTING]') {
             when { branch 'testing'}
             environment {
-                    ECS_CLUSTER = "VPC-smartfran-tst-stg-cluster-Public"
-                    ECS_SERVICE = "platform-service-tst-service"
-                    ECS_TASK = "platform-service-tst-task"
+                    ECS_CLUSTER = "smartfran-pedidos-common"
+                    ECS_SERVICE = "concentrador-pedidos-${BRANCH_NAME}-service"
+                    ECS_TASK = "concentrador-pedidos-${BRANCH_NAME}-task"
                     ECS_REGION = "us-east-2"
                 }
 
