@@ -21,13 +21,13 @@ module.exports = {
 		port: 27017
 	},
 	AWS: {
-		REGION: 'us-east-1',
+		REGION: 'us-east-2',
 		SQS: {
 			ORDER_PRODUCER: {
 				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesDEV.fifo'
 			},
 			ORDER_CONSUMER: {
-				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/BranchMessagesDEV.fifo'
+				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/TST_PlatformMessages.fifo'
 			},
 		}
 	},

@@ -6,7 +6,7 @@ class Aws {
     constructor() {
         AWS.config.setPromisesDependency();
         AWS.config.update({
-            region: 'us-east-1'
+            region: config.AWS.REGION
         });
     }
 
@@ -36,7 +36,7 @@ class Aws {
     }
 
     pollFromQueue() {
-        const sqs = new AWS.SQS({ apiVersion: '2008-10-17', region: 'us-east-1' });
+        const sqs = new AWS.SQS();
         const params = {
             QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
             AttributeNames: [
@@ -49,6 +49,7 @@ class Aws {
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {
+                console.log(new Date(), response);
                 if (!!response.Messages)
                     for (let message of response.Messages) {
                         const setNews = new SetNews(message.Attributes.MessageGroupId, response.ResponseMetadata.RequestId);
@@ -57,7 +58,6 @@ class Aws {
                 return response;
             })
             .then((response) => {
-                console.log(new Date(), response);
                 return response;
             })
             .then(async (response) => {
