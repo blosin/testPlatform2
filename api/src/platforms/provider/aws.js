@@ -6,7 +6,7 @@ class Aws {
     constructor() {
         AWS.config.setPromisesDependency();
         AWS.config.update({
-            region: config.AWS.REGION
+            region: 'us-east-1'
         });
     }
 
@@ -46,6 +46,7 @@ class Aws {
         };
         console.log(params);
         console.log(sqs);
+        console.log(AWS);
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {
