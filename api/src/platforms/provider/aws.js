@@ -36,7 +36,7 @@ class Aws {
     }
 
     pollFromQueue() {
-        const sqs = new AWS.SQS();
+        const sqs = new AWS.SQS({region:'us-east-1'});
         const params = {
             QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
             AttributeNames: [
