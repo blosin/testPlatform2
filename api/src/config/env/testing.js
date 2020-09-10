@@ -24,10 +24,10 @@ module.exports = {
 		REGION: 'us-east-1',
 		SQS: {
 			ORDER_PRODUCER: {
-				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesTST.fifo'
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesDEV.fifo'
 			},
 			ORDER_CONSUMER: {
-				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/BranchMessagesTST.fifo'
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/BranchMessagesDEV.fifo'
 			},
 		}
 	},
