@@ -45,6 +45,7 @@ class Aws {
             WaitTimeSeconds: 20
         };
         console.log(params);
+        console.log(sqs);
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {
@@ -63,7 +64,8 @@ class Aws {
                 if (!!response.Messages)
                     await this.removeFromQueue(response.Messages);
             })
-            .then(() => this.pollFromQueue());
+            .then(() => this.pollFromQueue())
+            .catch((e) => console.log('error', r))
     }
 
     removeFromQueue(messages) {
