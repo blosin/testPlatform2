@@ -65,7 +65,7 @@ class Aws {
                     await this.removeFromQueue(response.Messages);
             })
             .then(() => this.pollFromQueue())
-            .catch((e) => console.log('error', r))
+            .catch((e) => console.log('error', e))
     }
 
     removeFromQueue(messages) {
