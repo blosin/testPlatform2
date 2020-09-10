@@ -46,7 +46,6 @@ class Aws {
         };
         console.log(params);
         console.log(sqs);
-        console.log(AWS);
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {
