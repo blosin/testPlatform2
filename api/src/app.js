@@ -57,11 +57,6 @@ const morganParser = (tokens, req, res) => {
     (process.env.NODE_ENV == 'staging' || process.env.NODE_ENV == 'production')
   )
     return undefined;
-
-  if (!log.path.includes(urlPrefix)) {
-    new CustomError(CORE.NOTAPI, 'No api endpoint', req.uuid, log);
-    return undefined;
-  }
   return JSON.stringify(log);
 };
 
