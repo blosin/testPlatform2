@@ -24,7 +24,7 @@ class Aws {
     }
 
     pushNewToQueue(newOrder) {
-        const sqs = new AWS.SQS();
+        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
         const params = {
             QueueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME,
             MessageGroupId: newOrder.branchId.toString(),
@@ -36,7 +36,7 @@ class Aws {
     }
 
     pollFromQueue() {
-        const sqs = new AWS.SQS();
+        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
         const params = {
             QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
             AttributeNames: [
@@ -44,8 +44,6 @@ class Aws {
             ],
             WaitTimeSeconds: 20
         };
-        console.log(params);
-        console.log(sqs);
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {
@@ -69,7 +67,7 @@ class Aws {
     }
 
     removeFromQueue(messages) {
-        const sqs = new AWS.SQS();
+        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
         const params = {
             QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
             Entries: messages.map((message) => {

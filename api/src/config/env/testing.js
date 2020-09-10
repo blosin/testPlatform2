@@ -23,11 +23,12 @@ module.exports = {
 	AWS: {
 		REGION: 'us-east-2',
 		SQS: {
+			REGION: 'us-east-2',
 			ORDER_PRODUCER: {
-				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PlatformMessagesDEV.fifo'
+				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/TST_PlatformMessages.fifo'
 			},
 			ORDER_CONSUMER: {
-				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/TST_PlatformMessages.fifo'
+				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/TST_BranchMessages.fifo'
 			},
 		}
 	},
