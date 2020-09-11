@@ -44,6 +44,8 @@ class Aws {
             ],
             WaitTimeSeconds: 20
         };
+        console.log(sqs);
+        console.log(params);
         sqs.receiveMessage(params)
             .promise()
             .then(async (response) => {

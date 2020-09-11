@@ -48,13 +48,13 @@ const morganParser = (tokens, req, res) => {
     res_time: tokens['response-time'](req, res),
     ip: req ? req.ip : 'X.X.X.X',
     branchId: req.token ? req.token.branchId : 'null',
-    params: req.params,
-    body: req.body
+    params: req.params
   };
 
   if (
     (log.path == '/api/branches/news' && log.method == 'GET') &&
     (process.env.NODE_ENV == 'staging' || process.env.NODE_ENV == 'production')
+    || !log.path.includes('/api/')
   )
     return undefined;
   return JSON.stringify(log);
