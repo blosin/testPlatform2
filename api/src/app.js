@@ -19,6 +19,7 @@ const urlPrefix = `/${process.env.NODE_ENV}`;
 const exceptions = [
   { url: `${urlPrefix}/thirdParties/login`, methods: ['POST'] },
   { url: `${urlPrefix}/uberEats/tracking`, methods: ['POST'] },
+  { url: `${urlPrefix}/glovo/orders`, methods: ['POST'] },
   { url: `${urlPrefix}` + /\/glovo\/orders(\/?.*)/, methods: ['GET', 'POST'] },
   { url: `/` },
 ];
