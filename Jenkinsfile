@@ -163,11 +163,11 @@ pipeline {
         stage('Deploy [STAGING]') {
             when { branch 'staging'}
             environment {
-                ECS_CLUSTER = "smartfran-pedidos-${BRANCH_NAME}"
-                ECS_SERVICE = "platform-service-${BRANCH_NAME}-service"
-                ECS_TASK = "platform-service-${BRANCH_NAME}-task"
-                ECS_REGION = "us-east-2"
-            }
+                    ECS_CLUSTER = "smartfran-pedidos-common"
+                    ECS_SERVICE = "${SERVICE_NAME}-${BRANCH_NAME}-service"
+                    ECS_TASK = "${SERVICE_NAME}-${BRANCH_NAME}-task"
+                    ECS_REGION = "us-east-2"
+                }
 
             steps {
                 script {
