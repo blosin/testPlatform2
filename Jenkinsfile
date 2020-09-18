@@ -48,6 +48,8 @@ pipeline {
             }
         }
 
+        
+
         stage ('Get version'){
             when { anyOf { branch 'testing'; branch 'staging'; branch 'master'; branch 'hotfixing' } }
             steps {
@@ -63,6 +65,18 @@ pipeline {
 
         stage('Build: [TESTING]') {
             when { anyOf { branch 'testing'; branch 'hotfixing' } }
+            steps {
+                dir("${WORKSPACE}/api") {
+                    script {
+                        env.IMAGE = docker.build('${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}')
+                    }
+                }
+            }
+        }
+
+
+           stage('Build: [STAGING]') {
+            when { anyOf { branch 'staging'; branch 'hotfixing' } }
             steps {
                 dir("${WORKSPACE}/api") {
                     script {
