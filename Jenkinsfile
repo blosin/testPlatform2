@@ -139,7 +139,7 @@ pipeline {
                 ECS_CLUSTER = "smartfran-pedidos-${BRANCH_NAME}"
                 ECS_SERVICE = "concentrador-pedidos-${BRANCH_NAME}-service"
                 ECS_TASK = "concentrador-pedidos-${BRANCH_NAME}-task"
-                ECS_REGION = "us-east-1"
+                ECS_REGION = "us-east-2"
             }
 
             steps {
