@@ -129,6 +129,19 @@ pipeline {
             }
         }
 
+        stage('Push [STAGING]') {
+            when { anyOf { branch 'staging'; branch 'hotfixing' } }
+            steps {
+                dir("${WORKSPACE}/api") {
+                    script {
+                        sh "\$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
+                        sh "docker push ${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}"
+                    }
+                }
+            }
+        }
+
+
         stage('Deploy [TESTING]') {
             when { branch 'testing'}
             environment {
@@ -151,8 +164,8 @@ pipeline {
             when { branch 'staging'}
             environment {
                 ECS_CLUSTER = "smartfran-pedidos-${BRANCH_NAME}"
-                ECS_SERVICE = "concentrador-pedidos-${BRANCH_NAME}-service"
-                ECS_TASK = "concentrador-pedidos-${BRANCH_NAME}-task"
+                ECS_SERVICE = "platform-service-${BRANCH_NAME}-service"
+                ECS_TASK = "platform-service-${BRANCH_NAME}-task"
                 ECS_REGION = "us-east-2"
             }
 
