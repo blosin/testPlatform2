@@ -48,6 +48,8 @@ pipeline {
             }
         }
 
+        
+
         stage ('Get version'){
             when { anyOf { branch 'testing'; branch 'staging'; branch 'master'; branch 'hotfixing' } }
             steps {
@@ -63,6 +65,18 @@ pipeline {
 
         stage('Build: [TESTING]') {
             when { anyOf { branch 'testing'; branch 'hotfixing' } }
+            steps {
+                dir("${WORKSPACE}/api") {
+                    script {
+                        env.IMAGE = docker.build('${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}')
+                    }
+                }
+            }
+        }
+
+
+           stage('Build: [STAGING]') {
+            when { anyOf { branch 'staging'; branch 'hotfixing' } }
             steps {
                 dir("${WORKSPACE}/api") {
                     script {
@@ -115,6 +129,19 @@ pipeline {
             }
         }
 
+        stage('Push [STAGING]') {
+            when { anyOf { branch 'staging'; branch 'hotfixing' } }
+            steps {
+                dir("${WORKSPACE}/api") {
+                    script {
+                        sh "\$(aws ecr get-login --profile ${PROFILE} --no-include-email --region ${REGION})"
+                        sh "docker push ${DOCKER_REPOSITORY}/${PROJ_REPO}:${IMG_TAG}"
+                    }
+                }
+            }
+        }
+
+
         stage('Deploy [TESTING]') {
             when { branch 'testing'}
             environment {
@@ -136,11 +163,11 @@ pipeline {
         stage('Deploy [STAGING]') {
             when { branch 'staging'}
             environment {
-                ECS_CLUSTER = "smartfran-pedidos-${BRANCH_NAME}"
-                ECS_SERVICE = "concentrador-pedidos-${BRANCH_NAME}-service"
-                ECS_TASK = "concentrador-pedidos-${BRANCH_NAME}-task"
-                ECS_REGION = "us-east-1"
-            }
+                    ECS_CLUSTER = "smartfran-pedidos-common"
+                    ECS_SERVICE = "${SERVICE_NAME}-${BRANCH_NAME}-service"
+                    ECS_TASK = "${SERVICE_NAME}-${BRANCH_NAME}-task"
+                    ECS_REGION = "us-east-2"
+                }
 
             steps {
                 script {
