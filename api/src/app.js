@@ -54,13 +54,14 @@ const morganParser = (tokens, req, res) => {
     params: req.params
   };
 
-  console.log('\nENDPOINT: ', log.path, '\n')
+  if (log.path.length > 5)
+    console.log('\nENDPOINT: ', log.path, '\n')
   /* if (
     (log.path == '/api/branches/news' && log.method == 'GET') &&
     (process.env.NODE_ENV == 'staging' || process.env.NODE_ENV == 'production')
     || !log.path.includes('/api/')
-  )
-    return undefined; */
+  )*/
+  return undefined;
   return JSON.stringify(log);
 };
 

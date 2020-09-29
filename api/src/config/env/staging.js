@@ -8,7 +8,7 @@ module.exports = {
 		noexpires: '100y', // expires in 100 years
 	},
 	baseUrl: process.env.BASE_URL || 'http://localhost',
-	port: process.env.NODE_PORT || 3085,
+	port: process.env.NODE_PORT || 3087,
 	url: function () {
 		return this.baseUrl + ':' + this.port
 	},
@@ -21,5 +21,17 @@ module.exports = {
 		host: 'pedidostaging-wclmn.mongodb.net',
 		name: 'smartfran',
 		port: 27017
+	},
+	AWS: {
+		REGION: 'us-east-2',
+		SQS: {
+			REGION: 'us-east-2',
+			ORDER_PRODUCER: {
+				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/STG_PlatformMessages.fifo'
+			},
+			ORDER_CONSUMER: {
+				NAME: 'https://sqs.us-east-2.amazonaws.com/382381053403/STG_BranchMessages.fifo'
+			},
+		}
 	},
 };

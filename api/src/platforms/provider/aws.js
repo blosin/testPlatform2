@@ -1,6 +1,8 @@
 import AWS from 'aws-sdk';
 import config from '../../config/env';
 import SetNews from '../management/strategies/set-news';
+import { Consumer } from 'sqs-consumer';
+import { Producer } from 'sqs-producer';
 
 class Aws {
     constructor() {
@@ -23,62 +25,45 @@ class Aws {
             .then((param) => param.Value);
     }
 
-    pushNewToQueue(newOrder) {
-        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
-        const params = {
-            QueueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME,
-            MessageGroupId: newOrder.branchId.toString(),
-            MessageBody: JSON.stringify(newOrder)
-        };
-        sqs.sendMessage(params)
-            .promise()
-            .then((res) => res.MessageId);
+    async pushNewToQueue(newOrder) {
+        const producer = Producer.create({
+            queueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME,
+            region: config.AWS.SQS.REGION
+        });
+        await producer.send({
+            id: newOrder._id.toString(),
+            body: JSON.stringify(newOrder),
+            groupId: newOrder.branchId.toString(),
+        });
     }
 
     pollFromQueue() {
-        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
-        const params = {
-            QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
-            AttributeNames: [
-                'MessageGroupId', 'Messages', 'ResponseMetadata'
-            ],
-            WaitTimeSeconds: 20
-        };
-        sqs.receiveMessage(params)
-            .promise()
-            .then(async (response) => {
-                console.log(new Date(), response);
-                if (!!response.Messages)
-                    for (let message of response.Messages) {
-                        const setNews = new SetNews(message.Attributes.MessageGroupId, response.ResponseMetadata.RequestId);
-                        await setNews.setNews(JSON.parse(message.Body));
-                    };
-                return response;
+        Consumer.create({
+            queueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
+            region: config.AWS.SQS.REGION,
+            attributeNames: ['MessageGroupId', 'Messages', 'ResponseMetadata', 'RequestId'],
+            handleMessage: async (message) => {
+                console.log(message);
+                const setNews = new SetNews(message.Attributes.MessageGroupId, message.MessageId);
+                const x = await setNews.setNews(JSON.parse(message.Body));
+                console.log(x);
+            },
+            /* sqs: new AWS.SQS({
+                httpOptions: {
+                    agent: new https.Agent({
+                        keepAlive: true
+                    })
+                } 
+            })*/
+        })
+            .on('error', (err) => {
+                console.error('ERR', err.message);
             })
-            .then((response) => {
-                return response;
-            })
-            .then(async (response) => {
-                if (!!response.Messages)
-                    await this.removeFromQueue(response.Messages);
-            })
-            .then(() => this.pollFromQueue())
-            .catch((e) => console.log('error', e))
-    }
 
-    removeFromQueue(messages) {
-        const sqs = new AWS.SQS({ region: config.AWS.SQS.REGION });
-        const params = {
-            QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME,
-            Entries: messages.map((message) => {
-                return {
-                    Id: message.MessageId,
-                    ReceiptHandle: message.ReceiptHandle
-                }
+            .on('processing_error', (err) => {
+                console.error('PROC_ERR', err.message);
             })
-        };
-        sqs.deleteMessageBatch(params)
-            .promise();
+            .start()
     }
 }
 
