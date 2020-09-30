@@ -30,7 +30,7 @@ class Aws {
             queueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME,
             region: config.AWS.SQS.REGION
         });
-        await producer.send({
+        return producer.send({
             id: newOrder._id.toString(),
             body: JSON.stringify(newOrder),
             groupId: newOrder.branchId.toString(),
