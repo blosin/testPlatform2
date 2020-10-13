@@ -25,7 +25,7 @@ module.exports = {
 
                 let orderMapper = (data, platform) => {
                     let order = {};
-                    order.id = data.order.order_code;
+                    order.id = data.order.orderId;
                     order.originalId = data.order.orderId;
                     order.platformId = platform.internalCode;
                     order.statusId = NewsStateSingleton.idByCod(stateCod);
