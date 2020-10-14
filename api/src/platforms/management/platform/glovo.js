@@ -58,7 +58,7 @@ class Glovo extends Platform {
                 }]);
 
             if (!savedBranches.length) {
-                let error = `Some branches not exists:  ${order.branchId}.`;
+                let error = `Some branches not exists:  ${newOrder.branchId}.`;
                 logger.error({ message: '[EMAIL-LOG]. ' + error, meta: newOrder });
                 return reject({ error });
             }

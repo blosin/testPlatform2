@@ -17,7 +17,7 @@ module.exports = {
 		logging: 'console.log',
 		timezone: '-03:00',
 		username: 'smartfran',
-		password: '1BKabcXW3g1d91OD',
+		password: 'abc123.-',
 		host: 'pedidostaging-wclmn.mongodb.net',
 		name: 'smartfran',
 		port: 27017

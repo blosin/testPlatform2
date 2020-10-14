@@ -697,9 +697,9 @@ class Platform {
                         const savedNews = await Promise.all(promisesNews);
 
                         //Push all savedNews to the queue
-                        await Promise.all(savedNews
-                            .map((savedNew) =>
-                                this.aws.pushNewToQueue(savedNew)));
+                        // await Promise.all(savedNews
+                        //     .map((savedNew) =>
+                        //         this.aws.pushNewToQueue(savedNew)));
                     }
                     return resolve(ordersProccessed);
                 } catch (error) {
