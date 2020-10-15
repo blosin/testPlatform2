@@ -639,7 +639,6 @@ class Platform {
                                 branchId: branch.branchId,
                                 order: data
                             };
-                            console.log('orderCreator', orderCreator);
                             const newCreator = await this.parser.newsFromOrders(orderCreator, this._platform, newsCode, stateCod, branch, this.uuid);
                             /* If restaurant is closed, mark the new as viewed. */
                             if (!isOpened) {
@@ -713,25 +712,6 @@ class Platform {
                 logger.error({ message: msg, meta: error.toString() });
                 reject(error.toString());
             }
-            // } catch (error) {
-            //     console.log('error', error);
-            //     reject({ error });
-            // }
-            //     /* Insert all news, then resolve orders promises */
-            //     return res({ promisesOrders, promisesNews, ordersProccessed });
-
-            //     /* Save all orders and news generated. */
-            //     try {
-            //         const ordNewsPromises = promises.promisesOrders.concat(promises.promisesNews)
-            //         await Promise.all(ordNewsPromises);
-            //         resolve(promises.ordersProccessed);
-            //     } catch (error) {
-            //         const msg = `Failed to create orders.`;
-            //         error = { error: error.toString() };
-            //         logger.error({ message: msg, meta: error });
-            //         reject(msg);
-            //     }
-
         }).catch((error) => {
             reject(error.toString());
         });

@@ -39,7 +39,6 @@ const saveCancelOrder = (req, res) => {
 }
 
 const getOrder = async (req, res) => {
-    console.log('----', req.params.id);
     const glovo = getGlovoInstance();
     glovo.getOrderById(req.params.id)
         .then((order) => {

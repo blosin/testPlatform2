@@ -12,7 +12,6 @@ import CustomError from './utils/errors/customError';
 import { CORE } from './utils/errors/codeError';
 import UUID from './utils/errors/utils';
 const settings = require('./config/settings');
-const logger = require('./config/logger');
 
 let urlPrefix = '/api';
 if (process.env.NODE_ENV === 'testing')
@@ -44,29 +43,13 @@ app.use((req, res, next) => {
   next();
 });
 
-const morganParser = (tokens, req, res) => {
-  const log = {
-    method: tokens.method(req, res),
-    path: tokens.url(req, res),
-    res_status: tokens.status(req, res),
-    res_time: tokens['response-time'](req, res),
-    ip: req ? req.ip : 'X.X.X.X',
-    branchId: req.token ? req.token.branchId : 'null',
-    params: req.params
-  };
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms', {
+  skip: (req, res) =>
+    req.originalUrl === '/api/branches/news' &&
+    req.method === 'GET' ||
+    req.originalUrl === '/'
+}));
 
-  if (log.path.length > 5)
-    console.log('\nENDPOINT: ', log.path, '\n')
-  /* if (
-    (log.path == '/api/branches/news' && log.method == 'GET') &&
-    (process.env.NODE_ENV == 'staging' || process.env.NODE_ENV == 'production')
-    || !log.path.includes('/api/')
-  )*/
-  return undefined;
-  return JSON.stringify(log);
-};
-
-app.use(morgan(morganParser, { stream: logger.stream }));
 app.disable('etag');
 app.use(cors());
 
