@@ -7,15 +7,39 @@ module.exports = {
     newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
         return new Promise((resolve, reject) => {
 
+            const orderMapper = (data, platform) => {
+                try {
+                    let order = {}
+                    order.id = data.posId;
+                    order.originalId = data.originalId;
+                    order.displayId = data.displayId;
+                    order.platformId = platform.internalCode;
+                    order.statusId = NewsStateSingleton.idByCod(stateCod);
+                    order.orderTime = data.order.placed_at;
+                    order.deliveryTime = null;
+                    order.pickupOnShop = false;
+                    order.pickupDateOnShop = data.order.estimated_ready_for_pickup_at;
+                    order.preOrder = false;
+                    order.observations = '';
+                    order.ownDelivery = data.order.type == "DELIVERY_BY_UBER" ? false : true;
+                    return order;
+                } catch (error) {
+                    const msg = 'No se pudo parsear la orden de UberEats.';
+                    const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+                    reject(err);
+                }
+            }
+
             const paymentenMapper = (order, thirdParty) => {
                 try {
+                    const estimatedShipping = data.order.payment.charges.total.amount - order.payment.charges.sub_total.amount;
                     let paymentNews = {};
                     paymentNews.typeId = 2; //Credito
                     paymentNews.online = true;
-                    paymentNews.shipping = (parseFloat(order.payment.charges.total_fee.amount) / 100) || 0;
+                    paymentNews.shipping = parseFloat(estimatedShipping) / 100 || 0;
                     paymentNews.discount = 0;
                     paymentNews.voucher = '';
-                    paymentNews.subtotal = (parseFloat(order.payment.charges.sub_total.amount) / 100);
+                    paymentNews.subtotal = parseFloat(order.payment.charges.sub_total.amount) / 100;
                     paymentNews.currency = '$';
                     paymentNews.remaining = 0;
                     paymentNews.partial = 0;
@@ -64,7 +88,7 @@ module.exports = {
                     for (let detail of order) {
                         let det = {};
                         det.count = detail.quantity;
-                        det.price = (parseFloat(detail.price.unit_price.amount / 100));
+                        det.price = parseFloat(detail.price.unit_price.amount / 100);
                         det.promo = 0;
                         det.groupId = '0';
                         det.discount = 0;
@@ -72,6 +96,7 @@ module.exports = {
                         det.note = '';
 
                         const uberSku = parseInt(detail.external_data, 10);
+                        if (isNaN(uberSku)) uberSku = -1;
                         let tmpSku = uberSku >= 90000 && uberSku <= 99999 ? '99999' : uberSku.toString();
 
                         let optionsString = '';
@@ -94,28 +119,6 @@ module.exports = {
                         details.push(det);
                     }
                     return details;
-                } catch (error) {
-                    const msg = 'No se pudo parsear la orden de UberEats.';
-                    const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
-                    reject(err);
-                }
-            }
-
-            const orderMapper = (data, platform) => {
-                try {
-                    let newOrder = {}
-                    newOrder.id = data.order.id;
-                    newOrder.originalId = data.order.id;
-                    newOrder.platformId = platform.internalCode;
-                    newOrder.statusId = NewsStateSingleton.idByCod(stateCod);
-                    newOrder.orderTime = data.order.placed_at;
-                    newOrder.deliveryTime = null;
-                    newOrder.pickupOnShop = false;
-                    newOrder.pickupDateOnShop = data.order.estimated_ready_for_pickup_at;
-                    newOrder.preOrder = false;
-                    newOrder.observations = '';
-                    newOrder.ownDelivery = data.order.type == "DELIVERY_BY_UBER" ? false : true;
-                    return newOrder;
                 } catch (error) {
                     const msg = 'No se pudo parsear la orden de UberEats.';
                     const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
@@ -153,7 +156,7 @@ module.exports = {
                 news.order.details = detailsMapper(dataOrder.cart.items);
                 news.extraData = extraDataMapper(branch, platform);
 
-                news.order.totalAmount = parseFloat(data.order.payment.charges.total.amount, 10);
+                news.order.totalAmount = parseFloat(data.order.payment.charges.total.amount) / 100 || 0;
                 resolve(news);
             } catch (error) {
                 const msg = 'No se pudo parsear la orden de UberEats.';
@@ -165,8 +168,10 @@ module.exports = {
     },
     retriveMinimunData: function (order) {
         return {
-            branchReference: order.store.id,
-            id: order.id
+            branchReference: order.store.id.toString(),
+            posId: order.display_id.toString(),
+            originalId: order.id.toString(),
+            displayId: order.display_id.toString(),
         }
     }
 }

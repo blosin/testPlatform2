@@ -25,8 +25,9 @@ module.exports = {
 
                 let orderMapper = (data, platform) => {
                     let order = {};
-                    order.id = data.order.orderId;
-                    order.originalId = data.order.orderId;
+                    order.id = data.posId;
+                    order.originalId = data.originalId;
+                    order.displayId = data.displayId;
                     order.platformId = platform.internalCode;
                     order.statusId = NewsStateSingleton.idByCod(stateCod);
                     order.orderTime = data.order.order_time ? data.order.order_time : 0;
@@ -141,7 +142,6 @@ module.exports = {
 
                 news.typeId = NewsTypeSingleton.idByCod(newsCode);
                 news.branchId = data.branchId;
-                console.log(branch);
                 news.extraData = {
                     branch: branch.name,
                     chain: branch.chain.chain,
@@ -163,8 +163,10 @@ module.exports = {
     },
     retriveMinimunData: function (data) {
         return {
-            branchReference: data.branchId.toString(),
-            id: data.orderId
+            branchReference: data.store_id.toString(),
+            posId: data.order_id,
+            originalId: data.order_id.toString(),
+            displayId: data.order_code.toString()
         }
     }
 }

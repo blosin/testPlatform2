@@ -25,8 +25,9 @@ module.exports = {
 			const orderMapper = (data, platform) => {
 				try {
 					let order = {};
-					order.id = data.order.id;
-					order.originalId = data.order.id;
+					order.id = data.posId;
+                    order.originalId = data.originalId;
+                    order.displayId = data.displayId;
 					order.platformId = platform.internalCode;
 					order.statusId = NewsStateSingleton.idByCod(stateCod);
 					order.orderTime = data.order.registeredDate;
@@ -256,8 +257,11 @@ module.exports = {
 	},
 	retriveMinimunData: function (data) {
 		return {
-			branchReference: data.restaurant.integrationCode,
-			id: data.id
+			branchReference: data.restaurant.integrationCode.toString(),
+			posId: data.id,
+			originalId: data.id.toString(),
+			displayId: data.id.toString(),
+
 		}
 	}
 }

@@ -14,11 +14,9 @@ module.exports = {
 	},
 	path: path.normalize(path.join(__dirname, '..')),
 	database: {
-		logging: 'console.log',
-		timezone: '-03:00',
 		username: 'smartfran',
 		password: 'abc123.-',
-		host: 'pedidostaging-wclmn.mongodb.net',
+		host: 'pedidosstagingdos.dcejl.mongodb.net',
 		name: 'smartfran',
 		port: 27017
 	},

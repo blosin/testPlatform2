@@ -12,13 +12,12 @@ import deliveryTimeModel from '../../models/deliveryTime';
 import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import RejectedMessagesSingleton from '../../utils/rejectedMessages';
-import Aws from '../provider/aws';
 
 class Platform {
     constructor(platform) {
         this._platform = platform;
         this.doesNotApply = 'n/a';
-        this.aws = new Aws();
+        this.parser = this.importParser();
     }
     /**
      * This cron is for update platform parameters in DB.
@@ -73,21 +72,14 @@ class Platform {
     /**
      * Can be overriden.
      * */
-    importParser() {
-        return require('../interfaces/thirdParty');
-    }
-
-    /**
-     * Can be overriden.
-     * */
-    receiveOrder(order) {
+    receiveOrder(order, branchId) {
         return Promise.resolve(this.doesNotApply);
     }
 
     /**
      * Can be overriden.
      * */
-    viewOrder(order) {
+    viewOrder(order, branchId) {
         return new Promise(async (resolve) => {
             const state = NewsStateSingleton.stateByCod('view');
             await this.updateOrderState(order, state);
@@ -98,7 +90,7 @@ class Platform {
     /**
      * Can be overriden.
      * */
-    confirmOrder(order, deliveryTimeId) {
+    confirmOrder(order, branchId, deliveryTimeId) {
         return new Promise(async (resolve) => {
             const state = NewsStateSingleton.stateByCod('confirm');
             await this.updateOrderState(order, state);
@@ -250,7 +242,7 @@ class Platform {
         }
         catch (error) {
             const msg = `Order: ${order.id}. Failed to reject automatically the order.`;
-            error = { internalCode: this._platform.internalCode, error: error.toString(), orderId: order.id };
+            error = { error: error.toString(), order };
             logger.error({ message: msg, meta: error });
         }
     }
@@ -258,7 +250,7 @@ class Platform {
     updateOrderState(order, state) {
         try {
             return orderModel.findOneAndUpdate({
-                orderId: order.id,
+                originalId: order.originalId,
                 internalCode: this._platform.internalCode,
                 'extraData.rejected.rejectMessageId': {
                     $ne: RejectedMessagesSingleton.closedResRejectedMessages.id
@@ -309,7 +301,7 @@ class Platform {
         await platformModel.updateOne({
             internalCode: this._platform.internalCode
         }, {
-            lastContact: new Date()
+            $set: { lastContact: new Date() }
         });
     }
 
@@ -317,7 +309,7 @@ class Platform {
         return orderModel
             .aggregate([{
                 $match: {
-                    orderId: id,
+                    originalId: id,
                     internalCode: this._platform.internalCode
                 }
             },
@@ -334,7 +326,6 @@ class Platform {
     /**
      * Reject order by Platform rejection.
      * @param {*} orderId 
-     * @param {*} branchId 
      */
     rejectPlatformOrder(orderId) {
         return new Promise(async (resolve, reject) => {
@@ -342,7 +333,7 @@ class Platform {
                 const state = NewsStateSingleton.stateByCod('rej');
                 try {
                     this.updateLastContact();
-                    await this.updateOrderState({ id: orderId }, state);
+                    await this.updateOrderState({ originalId: orderId }, state);
                     resolve({
                         'id': orderId,
                         'state': state
@@ -352,7 +343,7 @@ class Platform {
                     throw error;
                 }
             } catch (message) {
-                logger.error({ message, meta: { orderId } });
+                logger.error({ message, meta: { originalId } });
                 return reject(message);
             }
         });
@@ -365,7 +356,7 @@ class Platform {
                 let savedOrder;
                 try {
                     savedOrder = await orderModel.findOne({
-                        'order.id': orderId,
+                        'originalId': orderId,
                         internalCode: this._platform.internalCode,
                         state: { $ne: NewsStateSingleton.stateByCod('rej_closed') },
                     }).lean();
@@ -389,23 +380,21 @@ class Platform {
     @returns branchPlatform with its data.
     */
     getBranchPlatform(platforms, platformId) {
-        return platforms.find((p) => p.platform.toString() == platformId.toString());
+        return platforms.find((p) =>
+            p.platform.toString() == platformId.toString());
     }
 
     /**
-     Check if the restaruant is closed now.
+    Check if the restaruant is closed now.
     If it's open, return true.
     If it's closed, reject the order automatically and return false.
-    PedidosYa should not send orders if the restaurant is closed.
-    ThirdParty not need to send any rejected event automatically.
-    Only Rappi need to reject automatically the order.
-    @param branch Complete branch
+    @param branchPlatform 
     */
     isClosedRestaurant(branchPlatform) {
         return new Promise(async (resolve) => {
             try {
+                const timeToClose = 3;
                 const dateNow = new Date();
-
                 const diffLastGetNews = moment.duration(moment(dateNow, 'DD/MM/YYYY HH:mm:ss')
                     .diff(moment(new Date(branchPlatform.lastGetNews), 'DD/MM/YYYY HH:mm:ss'))).asMinutes();
 
@@ -415,8 +404,8 @@ class Platform {
                         new Date(cp.close) <= dateNow &&
                         new Date(cp.open) >= dateNow)
                         ||
-                        diffLastGetNews > 3;
-                else if (diffLastGetNews > 3)
+                        diffLastGetNews > timeToClose;
+                else if (diffLastGetNews > timeToClose)
                     closed = true;
                 return resolve(!closed);
             } catch (error) {
@@ -428,39 +417,46 @@ class Platform {
     }
 
     /**
-     * Validate the orders sended.
-     * This function is only used by thirdParties.
-     *  */
-    saveOrders(newOrders) {
+ * Can be overriden.
+ * */
+    importParser() {
+        return require('../interfaces/thirdParty');
+    }
+
+    /**
+     * Validate the orders before save.
+     * */
+    validateNewOrders(newOrders) {
         this.updateLastContact();
         return new Promise(async (resolve, reject) => {
             let ordersSaved = [];
-
+            const minOrders = newOrders
+                .map((newOrd) => this.parser.retriveMinimunData(newOrd));
             /* Validate  orders */
             let orders = await orderModel.find({
-                orderId: { $in: newOrders.map((order) => order.id) },
+                originalId: { $in: minOrders.map((order) => order.originalId) },
                 internalCode: this._platform.internalCode,
                 state: { $ne: NewsStateSingleton.stateByCod('rej_closed') },
             }).lean();
 
             if (!!orders.length) {
                 const set = new Set();
-                ordersSaved = ordersSaved.filter((order) => {
-                    if (set.has(order.id)) {
+                orders = orders.filter((order) => {
+                    if (set.has(order.originalId)) {
                         return false;
                     }
-                    set.add(order.id);
+                    set.add(order.originalId);
                     return true;
                 });
-                const ids = Array.from(orders.map((o) => o.orderId));
+                const ids = Array.from(orders.map((o) => o.originalId));
                 const error = `Order/s: ${ids} already exists.`;
-                logger.error({ message: error, meta: { internalCode: this._platform.internalCode, newOrders } });
+                logger.error({ message: error, meta: { newOrders } });
                 return reject({ error });
             }
 
             /* Validate Branches */
-            let idsBranch = newOrders.map((order) =>
-                order.branchId);
+            let idsBranch = minOrders
+                .map((order) => order.branchReference);
             let uniqueIdsBranch = idsBranch.filter((elem, pos) =>
                 idsBranch.indexOf(elem) == pos);
 
@@ -488,7 +484,7 @@ class Platform {
 
             if (!!diff.length) {
                 let error = `Some branches not exists:  ${diff}.`;
-                logger.error({ message: '[EMAIL-LOG]. ' + error, meta: { internalCode: this._platform.internalCode, newOrders } });
+                logger.error({ message: error, meta: { newOrders } });
                 return reject({ error });
             }
 
@@ -501,7 +497,7 @@ class Platform {
                             .find((b) => b.branchId == order.branchId).platforms
                             .find((p) => p.platform == this._platform._id.toString()).branchReference;
                         return {
-                            id: order.orderId,
+                            id: order.posId,
                             state: order.state,
                             branchId: branchId
                         }
@@ -522,91 +518,97 @@ class Platform {
         });
     }
 
-    getOrderBranches(branchReference) {
-        const query = {
-            'platforms.platform': this._platform._id,
-            'platforms.branchReference': branchReference.toString()
-        };
-
-        return branchModel
-            .aggregate([
-                { $match: query },
-                { $unwind: '$platforms' },
-                { $match: query },
-                {
-                    $lookup: {
-                        from: 'chains',
-                        localField: 'chain',
-                        foreignField: '_id',
-                        as: 'joinChains'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'platforms',
-                        localField: 'platforms.platform',
-                        foreignField: '_id',
-                        as: 'joinPlatforms'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'clients',
-                        localField: 'client',
-                        foreignField: '_id',
-                        as: 'joinClients'
-                    }
-                },
-                {
-                    $lookup: {
-                        from: 'regions',
-                        localField: 'address.region',
-                        foreignField: '_id',
-                        as: 'joinRegions'
-                    }
-                },
-                { $unwind: { path: '$joinChains', preserveNullAndEmptyArrays: true } },
-                { $unwind: { path: '$joinClients', preserveNullAndEmptyArrays: true } },
-                { $unwind: { path: '$joinPlatforms', preserveNullAndEmptyArrays: true } },
-                { $unwind: { path: '$joinRegions', preserveNullAndEmptyArrays: true } },
-                {
-                    $project: {
-                        'name': '$name',
-                        'branchId': '$branchId',
-                        'name': '$name',
-                        'chain.chain': '$joinChains.chain',
-                        'platform.name': '$joinPlatforms.name',
-                        'platform.platform': '$joinPlatforms._id',
-                        'platform.lastGetNews': '$platforms.lastGetNews',
-                        'platform.progClosed': '$platforms.progClosed',
-                        'client.businessName': '$joinClients.businessName',
-                        'address.region': '$joinRegions.region'
-                    }
-                }
-            ]);
-    }
-
     /**
      *  Generate custom order and new for each one.
      *  Save them to database.
      *  @param orders List of orders received from the platform.
      *   */
     saveNewOrders(orders) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const parser = this.importParser();
+        return new Promise((resolve, reject) => {
+            new Promise(async (res, rej) => {
                 let ordersProccessed = [];
-                let newsProccessed = [];
                 let promisesOrders = [];
                 let promisesNews = [];
                 let branches = [];
+
                 for (let data of orders) {
-                    const { id, branchReference } = parser.retriveMinimunData(data);
+                    const {
+                        posId,
+                        originalId,
+                        displayId,
+                        branchReference
+                    } = this.parser.retriveMinimunData(data);
                     try {
-                        branches = await this.getOrderBranches(branchReference);
+                        const query = {
+                            'platforms.platform': this._platform._id,
+                            'platforms.branchReference': branchReference
+                        };
+
+                        branches = await branchModel
+                            .aggregate([
+                                { $match: query },
+                                { $unwind: '$platforms' },
+                                { $match: query },
+                                {
+                                    $lookup: {
+                                        from: 'chains',
+                                        localField: 'chain',
+                                        foreignField: '_id',
+                                        as: 'joinChains'
+                                    }
+                                },
+                                {
+                                    $lookup: {
+                                        from: 'platforms',
+                                        localField: 'platforms.platform',
+                                        foreignField: '_id',
+                                        as: 'joinPlatforms'
+                                    }
+                                },
+                                {
+                                    $lookup: {
+                                        from: 'clients',
+                                        localField: 'client',
+                                        foreignField: '_id',
+                                        as: 'joinClients'
+                                    }
+                                },
+                                {
+                                    $lookup: {
+                                        from: 'regions',
+                                        localField: 'address.region',
+                                        foreignField: '_id',
+                                        as: 'joinRegions'
+                                    }
+                                },
+                                { $unwind: { path: '$joinChains', preserveNullAndEmptyArrays: true } },
+                                { $unwind: { path: '$joinClients', preserveNullAndEmptyArrays: true } },
+                                { $unwind: { path: '$joinPlatforms', preserveNullAndEmptyArrays: true } },
+                                { $unwind: { path: '$joinRegions', preserveNullAndEmptyArrays: true } },
+                                {
+                                    $project: {
+                                        'name': '$name',
+                                        'branchId': '$branchId',
+                                        'name': '$name',
+                                        'chain.chain': '$joinChains.chain',
+                                        'platform.name': '$joinPlatforms.name',
+                                        'platform.platform': '$joinPlatforms._id',
+                                        'platform.lastGetNews': '$platforms.lastGetNews',
+                                        'platform.progClosed': '$platforms.progClosed',
+                                        'client.businessName': '$joinClients.businessName',
+                                        'address.region': '$joinRegions.region'
+                                    }
+                                }
+                            ]);
+
                         if (!branches.length)
                             throw 'No branches';
-
+                    } catch (error) {
+                        error = { internalCode: this._platform.internalCode, orders, error: error.toString() };
+                        const msg = `[EMAIL-LOG] There is no branches for this order.`;
+                        logger.error({ message: msg, meta: error });
+                    }
+                    try {
                         for (let branch of branches) {
                             let trace, stateCod, newsCode, isOpened, orderCreator;
                             try {
@@ -621,17 +623,24 @@ class Platform {
                                     newsCode = 'rej_closed_ord';
                                     data.state = NewsStateSingleton.stateByCod('rej_closed');
                                 }
+                            } catch (error) {
+                                const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
+                                logger.error({ message: msg, meta: { error: error.toString() } });
+                                throw { orderId: id, error };
+                            }
+
+                            try {
                                 orderCreator = {
                                     thirdParty: this._platform.name,
                                     internalCode: this._platform.internalCode,
                                     state: data.state,
-                                    orderId: id,
+                                    posId,
+                                    displayId,
+                                    originalId,
                                     branchId: branch.branchId,
                                     order: data
                                 }
-
-
-                                const newCreator = await parser.newsFromOrders(orderCreator, this._platform, newsCode, stateCod, branch, this.uuid);
+                                const newCreator = await this.parser.newsFromOrders(orderCreator, this._platform, newsCode, stateCod, branch, this.uuid);
                                 /* If restaurant is closed, mark the new as viewed. */
                                 if (!isOpened) {
                                     newCreator.viewed = new Date();
@@ -652,15 +661,19 @@ class Platform {
                                 newCreator['traces'] = trace;
                                 const orderQuery = {
                                     internalCode: this._platform.internalCode,
-                                    orderId: id
+                                    originalId,
                                 };
                                 const newsQuery = {
                                     order: {
-                                        id: id,
+                                        id: displayId,
                                         platformId: this._platform.internalCode
                                     }
                                 };
                                 const options = { new: true, upsert: true };
+
+                                ordersProccessed.push(
+                                    orderCreator
+                                );
 
                                 promisesOrders.push(
                                     orderModel.findOneAndUpdate(orderQuery, orderCreator, options)
@@ -669,48 +682,35 @@ class Platform {
                                 promisesNews.push(
                                     newsModel.findOneAndUpdate(newsQuery, newCreator, options)
                                 );
-
-                                ordersProccessed.push(
-                                    orderCreator
-                                );
-
-                                newsProccessed.push(
-                                    newCreator
-                                );
                             } catch (error) {
-                                console.log('adasdas', error);
-                                throw { orderId: id, error };
+                                const msg = `News: ${originalId} can not be parsed correctly.`;
+                                const err = logger.error({ message: msg, meta: { error: error.toString() } });
+                                throw err;
                             }
                         }
                     } catch (error) {
-                        console.log('asdasd');
-                        throw { orderId: error.id, error: `Order: ${error.id} can not be proccessed correctly.` };
+                        return rej({ orderId: error.id, error: `Order: ${error.id} can not be proccessed correctly.` });
                     }
                 }
+                /* Insert all news, then resolve orders promises */
+                return res({ promisesOrders, promisesNews, ordersProccessed });
 
+            }).then(async (promises) => {
                 /* Save all orders and news generated. */
                 try {
-                    if (!!promisesNews.length) {
-                        await Promise.all(promisesOrders);
-
-                        //Save all news
-                        const savedNews = await Promise.all(promisesNews);
-
-                        //Push all savedNews to the queue
-                        // await Promise.all(savedNews
-                        //     .map((savedNew) =>
-                        //         this.aws.pushNewToQueue(savedNew)));
-                    }
-                    return resolve(ordersProccessed);
+                    const ordNewsPromises = promises.promisesOrders.concat(promises.promisesNews)
+                    await Promise.all(ordNewsPromises);
+                    resolve(promises.ordersProccessed);
                 } catch (error) {
                     const msg = `Failed to create orders.`;
-                    logger.error({ message: msg, meta: error.toString() });
-                    throw msg;
+                    error = { error: error.toString() };
+                    logger.error({ message: msg, meta: error });
+                    reject(msg);
                 }
-            } catch (error) {
-                console.log('error', error);
-                reject({ error });
-            }
+
+            }).catch((error) => {
+                reject(error.toString());
+            });
         });
     }
 

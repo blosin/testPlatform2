@@ -150,19 +150,20 @@ module.exports = {
 
             const orderMapper = (data, platform) => {
                 try {
-                    let newOrder = {}
-                    newOrder.id = parseInt(data.order.order.id);
-                    newOrder.originalId = parseInt(data.order.order.id);
-                    newOrder.platformId = platform.internalCode;
-                    newOrder.statusId = NewsStateSingleton.idByCod(stateCod);
-                    newOrder.orderTime = data.order.order.createdAt;
-                    newOrder.deliveryTime = null;
-                    newOrder.pickupOnShop = false;
-                    newOrder.pickupDateOnShop = null;
-                    newOrder.preOrder = false;
-                    newOrder.observations = '';
-                    newOrder.ownDelivery = false;
-                    return newOrder;
+                    let order = {}
+                    order.id = data.posId;
+                    order.originalId = data.originalId;
+                    order.displayId = data.displayId;
+                    order.platformId = platform.internalCode;
+                    order.statusId = NewsStateSingleton.idByCod(stateCod);
+                    order.orderTime = data.order.order.createdAt;
+                    order.deliveryTime = null;
+                    order.pickupOnShop = false;
+                    order.pickupDateOnShop = null;
+                    order.preOrder = false;
+                    order.observations = '';
+                    order.ownDelivery = false;
+                    return order;
                 } catch (error) {
                     const msg = 'No se pudo parsear la orden de Rappi.';
                     const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
@@ -212,8 +213,10 @@ module.exports = {
     },
     retriveMinimunData: function (data) {
         return {
-            branchReference: data.store.id,
-            id: data.order.id
+            branchReference: data.store.id.toString(),
+            posId: data.order.id,
+            originalId: data.order.id.toString(),
+            displayId: data.order.id.toString(),
         }
     }
 }
