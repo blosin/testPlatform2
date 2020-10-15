@@ -39,12 +39,11 @@ class ConfirmStrategy extends NewsTypeStrategy {
         }
     }
 
-    async  manageNewType() {
+    async manageNewType() {
         return new Promise(async (resolve, reject) => {
             try {
                 this.savedNew = await this.findNew(this.newToSet.id);
                 const isValid = this.validateTransition();
-
                 let platformResult = null;
                 if (isValid) {
                     platformResult = await this.platform

@@ -84,7 +84,7 @@ class NewsTypeStrategy {
                         { $match: { _id: ObjectId(idNew) } },
                         {
                             $project: {
-                                'order.id': '$order.id',
+                                'order.originalId': '$order.originalId',
                                 'order.statusId': '$order.statusId',
                                 'order.platformId': '$order.platformId',
                                 'order.ownDelivery': '$order.ownDelivery',
