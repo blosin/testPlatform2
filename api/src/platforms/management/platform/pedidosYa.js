@@ -291,12 +291,16 @@ class PedidosYa extends Platform {
             try {
                 if (branch && branch.platforms) {
                     const platformBranch = this.getBranchPlatform(branch.platforms, this._platform._id);
-
+    
                     if (platformBranch) {
-
+                        const hbProm = platformBranch.branchIdReference
+                            .toString()
+                            .split(';')
+                            .map((idRef) =>
+                                this._api.event.heartBeat(parseInt(idRef, 10)));
+                        const hb = await Promise.all(hbProm);
                         this.updateLastContact();
-                        const idRef = platformBranch.branchReference.toString();
-                        const hb = await this._api.event.heartBeat(idRef);
+                        console.log('HB sended: ', platformBranch.branchIdReference);
                         resolve(hb);
                     } else {
                         resolve();

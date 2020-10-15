@@ -3,6 +3,7 @@ import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
 
+
 const paymentType = {
 	DEBIT: {
 		paymentId: 1,
@@ -25,9 +26,7 @@ module.exports = {
 			const orderMapper = (data, platform) => {
 				try {
 					let order = {};
-					order.id = data.posId;
-                    order.originalId = data.originalId;
-                    order.displayId = data.displayId;
+					order.id = data.order.id;
 					order.platformId = platform.internalCode;
 					order.statusId = NewsStateSingleton.idByCod(stateCod);
 					order.orderTime = data.order.registeredDate;
@@ -158,19 +157,25 @@ module.exports = {
 								let optionsString = '';
 								if (!!optionsGroups.options.length)
 									for (let option of optionsGroups.options) {
-										if (option.integrationCode &&
-											option.integrationCode != '' &&
-											option.integrationCode != '99999') {
-											skuComparator = option.integrationCode;
-											optionsString += ' ' + option.name;
-										} else {
+										if (option.integrationCode === '99999') {
 											optionsString += ' ' + option.name + ' cantidad ' + option.quantity;
+										} else {
+											skuComparator = option.integrationCode;
+											optionsString = option.name;
+											detDetails.sku = skuComparator;
+											detDetails.optionalText = optionsString;
+											detDetails.count = option.quantity;
+											const optionDetail = Object.assign({}, detDetails);
+											details.push(optionDetail);
 										}
 									}
 
-								detDetails.sku = skuComparator;
-								detDetails.optionalText = optionsString;
-								details.push(detDetails);
+								//Si son iguales es porque los options unicamente tenia sabores
+								if (optionsGroups.integrationCode === skuComparator) {
+									detDetails.sku = skuComparator;
+									detDetails.optionalText = optionsString;
+									details.push(detDetails);
+								}
 							}
 							numberOfPromotions += 1;
 
@@ -211,6 +216,7 @@ module.exports = {
 					}
 					return details;
 				} catch (error) {
+					console.log('-erreEE', error);
 					const msg = 'No se pudo parsear la orden de PY.';
 					const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
 					reject(err);
@@ -257,11 +263,10 @@ module.exports = {
 	},
 	retriveMinimunData: function (data) {
 		return {
-			branchReference: data.restaurant.integrationCode.toString(),
-			posId: data.id,
-			originalId: data.id.toString(),
-			displayId: data.id.toString(),
-
+			branchReference: data.restaurant.integrationCode,
+            posId: data.id,
+            originalId: data.id.toString(),
+            displayId: data.id.toString(),
 		}
 	}
 }

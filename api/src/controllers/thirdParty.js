@@ -92,7 +92,7 @@ const saveOrder = (req, res) => {
     const platformFactory = new PlatformFactory();
     const platform = platformFactory.createPlatform(PlatformSingleton.getByCod(req.token.internalCode), req.uuid);
 
-    platform.saveOrders(req.body)
+    platform.validateNewOrders(req.body)
         .then((ordersSaved) =>
             res
                 .status(200)

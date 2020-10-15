@@ -12,7 +12,7 @@
       "memory": 256,
       "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:0.0.2",
       "essential": true,
-      "name": "platform-service-staging-container",
+      "name": "platform-service-testing-container",
       "entryPoint": [
         "npm",
         "run"
@@ -23,7 +23,7 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "staging"
+          "value": "testing"
         }
       ]
     }
@@ -35,14 +35,14 @@
     },
     {
       "key": "Environment",
-      "value": "staging"
+      "value": "testing"
     },
     {
       "key": "Project",
       "value": "Concentrador"
     }
   ],
-  "family": "platform-service-staging-task",
+  "family": "platform-service-testing-task",
   "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
 
 }
