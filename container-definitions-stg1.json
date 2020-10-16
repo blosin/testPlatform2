@@ -16,7 +16,7 @@
           "containerPort": 3087
         }
       ],
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-1.0.1",
+      "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}",
       "essential": true,
       "name": "platform-service-staging-container",
       "entryPoint": [
