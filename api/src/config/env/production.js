@@ -14,13 +14,22 @@ module.exports = {
 	},
 	path: path.normalize(path.join(__dirname, '..')),
 	database: {
-		logging: 'console.log',
-		timezone: '-03:00',
-		username: 'smartfran',
-		password: 'fik7iz5cl3vPGgzf',
+		username: 'concentrador',
+		password: 'concentradoR_123',
 		host: 'pedidossmartfran-narx2.mongodb.net',
 		name: 'smartfran',
 		port: 27017
 	},
-	
+	AWS: {
+		REGION: 'us-east-1',
+		SQS: {
+			REGION: 'us-east-1',
+			ORDER_PRODUCER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PRD_PlatformMessages.fifo'
+			},
+			ORDER_CONSUMER: {
+				NAME: 'https://sqs.us-east-1.amazonaws.com/382381053403/PRD_BranchMessages.fifo'
+			},
+		}
+	}
 };

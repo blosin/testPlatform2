@@ -4,21 +4,21 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/concentrador-pedidos-production-task",
+          "awslogs-group": "/ecs/platform-service-production-task",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
       },
       "portMappings": [
         {
-          "hostPort": 3085,
+          "hostPort": 3087,
           "protocol": "tcp",
-          "containerPort": 3085
+          "containerPort": 3087
         }
       ],
-      "image": "265556570017.dkr.ecr.us-west-2.amazonaws.com/smartfran/api:${IMG_TAG}",
+      "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}",
       "essential": true,
-      "name": "concentrador-api",
+      "name": "platform-service-production-container",
       "entryPoint": [
         "npm",
         "run"
@@ -38,9 +38,9 @@
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "cpu": "512",
-  "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::382381053403:role/ecsTaskExecutionRole",
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
   "tags": [
     {
       "key": "Environment",
@@ -48,10 +48,9 @@
     },
     {
       "key": "Project",
-      "value": "Concentrador"
+      "value": "platform-service"
     }
   ],
-  "family": "concentrador-pedidos-production-task",
-  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
-
+  "family": "platform-service-production-task",
+  "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
 }
