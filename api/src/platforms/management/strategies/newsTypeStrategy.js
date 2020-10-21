@@ -84,11 +84,13 @@ class NewsTypeStrategy {
                         { $match: { _id: ObjectId(idNew) } },
                         {
                             $project: {
+                                'order.id': '$order.originalId',
                                 'order.originalId': '$order.originalId',
                                 'order.statusId': '$order.statusId',
                                 'order.platformId': '$order.platformId',
                                 'order.ownDelivery': '$order.ownDelivery',
                                 'order.preOrder': '$order.preOrder',
+                                'order.branchId': '$branchId',
                                 'branchId': '$branchId',
                                 'extraData.rejected': '$extraData.rejected',
                                 'traces': '$traces'
@@ -96,7 +98,6 @@ class NewsTypeStrategy {
                         },
                         { $limit: 1 }
                     ]);
-
                 this.savedNew = this.savedNew.pop();
                 if (!this.savedNew || !this.savedNew.order)
                     throw ('New not found.');
