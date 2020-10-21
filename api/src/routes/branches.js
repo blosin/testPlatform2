@@ -8,6 +8,6 @@ router
   .get(addVersion, controller.getNews)
   .post(addVersion, controller.setNews);
 
-router.route('/heartbeat').get(controller.getNews);
+router.route('/heartbeat').get(controller.updateDate);
 
 module.exports = router;
