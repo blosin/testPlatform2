@@ -130,7 +130,6 @@ class PedidosYa extends Platform {
         orderId: data.id,
         internalCode: this._platform.internalCode,
       });
-      console.log(3333333333);
       if (data.state == NewsStateSingleton.stateByCod('pend')) {
         if (!savedOrder) {
           data.driver = {};

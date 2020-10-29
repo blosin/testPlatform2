@@ -92,14 +92,19 @@ const saveOrder = (req, res) => {
     PlatformSingleton.getByCod(req.token.internalCode),
     req.uuid,
   );
-  if (isArray(req.body))
-    platform
-      .validateNewOrders(req.body.pop())
-      .then((ordersSaved) => {
-        res.status(200).send(ordersSaved).end();
+  if (isArray(req.body)) {
+    const resultProm = req.body.map((data) => platform.validateNewOrders(data));
+
+    Promise.allSettled(resultProm)
+      .then((resultPromise) => {
+        const result = resultPromise
+          .filter((res) => res.status === 'fulfilled')
+          .map((res) => res.value);
+
+        res.status(200).send(result).end();
       })
       .catch((error) => res.status(400).json(error).end());
-  else
+  } else
     platform
       .validateNewOrders(req.body)
       .then((ordersSaved) => {

@@ -94,12 +94,25 @@ class Rappi extends Platform {
             'x-auth-int': xAuth,
           },
         };
-        console.log(333333333333333333344444444444444, response.data);
-        console.log(111111111111, response.data.lenght);
+
         const url = this.baseUrl + this.urlGetOrders;
         const response = await axios.get(url, options);
-        const saved = this.saveNewOrders(response.data[0], this._platform);
-        resolve(saved);
+        var result;
+
+        if (!!response.data[0]) {
+          var saved = response.data.map((data) =>
+            this.saveNewOrders(data, this._platform),
+          );
+          if (saved) {
+            await Promise.allSettled(saved).then((resultProm) => {
+              result = resultProm
+                .filter((res) => res.status === 'fulfilled')
+                .map((res) => res.value);
+            });
+          }
+        }
+
+        resolve(result);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to get orders.';

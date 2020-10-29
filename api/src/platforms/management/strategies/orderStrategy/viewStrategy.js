@@ -24,10 +24,9 @@ class ViewStrategy extends NewsTypeStrategy {
   manageNewType() {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('iddddddddd', this.newToSet.id);
         this.savedNew = await this.findNew(this.newToSet.id);
         const isValid = this.validateTransition();
-        console.log('rrrrrrtttttttttt', isValid);
+
         let platformResult = null;
         if (isValid) {
           platformResult = await this.platform.viewOrder(this.savedNew.order);
@@ -36,7 +35,6 @@ class ViewStrategy extends NewsTypeStrategy {
           platformResult,
           isValid,
         );
-        console.log({ findQuery, updateQuery, options });
         await this.updateNew(findQuery, updateQuery, options);
         if (!isValid) {
           const msg =

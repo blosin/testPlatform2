@@ -501,14 +501,14 @@ class Platform {
       /* Find branch associated to de references given by the platform */
 
       let foundBranch = await branchModel
-        .find({
+        .findOne({
           'platforms.branchReference': minOrders.branchReference,
           'platforms.platform': this._platform._id,
         })
         .lean();
 
-      if (!foundBranch.length) {
-        let error = `The branch not exists:  ${newOrder}.`;
+      if (foundBranch == null) {
+        let error = `The branch not exists. ${minOrders.branchReference}`;
         logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
       }
@@ -516,13 +516,13 @@ class Platform {
         .then((res) => {
           if (!res) throw 'Orders could not been processed.';
 
-          if (foundBranch[0].branchId == res.order.branchId)
+          if (foundBranch.branchId == res.order.branchId)
             orderSaved = {
               id: res.posId,
               state: res.state,
               branchId: res.order.branchId,
             };
-
+          console.log('tt', orderSaved);
           return resolve(orderSaved);
         })
         .catch((error) => {
@@ -604,7 +604,6 @@ class Platform {
   saveNewOrders(order) {
     return new Promise(async (resolve, reject) => {
       let orderProccessed, newProccessed, promiseOrder, promiseNew;
-
       const {
         posId,
         originalId,
