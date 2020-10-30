@@ -507,11 +507,12 @@ class Platform {
         })
         .lean();
 
-      if (foundBranch == null) {
-        let error = `The branch not exists. ${minOrders.branchReference}`;
+      if (!foundBranch) {
+        const error = `The branch not exists. ${minOrders.branchReference}`;
         logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
       }
+
       this.saveNewOrders(newOrder)
         .then((res) => {
           if (!res) throw 'Orders could not been processed.';
@@ -522,7 +523,6 @@ class Platform {
               state: res.state,
               branchId: res.order.branchId,
             };
-          console.log('tt', orderSaved);
           return resolve(orderSaved);
         })
         .catch((error) => {
@@ -610,16 +610,17 @@ class Platform {
         displayId,
         branchReference,
       } = this.parser.retriveMinimunData(order);
-      let branch = [];
+      let branch;
 
       try {
-        branch = await this.getOrderBranches(branchReference);
+        branches = await this.getOrderBranches(branchReference);
+        branch = branches[0];
         if (!branch.length) throw 'There is no branch for this order';
 
         let trace, stateCod, newsCode, isOpened, orderCreator;
         try {
           /* Check if restaurant is open */
-          isOpened = await this.isClosedRestaurant(branch[0].platform);
+          isOpened = await this.isClosedRestaurant(branch.platform);
           if (isOpened) {
             stateCod = 'pend';
             newsCode = 'new_ord';
@@ -641,7 +642,7 @@ class Platform {
             posId,
             displayId,
             originalId,
-            branchId: branch[0].branchId,
+            branchId: branch.branchId,
             order,
           };
 
@@ -650,7 +651,7 @@ class Platform {
             this._platform,
             newsCode,
             stateCod,
-            branch[0],
+            branch,
             this.uuid,
           );
           /* If restaurant is closed, mark the new as viewed. */

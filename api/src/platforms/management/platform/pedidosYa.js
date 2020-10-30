@@ -134,7 +134,6 @@ class PedidosYa extends Platform {
         if (!savedOrder) {
           data.driver = {};
           if (data.logistics) data.driver = await this.retriveDriver(data);
-          console.log('dataaa', data);
           this.saveNewOrders(data, this._platform);
         } else {
           console.log('La orden ya esta guardada', data.id);

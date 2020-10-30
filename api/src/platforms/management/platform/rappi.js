@@ -97,12 +97,11 @@ class Rappi extends Platform {
 
         const url = this.baseUrl + this.urlGetOrders;
         const response = await axios.get(url, options);
-        var result;
+        var result, saved;
 
         if (!!response.data[0]) {
-          var saved = response.data.map((data) =>
-            this.saveNewOrders(data, this._platform),
-          );
+          saved = response.data.map((data) =>
+            this.saveNewOrders(data, this._platform));
           if (saved) {
             await Promise.allSettled(saved).then((resultProm) => {
               result = resultProm

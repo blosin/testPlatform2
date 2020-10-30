@@ -41,7 +41,6 @@ const deleteOne = (req, res) => {
 
 const login = async (req, res) => {
   try {
-    console.log(555555555555);
     if (!req.body.thirdPartyId || !req.body.thirdPartySecret) {
       const msg = 'Insuficient parameters.';
       logger.error({ message: msg, meta: { body: req.body } });
@@ -97,9 +96,16 @@ const saveOrder = (req, res) => {
 
     Promise.allSettled(resultProm)
       .then((resultPromise) => {
-        const result = resultPromise
+
+        const resultOk = resultPromise
           .filter((res) => res.status === 'fulfilled')
           .map((res) => res.value);
+
+        const resultNoOk = resultPromise
+          .filter((res) => res.status === 'rejected')
+          .map((res) => res.reason);
+
+        const result = resultOk.concat(resultNoOk);
 
         res.status(200).send(result).end();
       })
