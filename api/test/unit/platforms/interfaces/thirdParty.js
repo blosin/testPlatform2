@@ -208,6 +208,9 @@ describe('THIRDPARTY - Platform parser', function () {
         state: 'CONFIRMED',
         orderId: 50194,
         branchId: '15',
+        displayId: 50194,
+        posId: 50194,
+        originalId: 50194,
         order: {
           id: 50194,
           state: 'CONFIRMED',
@@ -369,6 +372,7 @@ describe('THIRDPARTY - Platform parser', function () {
           preOrder: false,
           observations: 'observacion',
           ownDelivery: false,
+          displayId: 50194,
         },
         viewed: null,
         typeId: 1,

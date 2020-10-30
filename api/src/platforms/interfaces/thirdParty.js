@@ -8,7 +8,6 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const orderMapper = (data, platform) => {
         try {
-          console.log('tttttttttt', data);
           let order = {};
           order.id = data.posId;
           order.originalId = data.originalId;

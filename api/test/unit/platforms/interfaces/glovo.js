@@ -11,6 +11,9 @@ const glovo_order = {
   state: 'CONFIRMED',
   orderId: 50194,
   branchId: '15',
+  displayId: 1050289,
+  posId: 'BA7DWBUL',
+  originalId: 1050289,
   order: {
     orderId: 1050289,
     branchId: '15',
@@ -129,6 +132,7 @@ const glovo_new = {
     deliveryTime: null,
     observations: 'I am allergic to tomato',
     preOrder: false,
+    displayId: 1050289,
   },
   typeId: 1,
   branchId: '15',
