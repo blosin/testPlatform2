@@ -34,6 +34,6 @@ const loadPlatforms = () => {
 };
 
 const initPollingQueue = () => {
-  /*   const aws = new Aws();
-  aws.pollFromQueue(); */
+  const aws = new Aws();
+  aws.pollFromQueue();
 };
