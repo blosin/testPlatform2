@@ -46,6 +46,7 @@ class Pad extends Platform {
 
                 const idPreparando = 2;
                 const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idPreparando}`;
+                console.log('url-pad', url);
                 const res = await axios.post(url, {}, this.authData);
                 resolve(res.data);
             } catch (error) {

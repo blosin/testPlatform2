@@ -78,28 +78,31 @@ class NewsTypeStrategy {
     );
   }
 
-  findNew(idNew) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.savedNew = await news.aggregate([
-          { $match: { _id: ObjectId(idNew) } },
-          {
-            $project: {
-              'order.originalId': '$order.originalId',
-              'order.statusId': '$order.statusId',
-              'order.platformId': '$order.platformId',
-              'order.ownDelivery': '$order.ownDelivery',
-              'order.preOrder': '$order.preOrder',
-              branchId: '$branchId',
-              'extraData.rejected': '$extraData.rejected',
-              traces: '$traces',
-            },
-          },
-          { $limit: 1 },
-        ]);
-
-        this.savedNew = this.savedNew.pop();
-        if (!this.savedNew || !this.savedNew.order) throw 'New not found.';
+    findNew(idNew) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                this.savedNew = await news
+                    .aggregate([
+                        { $match: { _id: ObjectId(idNew) } },
+                        {
+                            $project: {
+                                'order.id': '$order.originalId',
+                                'order.originalId': '$order.originalId',
+                                'order.statusId': '$order.statusId',
+                                'order.platformId': '$order.platformId',
+                                'order.ownDelivery': '$order.ownDelivery',
+                                'order.preOrder': '$order.preOrder',
+                                'order.branchId': '$branchId',
+                                'branchId': '$branchId',
+                                'extraData.rejected': '$extraData.rejected',
+                                'traces': '$traces'
+                            }
+                        },
+                        { $limit: 1 }
+                    ]);
+                this.savedNew = this.savedNew.pop();
+                if (!this.savedNew || !this.savedNew.order)
+                    throw ('New not found.');
 
         this.createPlatform(this.savedNew.order.platformId);
         return resolve(this.savedNew);

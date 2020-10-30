@@ -38,7 +38,7 @@ module.exports = {
       const paymentenMapper = (payment) => {
         try {
           let paymentNews = {};
-          paymentNews.typeId = 3; //Efectivo
+          paymentNews.typeId = payment.online ? 2 : 3; //Credito o Efectivo
           paymentNews.online = payment.online;
           paymentNews.shipping = payment.shipping || 0;
           paymentNews.discount = payment.discount || 0;
@@ -51,14 +51,10 @@ module.exports = {
           return paymentNews;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
-            data,
-            branch,
-            error: error.toString(),
-          });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
           reject(err);
         }
-      };
+      }
 
       const driverMapper = (order) => {
         try {

@@ -20,11 +20,14 @@ const paymentType = {
 
 module.exports = {
   newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
+
     return new Promise((resolve, reject) => {
       const orderMapper = (data, platform) => {
         try {
           let order = {};
           order.id = data.order.id;
+          order.originalId = data.order.id;
+          order.displayId = data.order.id;
           order.platformId = platform.internalCode;
           order.statusId = NewsStateSingleton.idByCod(stateCod);
           order.orderTime = data.order.registeredDate;
@@ -34,18 +37,15 @@ module.exports = {
           order.preOrder = data.order.preOrder;
           order.observations = data.order.notes;
           order.ownDelivery = !data.order.logistics;
-          if (data.order.pickup) order.ownDelivery = false;
+          if (data.order.pickup)
+            order.ownDelivery = false;
           return order;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de PY.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
-            data,
-            branch,
-            error: error.toString(),
-          });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
           reject(err);
         }
-      };
+      }
 
       const paymentenMapper = (payment, discounts, thirdParty) => {
         try {
