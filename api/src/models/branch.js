@@ -61,7 +61,7 @@ const branchSchema = new Schema(
         branchIdReference: { type: Number },
         lastGetNews: { type: Date },
         progClosed: [{ close: Date, open: Date, description: String }],
-        isActive: { type: Boolean },
+        isActive: { type: Boolean, default: true },
       },
     ],
     smartfran_sw: {
