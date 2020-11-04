@@ -1,14 +1,13 @@
 'use strict';
 import moment from 'moment';
 import cron from 'node-cron';
-
 import logger from '../../config/logger';
-import orderModel from '../../models/order';
-import newsModel from '../../models/news';
 import branchModel from '../../models/branch';
+import deliveryTimeModel from '../../models/deliveryTime';
+import newsModel from '../../models/news';
+import orderModel from '../../models/order';
 import platformModel from '../../models/platform';
 import rejectedMessageModel from '../../models/rejectedMessage';
-import deliveryTimeModel from '../../models/deliveryTime';
 import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import RejectedMessagesSingleton from '../../utils/rejectedMessages';
@@ -490,100 +489,41 @@ class Platform {
   }
 
   /**
-   * Validate the orders before save.
+   * Validate the order before save.
    * */
-  validateNewOrders(newOrders) {
+
+  validateNewOrders(newOrder) {
     this.updateLastContact();
     return new Promise(async (resolve, reject) => {
-      let ordersSaved = [];
-      const minOrders = newOrders.map((newOrd) =>
-        this.parser.retriveMinimunData(newOrd),
-      );
-      /* Validate  orders */
-      let orders = await orderModel
-        .find({
-          originalId: { $in: minOrders.map((order) => order.originalId) },
-          internalCode: this._platform.internalCode,
-          state: { $ne: NewsStateSingleton.stateByCod('rej_closed') },
+      let orderSaved;
+      const minOrders = this.parser.retriveMinimunData(newOrder);
+
+      /* Find branch associated to de references given by the platform */
+
+      let foundBranch = await branchModel
+        .findOne({
+          'platforms.branchReference': minOrders.branchReference,
+          'platforms.platform': this._platform._id,
         })
         .lean();
 
-      if (!!orders.length) {
-        const set = new Set();
-        orders = orders.filter((order) => {
-          if (set.has(order.originalId)) {
-            return false;
-          }
-          set.add(order.originalId);
-          return true;
-        });
-        const ids = Array.from(orders.map((o) => o.originalId));
-        const error = `Order/s: ${ids} already exists.`;
-        logger.error({ message: error, meta: { newOrders } });
+      if (!foundBranch) {
+        const error = `The branch not exists. ${minOrders.branchReference}`;
+        logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
       }
 
-      /* Validate Branches */
-      let idsBranch = minOrders.map((order) => order.branchReference);
-      let uniqueIdsBranch = idsBranch.filter(
-        (elem, pos) => idsBranch.indexOf(elem) == pos,
-      );
-
-      /* Find branches associated to de references given by the platform */
-      let savedBranches = [];
-      for (let uniqueId of uniqueIdsBranch) {
-        let foundBranches = await branchModel
-          .find({
-            'platforms.branchReference': uniqueId,
-            'platforms.platform': this._platform._id,
-          })
-          .lean();
-        savedBranches = savedBranches.concat(foundBranches);
-      }
-
-      let refSavedBranches = [];
-      savedBranches.forEach((b) => {
-        let ids = b.platforms.map((p) => p.branchReference);
-        refSavedBranches = refSavedBranches.concat(ids);
-      });
-
-      /* 
-            Check if all unique branches have its corresponden Branch
-            */
-      let diff = uniqueIdsBranch.filter(
-        (i) => !refSavedBranches.find((r) => r == i.toString()),
-      );
-
-      if (!!diff.length) {
-        let error = `Some branches not exists:  ${diff}.`;
-        logger.error({ message: error, meta: { newOrders } });
-        return reject({ error });
-      }
-
-      this.saveNewOrders(newOrders)
+      this.saveNewOrders(newOrder)
         .then((res) => {
-          if (!res.length) throw 'Orders could not been processed.';
-          ordersSaved = res.map((order) => {
-            let branchId = savedBranches
-              .find((b) => b.branchId == order.branchId)
-              .platforms.find(
-                (p) => p.platform == this._platform._id.toString(),
-              ).branchReference;
-            return {
-              id: order.posId,
-              state: order.state,
-              branchId: branchId,
+          if (!res) throw 'Orders could not been processed.';
+
+          if (foundBranch.branchId == res.order.branchId)
+            orderSaved = {
+              id: res.posId,
+              state: res.state,
+              branchId: res.order.branchId,
             };
-          });
-          const set = new Set();
-          ordersSaved = ordersSaved.filter((order) => {
-            if (set.has(order.id)) {
-              return false;
-            }
-            set.add(order.id);
-            return true;
-          });
-          return resolve(ordersSaved);
+          return resolve(orderSaved);
         })
         .catch((error) => {
           reject({ error: error.toString() });
@@ -596,7 +536,6 @@ class Platform {
       'platforms.platform': this._platform._id,
       'platforms.branchReference': branchReference.toString(),
     };
-
     return branchModel.aggregate([
       { $match: query },
       { $unwind: '$platforms' },
@@ -652,152 +591,154 @@ class Platform {
           'address.region': '$joinRegions.region',
         },
       },
+      {
+        $limit: 1,
+      },
     ]);
   }
 
   /**
    *  Generate custom order and new for each one.
    *  Save them to database.
-   *  @param orders List of orders received from the platform.
+   *  @param order  order received from the platform.
    *   */
-  saveNewOrders(orders) {
+  saveNewOrders(order) {
     return new Promise(async (resolve, reject) => {
-      let ordersProccessed = [];
-      let newsProccessed = [];
-      let promisesOrders = [];
-      let promisesNews = [];
-      let branches = [];
+      let orderProccessed, newProccessed, promiseOrder, promiseNew;
+      const {
+        posId,
+        originalId,
+        displayId,
+        branchReference,
+      } = this.parser.retriveMinimunData(order);
+      let branch;
 
-      for (let data of orders) {
-        const {
-          posId,
-          originalId,
-          displayId,
-          branchReference,
-        } = this.parser.retriveMinimunData(data);
+      try {
+        branches = await this.getOrderBranches(branchReference);
+        branch = branches[0];
+        if (!branch.length) throw 'There is no branch for this order';
+
+        let trace, stateCod, newsCode, isOpened, orderCreator;
         try {
-          branches = await this.getOrderBranches(branchReference);
-          if (!branches.length) throw 'There is no branches for this order';
-          for (let branch of branches) {
-            let trace, stateCod, newsCode, isOpened, orderCreator;
-            try {
-              /* Check if restaurant is open */
-              isOpened = await this.isClosedRestaurant(branch.platform);
-              console.log(branch.platform);
-              //Define estado de la orden
-              if (isOpened && branch.platform.isActive) {
-                stateCod = 'pend';
-                newsCode = 'new_ord';
-              } else {
-                stateCod = 'rej';
-                newsCode = 'rej_closed_ord';
-                data.state = NewsStateSingleton.stateByCod('rej_closed');
-              }
-            } catch (error) {
-              const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
-              logger.error({ message: msg, meta: { error: error.toString() } });
-              throw { orderId: id, error };
-            }
-
-            try {
-              orderCreator = {
-                thirdParty: this._platform.name,
-                internalCode: this._platform.internalCode,
-                state: data.state,
-                posId,
-                displayId,
-                originalId,
-                branchId: branch.branchId,
-                order: data,
-              };
-              const newCreator = await this.parser.newsFromOrders(
-                orderCreator,
-                this._platform,
-                newsCode,
-                stateCod,
-                branch,
-                this.uuid,
-              );
-              //Define motivo de la orden
-              /* If restaurant is closed, mark the new as viewed. */
-              if (!isOpened) {
-                newCreator.viewed = new Date();
-                const rej = RejectedMessagesSingleton.closedResRejectedMessages;
-                newCreator.extraData.rejected = {
-                  rejectMessageId: rej.id,
-                  rejectMessageDescription: rej.name,
-                  rejectMessageNote: null,
-                  entity: 'CONCENTRADOR',
-                };
-              } else if (!branch.platform.isActive) {
-                newCreator.viewed = new Date();
-                const rej =
-                  RejectedMessagesSingleton.inactiveResRejectedMessages;
-                newCreator.extraData.rejected = {
-                  rejectMessageId: rej.id,
-                  rejectMessageDescription: rej.name,
-                  rejectMessageNote: null,
-                  entity: 'CONCENTRADOR',
-                };
-              }
-              trace = newsModel.createTrace({
-                typeId: newCreator.typeId,
-                orderStatusId: newCreator.order.statusId,
-              });
-              trace.entity = 'PLATFORM';
-
-              newCreator['traces'] = trace;
-              const orderQuery = {
-                internalCode: this._platform.internalCode,
-                originalId,
-              };
-              const newsQuery = {
-                order: {
-                  id: displayId,
-                  platformId: this._platform.internalCode,
-                },
-              };
-              const options = { new: true, upsert: true };
-
-              promisesOrders.push(
-                orderModel.findOneAndUpdate(orderQuery, orderCreator, options),
-              );
-              promisesNews.push(
-                newsModel.findOneAndUpdate(newsQuery, newCreator, options),
-              );
-              ordersProccessed.push(orderCreator);
-              newsProccessed.push(newCreator);
-            } catch (error) {
-              const msg = `News: ${originalId} can not be parsed correctly.`;
-              const err = logger.error({
-                message: msg,
-                meta: { error: error.toString() },
-              });
-              throw err;
-            }
+          /* Check if restaurant is open */
+          isOpened = await this.isClosedRestaurant(branch.platform);
+          if (isOpened) {
+            stateCod = 'pend';
+            newsCode = 'new_ord';
+          } else {
+            stateCod = 'rej';
+            newsCode = 'rej_closed_ord';
+            order.state = NewsStateSingleton.stateByCod('rej_closed');
           }
         } catch (error) {
-          throw {
-            orderId: error.id,
-            error: `Order: ${error.id} can not be proccessed correctly.`,
-          };
+          const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
+          logger.error({ message: msg, meta: { error: error.toString() } });
+          throw { orderId: id, error };
         }
+        try {
+          orderCreator = {
+            thirdParty: this._platform.name,
+            internalCode: this._platform.internalCode,
+            state: order.state,
+            posId,
+            displayId,
+            originalId,
+            branchId: branch.branchId,
+            order,
+          };
+
+          const newCreator = await this.parser.newsFromOrders(
+            orderCreator,
+            this._platform,
+            newsCode,
+            stateCod,
+            branch,
+            this.uuid,
+          );
+          /* If restaurant is closed, mark the new as viewed. */
+          if (!isOpened) {
+            newCreator.viewed = new Date();
+            const rej = RejectedMessagesSingleton.closedResRejectedMessages;
+            newCreator.extraData.rejected = {
+              rejectMessageId: rej.id,
+              rejectMessageDescription: rej.name,
+              rejectMessageNote: null,
+              entity: 'CONCENTRADOR',
+            };
+          } else if (!branch.platform.isActive) {
+            newCreator.viewed = new Date();
+            const rej =
+              RejectedMessagesSingleton.inactiveResRejectedMessages;
+            newCreator.extraData.rejected = {
+              rejectMessageId: rej.id,
+              rejectMessageDescription: rej.name,
+              rejectMessageNote: null,
+              entity: 'CONCENTRADOR',
+            };
+          }
+          trace = newsModel.createTrace({
+            typeId: newCreator.typeId,
+            orderStatusId: newCreator.order.statusId,
+          });
+          trace.entity = 'PLATFORM';
+
+          newCreator['traces'] = trace;
+          const orderQuery = {
+            internalCode: this._platform.internalCode,
+            originalId,
+          };
+          const newsQuery = {
+            order: {
+              id: displayId,
+              platformId: this._platform.internalCode,
+            },
+          };
+          const options = { new: true, upsert: true };
+
+          promiseOrder = orderModel.findOneAndUpdate(
+            orderQuery,
+            orderCreator,
+            options,
+          );
+
+          promiseNew = newsModel.findOneAndUpdate(
+            newsQuery,
+            newCreator,
+            options,
+          );
+          orderProccessed = orderCreator;
+
+          newProccessed = newCreator;
+        } catch (error) {
+          const msg = `News: ${originalId} can not be parsed correctly.`;
+          const err = logger.error({
+            message: msg,
+            meta: { error: error.toString() },
+          });
+          throw err;
+        }
+      } catch (error) {
+        throw {
+          orderId: error.id,
+          error: `Order: ${error.id} can not be proccessed correctly.`,
+        };
       }
 
       /* Save all orders and news generated. */
       try {
-        if (!!promisesNews.length) {
-          await Promise.all(promisesOrders);
-
+        if (promiseNew) {
           //Save all news
-          const savedNews = await Promise.all(promisesNews);
+          const [saveOrders, savedNews] = await Promise.all([
+            promiseOrder,
+            promiseNew,
+          ]);
 
           //Push all savedNews to the queue
           // await Promise.all(savedNews
           //     .map((savedNew) =>
           //         this.aws.pushNewToQueue(savedNew)));
         }
-        return resolve(ordersProccessed);
+        return resolve(orderProccessed);
       } catch (error) {
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
