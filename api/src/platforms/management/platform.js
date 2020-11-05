@@ -604,19 +604,18 @@ class Platform {
    *   */
   saveNewOrders(order) {
     return new Promise(async (resolve, reject) => {
-      let orderProccessed, newProccessed, promiseOrder, promiseNew;
+      let orderProccessed, newProccessed, promiseOrder, promiseNew, branch;
       const {
         posId,
         originalId,
         displayId,
         branchReference,
       } = this.parser.retriveMinimunData(order);
-      let branch;
 
       try {
-        branches = await this.getOrderBranches(branchReference);
+        let branches = await this.getOrderBranches(branchReference);
         branch = branches[0];
-        if (!branch.length) throw 'There is no branch for this order';
+        if (!branch) throw 'There is no branch for this order';
 
         let trace, stateCod, newsCode, isOpened, orderCreator;
         try {
@@ -667,8 +666,7 @@ class Platform {
             };
           } else if (!branch.platform.isActive) {
             newCreator.viewed = new Date();
-            const rej =
-              RejectedMessagesSingleton.inactiveResRejectedMessages;
+            const rej = RejectedMessagesSingleton.inactiveResRejectedMessages;
             newCreator.extraData.rejected = {
               rejectMessageId: rej.id,
               rejectMessageDescription: rej.name,
