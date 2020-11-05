@@ -70,6 +70,14 @@ const branchSchema = new Schema(
           type: String,
           maxlength: 50,
         },
+        nextVersionToInstall: {
+          type: String,
+          maxlength: 50,
+        },
+        nextVersionUrl: {
+          type: String,
+          maxlength: 50,
+        },
         installedDate: {
           type: Date,
           default: Date.now,
@@ -77,6 +85,14 @@ const branchSchema = new Schema(
       },
       notificator: {
         installedVersion: {
+          type: String,
+          maxlength: 50,
+        },
+        nextVersionToInstall: {
+          type: String,
+          maxlength: 50,
+        },
+        nextVersionUrl: {
           type: String,
           maxlength: 50,
         },
