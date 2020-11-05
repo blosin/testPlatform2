@@ -621,7 +621,7 @@ class Platform {
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(branch.platform);
-          if (isOpened) {
+          if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
           } else {
