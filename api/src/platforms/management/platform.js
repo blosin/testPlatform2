@@ -616,7 +616,7 @@ class Platform {
       try {
         branches = await this.getOrderBranches(branchReference);
         branch = branches[0];
-        if (!branch.length) throw 'There is no branch for this order';
+        if (!branch) throw 'There is no branch for this order';
 
         let trace, stateCod, newsCode, isOpened, orderCreator;
         try {
