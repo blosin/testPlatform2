@@ -126,6 +126,10 @@ const branchSchema = new Schema(
     deletedAt: {
       type: Date,
     },
+    credentials: {
+      aws_id: { type: String },
+      aws_secret: { type: String },
+    },
   },
   {
     strict: false,
