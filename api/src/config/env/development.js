@@ -26,11 +26,11 @@ module.exports = {
       REGION: 'us-east-2',
       ORDER_PRODUCER: {
         NAME:
-          'https://sqs.us-east-2.amazonaws.com/382381053403/##_PlatformMessagesDEV.fifo',
+          'https://sqs.us-east-2.amazonaws.com/382381053403/##_DEV_PlatformMessages.fifo',
       },
       ORDER_CONSUMER: {
         NAME:
-          'https://sqs.us-east-2.amazonaws.com/382381053403/BranchMessagesDEV.fifo',
+          'https://sqs.us-east-2.amazonaws.com/382381053403/DEV_BranchMessages.fifo',
       },
     },
   },
