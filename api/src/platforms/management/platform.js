@@ -521,7 +521,7 @@ class Platform {
             orderSaved = {
               id: res.posId,
               state: res.state,
-              branchId: res.order.branchId,
+              branchId: res.order.branchId.toString(),
             };
           return resolve(orderSaved);
         })
@@ -604,7 +604,12 @@ class Platform {
    *   */
   saveNewOrders(order) {
     return new Promise(async (resolve, reject) => {
-      let orderProccessed, newProccessed, promiseOrder, promiseNew, branch;
+      let orderProccessed,
+        newProccessed,
+        promiseOrder,
+        promiseNew,
+        branch,
+        isOpened;
       const {
         posId,
         originalId,
@@ -615,9 +620,10 @@ class Platform {
       try {
         let branches = await this.getOrderBranches(branchReference);
         branch = branches[0];
+
         if (!branch) throw 'There is no branch for this order';
 
-        let trace, stateCod, newsCode, isOpened, orderCreator;
+        let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(branch.platform);
@@ -716,10 +722,10 @@ class Platform {
           throw err;
         }
       } catch (error) {
-        throw {
+        reject({
           orderId: error.id,
           error: `Order: ${error.id} can not be proccessed correctly.`,
-        };
+        });
       }
 
       /* Save all orders and news generated. */
@@ -731,10 +737,9 @@ class Platform {
             promiseNew,
           ]);
 
-          //Push all savedNews to the queue
-          // await Promise.all(savedNews
-          //     .map((savedNew) =>
-          //         this.aws.pushNewToQueue(savedNew)));
+          if (isOpened && branch.platform.isActive)
+            //Push all savedNews to the queue
+            await this.aws.pushNewToQueue(savedNews);
         }
         return resolve(orderProccessed);
       } catch (error) {
@@ -742,8 +747,6 @@ class Platform {
         logger.error({ message: msg, meta: error.toString() });
         reject(error.toString());
       }
-    }).catch((error) => {
-      reject(error.toString());
     });
   }
 
