@@ -94,20 +94,9 @@ const saveOrder = (req, res) => {
   if (isArray(req.body)) {
     const resultProm = req.body.map((data) => platform.validateNewOrders(data));
 
-    Promise.allSettled(resultProm)
+    Promise.all(resultProm)
       .then((resultPromise) => {
-
-        const resultOk = resultPromise
-          .filter((res) => res.status === 'fulfilled')
-          .map((res) => res.value);
-
-        const resultNoOk = resultPromise
-          .filter((res) => res.status === 'rejected')
-          .map((res) => res.reason);
-
-        const result = resultOk.concat(resultNoOk);
-
-        res.status(200).send(result).end();
+        res.status(200).send(resultPromise).end();
       })
       .catch((error) => res.status(400).json(error).end());
   } else

@@ -25,7 +25,10 @@ class Aws {
 
   async pushNewToQueue(newOrder) {
     const producer = Producer.create({
-      queueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME,
+      queueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME.replace(
+        '##_',
+        newOrder.branchId.toString(),
+      ),
       region: config.AWS.SQS.REGION,
     });
     return producer.send({
