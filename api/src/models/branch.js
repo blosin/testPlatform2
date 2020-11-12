@@ -10,40 +10,40 @@ const branchSchema = new Schema(
     branchId: {
       type: Number,
       unique: true,
-      required: true,
+      required: true
     },
     branchSecret: {
       type: String,
       required: true,
-      maxlength: 50,
+      maxlength: 50
     },
     code: {
-      type: Number,
+      type: Number
     },
     secret: {
-      type: String,
+      type: String
     },
     name: {
       type: String,
       required: true,
-      maxlength: 100,
+      maxlength: 100
     },
     branchPhone: {
       type: String,
-      maxlength: 50,
+      maxlength: 50
     },
     branchTimeout: {
       type: Number,
       required: true,
-      default: 20,
+      default: 20
     },
     startDate: {
       type: Date,
       required: true,
-      default: Date.now,
+      default: Date.now
     },
     suspendedDate: {
-      type: Date,
+      type: Date
     },
     address: {
       country: { type: String },
@@ -52,7 +52,7 @@ const branchSchema = new Schema(
       region: { type: Schema.Types.ObjectId, ref: regionSchema },
       address: { type: String },
       cp: { type: Number },
-      coordinates: { type: String },
+      coordinates: { type: String }
     },
     platforms: [
       {
@@ -61,91 +61,91 @@ const branchSchema = new Schema(
         branchIdReference: { type: Number },
         lastGetNews: { type: Date },
         progClosed: [{ close: Date, open: Date, description: String }],
-        isActive: { type: Boolean, default: true },
-      },
+        isActive: { type: Boolean, default: true }
+      }
     ],
     smartfran_sw: {
       agent: {
         installedVersion: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         nextVersionToInstall: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         nextVersionUrl: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         installedDate: {
           type: Date,
-          default: Date.now,
-        },
+          default: Date.now
+        }
       },
       notificator: {
         installedVersion: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         nextVersionToInstall: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         nextVersionUrl: {
           type: String,
-          maxlength: 50,
+          maxlength: 50
         },
         installedDate: {
           type: Date,
-          default: Date.now,
-        },
-      },
+          default: Date.now
+        }
+      }
     },
     tzo: {
       type: Number,
       default: -3,
-      required: true,
+      required: true
     },
     permissions: {
       type: Array,
       default: [
         '/api/branches/news',
         '/api/branches/parameters',
-        '/api/branches/smartfran-sw/version',
-      ],
+        '/api/branches/smartfran-sw/version'
+      ]
     },
     chain: {
       type: Schema.Types.ObjectId,
-      ref: chainSchema,
+      ref: chainSchema
     },
     client: {
       type: Schema.Types.ObjectId,
-      ref: clientSchema,
+      ref: clientSchema
     },
     deletedAt: {
-      type: Date,
+      type: Date
     },
     credentials: {
       aws_id: { type: String },
-      aws_secret: { type: String },
-    },
+      aws_secret: { type: String }
+    }
   },
   {
     strict: false,
-    timestamps: true,
-  },
+    timestamps: true
+  }
 );
 
 branchSchema.index(
   {
     'platforms.platform': 1,
     'platforms.branchReference': 1,
-    'platforms.branchIdReference': 1,
+    'platforms.branchIdReference': 1
   },
   {
-    unique: true,
-  },
+    unique: true
+  }
 );
 
 branchSchema.plugin(uniqueValidator);
@@ -154,7 +154,7 @@ branchSchema.plugin(require('@meanie/mongoose-to-json'));
 branchSchema.statics.validateNewProgClosed = (
   platformBranch,
   dateFrom,
-  timeToClose,
+  timeToClose
 ) => {
   if (!(typeof timeToClose == 'number') || !(timeToClose > 0))
     return 'TimeToClose must be greater than 0.';

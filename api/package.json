@@ -10,6 +10,7 @@
     "serve:stg": "NODE_ENV=staging npm run serve",
     "serve:prd": "NODE_ENV=production npm run serve",
     "start": "AWS_PROFILE=smartfran nodemon --inspect=127.0.0.1:9230  src/index.js --watch src --exec babel-node",
+    "start:win": "nodemon --inspect=127.0.0.1:9230  src/index.js --watch src --exec babel-node",
     "start:dev": "NODE_ENV=development npm run start",
     "start:tst": "NODE_ENV=testing npm run start",
     "start:stg": "NODE_ENV=staging npm run start",
