@@ -8,33 +8,32 @@ import Aws from '../platforms/provider/aws';
 import PlatformFactory from '../platforms/management/factory_platform';
 
 module.exports.initUtils = () => {
-    return new Promise(async (resolve) => {
-        await Promise.all([
-            NewsTypeSingleton.getInstance(),
-            NewsStateSingleton.getInstance(),
-            RejectedMessagesSingleton.getInstance(),
-            PlatformSingleton.getInstance()
-        ]);
+  return new Promise(async (resolve) => {
+    await Promise.all([
+      NewsTypeSingleton.getInstance(),
+      NewsStateSingleton.getInstance(),
+      RejectedMessagesSingleton.getInstance(),
+      PlatformSingleton.getInstance(),
+    ]);
 
-        /* Load all platforms after getting them */
-        loadPlatforms();
-        initPollingQueue();
-        resolve();
-    });
-
-}
+    /* Load all platforms after getting them */
+    loadPlatforms();
+    initPollingQueue();
+    resolve();
+  });
+};
 
 const loadPlatforms = () => {
-    const platformFactory = new PlatformFactory();
-    const platforms = PlatformSingleton.platforms;
+  const platformFactory = new PlatformFactory();
+  const platforms = PlatformSingleton.platforms;
 
-    platforms.forEach((platform) => {
-        let uuid = UUID();
-        platformFactory.createPlatform(platform, uuid);
-    });
-}
+  platforms.forEach((platform) => {
+    let uuid = UUID();
+    platformFactory.createPlatform(platform, uuid);
+  });
+};
 
 const initPollingQueue = () => {
-    const aws = new Aws();
-    aws.pollFromQueue();
-}
+  const aws = new Aws();
+  aws.pollFromQueue();
+};

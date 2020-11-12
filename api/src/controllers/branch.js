@@ -46,7 +46,10 @@ const getNews = async (req, res) => {
     });
     const platformFactory = new PlatformFactory();
     const pedidosYaInternalCode = 1;
-    const pedidosYa = platformFactory.createPlatform(PlatformSingleton.getByCod(pedidosYaInternalCode), req.uuid);
+    const pedidosYa = platformFactory.createPlatform(
+      PlatformSingleton.getByCod(pedidosYaInternalCode),
+      req.uuid
+    );
     pedidosYa.callHeartBeat(req.token);
     udpdateLastGetNews(req.token.branchId);
     return res.status(200).json(newsOrders).end();
@@ -109,15 +112,20 @@ const setNews = (req, res) => {
     }
   }
 
-  return res.status(200).json({ message: 'All news were successfully processed.' }).end();
+  return res
+    .status(200)
+    .json({ message: 'All news were successfully processed.' })
+    .end();
 };
 
 const updateDate = async (req, res) => {
   try {
-    console.log(33);
     const platformFactory = new PlatformFactory();
     const pedidosYaInternalCode = 1;
-    const pedidosYa = platformFactory.createPlatform(PlatformSingleton.getByCod(pedidosYaInternalCode), req.uuid);
+    const pedidosYa = platformFactory.createPlatform(
+      PlatformSingleton.getByCod(pedidosYaInternalCode),
+      req.uuid
+    );
     pedidosYa.callHeartBeat(req.token);
     udpdateLastGetNews(req.token.branchId);
     return res.status(200).json({}).end();

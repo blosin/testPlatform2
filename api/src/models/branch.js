@@ -60,12 +60,21 @@ const branchSchema = new Schema(
         branchReference: { type: String },
         branchIdReference: { type: Number },
         lastGetNews: { type: Date },
-        progClosed: [{ close: Date, open: Date, description: String }]
+        progClosed: [{ close: Date, open: Date, description: String }],
+        isActive: { type: Boolean, default: true }
       }
     ],
     smartfran_sw: {
       agent: {
         installedVersion: {
+          type: String,
+          maxlength: 50
+        },
+        nextVersionToInstall: {
+          type: String,
+          maxlength: 50
+        },
+        nextVersionUrl: {
           type: String,
           maxlength: 50
         },
@@ -76,6 +85,14 @@ const branchSchema = new Schema(
       },
       notificator: {
         installedVersion: {
+          type: String,
+          maxlength: 50
+        },
+        nextVersionToInstall: {
+          type: String,
+          maxlength: 50
+        },
+        nextVersionUrl: {
           type: String,
           maxlength: 50
         },
@@ -94,7 +111,6 @@ const branchSchema = new Schema(
       type: Array,
       default: [
         '/api/branches/news',
-        '/api/branches/heartbeat',
         '/api/branches/parameters',
         '/api/branches/smartfran-sw/version'
       ]
@@ -109,6 +125,10 @@ const branchSchema = new Schema(
     },
     deletedAt: {
       type: Date
+    },
+    credentials: {
+      aws_id: { type: String },
+      aws_secret: { type: String }
     }
   },
   {
@@ -131,9 +151,15 @@ branchSchema.index(
 branchSchema.plugin(uniqueValidator);
 branchSchema.plugin(require('@meanie/mongoose-to-json'));
 
-branchSchema.statics.validateNewProgClosed = (platformBranch, dateFrom, timeToClose) => {
-  if (!(typeof timeToClose == 'number') || !(timeToClose > 0)) return 'TimeToClose must be greater than 0.';
-  if (!platformBranch.progClosed || !platformBranch.progClosed.length) platformBranch.progClosed = [];
+branchSchema.statics.validateNewProgClosed = (
+  platformBranch,
+  dateFrom,
+  timeToClose
+) => {
+  if (!(typeof timeToClose == 'number') || !(timeToClose > 0))
+    return 'TimeToClose must be greater than 0.';
+  if (!platformBranch.progClosed || !platformBranch.progClosed.length)
+    platformBranch.progClosed = [];
   const isOtherProg = platformBranch.progClosed.some((p) => dateFrom <= p.open);
 
   if (isOtherProg) return 'The restaurant is closed now.';
@@ -141,7 +167,8 @@ branchSchema.statics.validateNewProgClosed = (platformBranch, dateFrom, timeToCl
 };
 
 branchSchema.statics.findProgClosedToOpen = (platformBranch, dateFrom) => {
-  if (!platformBranch.progClosed || !platformBranch.progClosed.length) platformBranch.progClosed = [];
+  if (!platformBranch.progClosed || !platformBranch.progClosed.length)
+    platformBranch.progClosed = [];
   const closedProg = platformBranch.progClosed.find((p) => dateFrom <= p.open);
 
   if (!closedProg) return 'The restaurant has no closed programmed now.';
