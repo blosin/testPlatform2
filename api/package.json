@@ -41,7 +41,6 @@
     "node-cron": "^2.0.3",
     "regenerator-runtime": "^0.13.3",
     "sqs-consumer": "^5.4.0",
-    "sqs-producer": "^2.0.2",
     "uuid": "8.0.0",
     "winston": "3.2.1",
     "winston-mongodb": "5.0.0"

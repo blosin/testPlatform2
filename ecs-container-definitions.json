@@ -10,11 +10,7 @@
       ],
       "cpu": 0,
       "memory": 256,
-<<<<<<< HEAD
       "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:0.0.2",
-=======
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-1.0.1",
->>>>>>> staging
       "essential": true,
       "name": "platform-service-testing-container",
       "entryPoint": [
@@ -39,11 +35,7 @@
     },
     {
       "key": "Environment",
-<<<<<<< HEAD
       "value": "testing"
-=======
-      "value": "staging"
->>>>>>> staging
     },
     {
       "key": "Project",

@@ -737,9 +737,10 @@ class Platform {
             promiseNew,
           ]);
 
-          if (isOpened && branch.platform.isActive)
+          if (isOpened && branch.platform.isActive) {
             //Push all savedNews to the queue
             await this.aws.pushNewToQueue(savedNews);
+          }
         }
         return resolve(orderProccessed);
       } catch (error) {

@@ -2,7 +2,6 @@ import AWS from 'aws-sdk';
 import config from '../../config/env';
 import SetNews from '../management/strategies/set-news';
 import { Consumer } from 'sqs-consumer';
-import { Producer } from 'sqs-producer';
 
 class Aws {
   constructor() {
@@ -13,7 +12,9 @@ class Aws {
   }
 
   retriveKey({ key = requiredParam('key') }) {
-    const ssm = new AWS.SSM();
+    const ssm = new AWS.SSM({
+      credentials: null
+    });
     return ssm
       .getParameters({
         Names: [key],
@@ -24,18 +25,19 @@ class Aws {
   }
 
   async pushNewToQueue(newOrder) {
-    const producer = Producer.create({
-      queueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME.replace(
-        '##_',
-        newOrder.branchId.toString(),
-      ),
+    const sqs = new AWS.SQS({
       region: config.AWS.SQS.REGION,
+      credentials: null
     });
-    return producer.send({
-      id: newOrder._id.toString(),
-      body: JSON.stringify(newOrder),
-      groupId: newOrder.branchId.toString(),
-    });
+
+    const params = {
+      MessageBody: JSON.stringify(newOrder),
+      MessageGroupId: newOrder._id.toString(),
+      QueueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME.replace('##_', newOrder.branchId.toString()),
+    };
+    return sqs
+      .sendMessage(params)
+      .promise();
   }
 
   pollFromQueue() {
@@ -51,28 +53,17 @@ class Aws {
       batchSize: 10,
       handleMessageBatch: (messages) => {
         messages.forEach(async (message) => {
-          console.log('entro');
-          console.log(message);
           const setNews = new SetNews(
             message.Attributes.MessageGroupId,
             message.MessageId,
           );
-          const x = await setNews.setNews(JSON.parse(message.Body));
-          console.log('33333', x);
+          setNews.setNews(JSON.parse(message.Body));
         });
       },
-      /* sqs: new AWS.SQS({
-                httpOptions: {
-                    agent: new https.Agent({
-                        keepAlive: true
-                    })
-                } 
-            })*/
     })
       .on('error', (err) => {
         console.error('ERR', err.message);
       })
-
       .on('processing_error', (err) => {
         console.error('PROC_ERR', err.message);
       })
