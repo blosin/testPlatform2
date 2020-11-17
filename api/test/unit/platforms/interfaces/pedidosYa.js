@@ -181,6 +181,8 @@ const parsed_new = {
     id: 133290240,
     platformId: 1,
     statusId: 1,
+    displayId: 133290240,
+    originalId: 133290240,
     orderTime: '2019-10-29T09:52:05Z',
     deliveryTime: '2019-10-29T10:29:05Z',
     pickupOnShop: false,
@@ -541,6 +543,8 @@ describe('PEDIDOSYA - Platform parser', function () {
         order: {
           id: 134213514,
           platformId: 1,
+          originalId: 134213514,
+          displayId: 134213514,
           statusId: 1,
           orderTime: '2019-12-07T15:20:24Z',
           deliveryTime: '2019-12-07T15:57:24Z',

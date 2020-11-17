@@ -112,7 +112,8 @@ const branchSchema = new Schema(
       default: [
         '/api/branches/news',
         '/api/branches/parameters',
-        '/api/branches/smartfran-sw/version'
+        '/api/branches/smartfran-sw/version',
+        '/api/branches/heartbeat'
       ]
     },
     chain: {

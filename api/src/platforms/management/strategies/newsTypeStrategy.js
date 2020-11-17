@@ -116,14 +116,11 @@ class NewsTypeStrategy {
   updateNew(findQuery, updateQuery, options) {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log(1111, findQuery, updateQuery, options);
         const updated = await news.findByIdAndUpdate(
           findQuery,
           updateQuery,
           options
         );
-
-        console.log(11, updated);
         return resolve(updated);
       } catch (err) {
         console.log(err);
