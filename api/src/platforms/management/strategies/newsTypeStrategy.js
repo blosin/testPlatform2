@@ -22,8 +22,8 @@ class NewsTypeStrategy {
           orderStatusId: this.statusId,
           isValid: isValid,
           platformResult: platformResult,
-          updatedAt: new Date(),
-        },
+          updatedAt: new Date()
+        }
       };
     } catch (error) {
       const msg = 'No se pudo generar el objeto trace.';
@@ -35,20 +35,20 @@ class NewsTypeStrategy {
   createObjectsUpdate(platformResult, isValid) {
     try {
       this.createTrace(platformResult, isValid);
-      const findQuery = { _id: this.savedNew._id };
+      const findQuery = this.savedNew._id;
       let updateQuery;
       if (isValid) {
         updateQuery = {
           typeId: this.typeId,
           'order.statusId': this.statusId,
-          $push: { traces: this.trace },
+          $push: { traces: this.trace }
         };
       } else {
         updateQuery = {
-          $push: { traces: this.trace },
+          $push: { traces: this.trace }
         };
       }
-      const options = {};
+      const options = { new: true };
 
       return { findQuery, updateQuery, options };
     } catch (error) {
@@ -63,7 +63,7 @@ class NewsTypeStrategy {
       const platformFactory = new PlatformFactory();
       this.platform = platformFactory.createPlatform(
         PlatformSingleton.getByCod(platformId),
-        this.uuid,
+        this.uuid
       );
     } catch (error) {
       const msg = 'No se pudo generar la plataforma.';
@@ -74,35 +74,33 @@ class NewsTypeStrategy {
 
   findTrace(typeId) {
     return this.savedNew.traces.find(
-      (trace) => trace.update.typeId == typeId && trace.entity == this.entity,
+      (trace) => trace.update.typeId == typeId && trace.entity == this.entity
     );
   }
 
-    findNew(idNew) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                this.savedNew = await news
-                    .aggregate([
-                        { $match: { _id: ObjectId(idNew) } },
-                        {
-                            $project: {
-                                'order.id': '$order.originalId',
-                                'order.originalId': '$order.originalId',
-                                'order.statusId': '$order.statusId',
-                                'order.platformId': '$order.platformId',
-                                'order.ownDelivery': '$order.ownDelivery',
-                                'order.preOrder': '$order.preOrder',
-                                'order.branchId': '$branchId',
-                                'branchId': '$branchId',
-                                'extraData.rejected': '$extraData.rejected',
-                                'traces': '$traces'
-                            }
-                        },
-                        { $limit: 1 }
-                    ]);
-                this.savedNew = this.savedNew.pop();
-                if (!this.savedNew || !this.savedNew.order)
-                    throw ('New not found.');
+  findNew(idNew) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.savedNew = await news.aggregate([
+          { $match: { _id: ObjectId(idNew) } },
+          {
+            $project: {
+              'order.id': '$order.originalId',
+              'order.originalId': '$order.originalId',
+              'order.statusId': '$order.statusId',
+              'order.platformId': '$order.platformId',
+              'order.ownDelivery': '$order.ownDelivery',
+              'order.preOrder': '$order.preOrder',
+              'order.branchId': '$branchId',
+              branchId: '$branchId',
+              'extraData.rejected': '$extraData.rejected',
+              traces: '$traces'
+            }
+          },
+          { $limit: 1 }
+        ]);
+        this.savedNew = this.savedNew.pop();
+        if (!this.savedNew || !this.savedNew.order) throw 'New not found.';
 
         this.createPlatform(this.savedNew.order.platformId);
         return resolve(this.savedNew);
@@ -118,14 +116,15 @@ class NewsTypeStrategy {
   updateNew(findQuery, updateQuery, options) {
     return new Promise(async (resolve, reject) => {
       try {
-        const updated = await news
-          .updateOne(findQuery, updateQuery, options)
-          .lean();
+        console.log(1111, findQuery, updateQuery, options);
+        const updated = await news.findByIdAndUpdate(
+          findQuery,
+          updateQuery,
+          options
+        );
 
-        if (updated.ok == 1) return resolve({ message: 'Ok' });
-        else {
-          throw 'No se pudo actualizar la novedad. Update.ok != 0.';
-        }
+        console.log(11, updated);
+        return resolve(updated);
       } catch (err) {
         console.log(err);
         const msg = 'No se pudo actualizar la novedad.';

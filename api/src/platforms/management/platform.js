@@ -60,7 +60,7 @@ class Platform {
   async getPlatformParameters() {
     const [rejectedMessages, deliveryTimes] = await Promise.all([
       this.getRejectedMessages(),
-      this.getDeliveryTimes(),
+      this.getDeliveryTimes()
     ]);
     this.updateRejectedMessage(rejectedMessages);
     this.updateDeliveryTimes(deliveryTimes);
@@ -134,7 +134,7 @@ class Platform {
         name: 'Sin Informacion',
         driver: null,
         pickupDate: null,
-        estimatedDeliveryDate: null,
+        estimatedDeliveryDate: null
       };
       return resolve(noDriver);
     });
@@ -149,11 +149,11 @@ class Platform {
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const closedProg = branchModel.findProgClosedToOpen(
           platformBranch,
-          dateNow,
+          dateNow
         );
 
         if (typeof closedProg == 'string')
@@ -164,16 +164,16 @@ class Platform {
         await branchModel.updateOne(
           {
             branchId,
-            'platforms.platform': this._platform._id,
+            'platforms.platform': this._platform._id
           },
           {
             $set: {
-              'platforms.$[].progClosed.$[i].open': dateFromUTC,
-            },
+              'platforms.$[].progClosed.$[i].open': dateFromUTC
+            }
           },
           {
-            arrayFilters: [{ 'i._id': closedProg._id }],
-          },
+            arrayFilters: [{ 'i._id': closedProg._id }]
+          }
         );
         resolve();
       } catch (error) {
@@ -195,12 +195,12 @@ class Platform {
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const validatedClosed = branchModel.validateNewProgClosed(
           platformBranch,
           dateNow,
-          timeToClose,
+          timeToClose
         );
         const dateFromUTC = moment(dateNow);
         const dateToUTC = moment(dateNow).add(timeToClose, 'm');
@@ -211,17 +211,17 @@ class Platform {
         await branchModel.updateOne(
           {
             branchId,
-            'platforms.platform': this._platform._id,
+            'platforms.platform': this._platform._id
           },
           {
             $push: {
               'platforms.$.progClosed': {
                 close: dateFromUTC,
                 open: dateToUTC,
-                description: description,
-              },
-            },
-          },
+                description: description
+              }
+            }
+          }
         );
         resolve();
       } catch (error) {
@@ -230,7 +230,7 @@ class Platform {
           branchId,
           platform: this._platform,
           timeToClose,
-          description,
+          description
         };
         const msg = `Failed to closeRestaurant. RestaurantCode: ${branchId}.`;
         logger.error({ message: msg, meta: error });
@@ -256,7 +256,7 @@ class Platform {
         rejectMessageId: rej.id,
         rejectMessageDescription: rej.name,
         rejectMessageNote: null,
-        entity: 'CONCENTRADOR',
+        entity: 'CONCENTRADOR'
       };
       await this.updateNewsState(
         order,
@@ -264,7 +264,7 @@ class Platform {
         typeId,
         null,
         'CONCENTRADOR',
-        rejectedExtraData,
+        rejectedExtraData
       );
     } catch (error) {
       const msg = `Order: ${order.id}. Failed to reject automatically the order.`;
@@ -280,16 +280,16 @@ class Platform {
           originalId: order.originalId,
           internalCode: this._platform.internalCode,
           'extraData.rejected.rejectMessageId': {
-            $ne: RejectedMessagesSingleton.closedResRejectedMessages.id,
-          },
+            $ne: RejectedMessagesSingleton.closedResRejectedMessages.id
+          }
         },
         {
           state: state,
-          'order.state': state,
+          'order.state': state
         },
         {
-          new: true,
-        },
+          new: true
+        }
       );
     } catch (error) {
       const msg = 'Failed to update order state.';
@@ -305,7 +305,7 @@ class Platform {
     typeId,
     viewed,
     entity,
-    rejectedExtraData = null,
+    rejectedExtraData = null
   ) {
     try {
       const object = { typeId, orderStatusId: parseInt(statusId, 10) };
@@ -316,19 +316,19 @@ class Platform {
           'order.id': order.id,
           'order.platformId': this._platform.internalCode,
           typeId: {
-            $ne: NewsTypeSingleton.idByCod('rej_closed_ord'),
-          },
+            $ne: NewsTypeSingleton.idByCod('rej_closed_ord')
+          }
         },
         {
           typeId,
           viewed,
           'extraData.rejected': rejectedExtraData,
           'order.statusId': parseInt(statusId, 10),
-          $push: { traces: trace },
+          $push: { traces: trace }
         },
         {
-          new: true,
-        },
+          new: true
+        }
       );
     } catch (error) {
       const msg = 'Failed to update news state.';
@@ -338,7 +338,7 @@ class Platform {
         typeId,
         viewed,
         entity,
-        error: error.toString(),
+        error: error.toString()
       };
       logger.error({ message: msg, meta: error });
       return Promise.reject(msg);
@@ -348,11 +348,11 @@ class Platform {
   async updateLastContact() {
     await platformModel.updateOne(
       {
-        internalCode: this._platform.internalCode,
+        internalCode: this._platform.internalCode
       },
       {
-        $set: { lastContact: new Date() },
-      },
+        $set: { lastContact: new Date() }
+      }
     );
   }
 
@@ -362,10 +362,10 @@ class Platform {
         {
           $match: {
             originalId: id,
-            internalCode: this._platform.internalCode,
-          },
+            internalCode: this._platform.internalCode
+          }
         },
-        { $limit: 1 },
+        { $limit: 1 }
       ])
       .project({ order: true, _id: false })
       .then((ordersRes) => ordersRes.pop())
@@ -388,7 +388,7 @@ class Platform {
           await this.updateOrderState({ originalId: orderId }, state);
           resolve({
             id: orderId,
-            state: state,
+            state: state
           });
         } catch (error) {
           logger.error({ meta: { error: error.toString() } });
@@ -411,7 +411,7 @@ class Platform {
             .findOne({
               originalId: orderId,
               internalCode: this._platform.internalCode,
-              state: { $ne: NewsStateSingleton.stateByCod('rej_closed') },
+              state: { $ne: NewsStateSingleton.stateByCod('rej_closed') }
             })
             .lean();
         } catch (error) {
@@ -420,7 +420,7 @@ class Platform {
         if (!savedOrder)
           return reject({
             orderId,
-            error: `The order ${orderId} could not be found.`,
+            error: `The order ${orderId} could not be found.`
           });
         return resolve(savedOrder.order);
       } catch (error) {
@@ -438,7 +438,7 @@ class Platform {
     */
   getBranchPlatform(platforms, platformId) {
     return platforms.find(
-      (p) => p.platform.toString() == platformId.toString(),
+      (p) => p.platform.toString() == platformId.toString()
     );
   }
 
@@ -458,9 +458,9 @@ class Platform {
             moment(dateNow, 'DD/MM/YYYY HH:mm:ss').diff(
               moment(
                 new Date(branchPlatform.lastGetNews),
-                'DD/MM/YYYY HH:mm:ss',
-              ),
-            ),
+                'DD/MM/YYYY HH:mm:ss'
+              )
+            )
           )
           .asMinutes();
 
@@ -469,7 +469,7 @@ class Platform {
           closed =
             branchPlatform.progClosed.some(
               (cp) =>
-                new Date(cp.close) <= dateNow && new Date(cp.open) >= dateNow,
+                new Date(cp.close) <= dateNow && new Date(cp.open) >= dateNow
             ) || diffLastGetNews > timeToClose;
         else if (diffLastGetNews > timeToClose) closed = true;
         return resolve(!closed);
@@ -498,12 +498,27 @@ class Platform {
       let orderSaved;
       const minOrders = this.parser.retriveMinimunData(newOrder);
 
+      /* Validate  orders */
+      let order = await orderModel
+        .find({
+          originalId: { $in: minOrders.originalId },
+          internalCode: this._platform.internalCode,
+          state: { $ne: NewsStateSingleton.stateByCod('rej_closed') }
+        })
+        .lean();
+
+      if (order.length) {
+        const error = `Order: ${order[0].originalId} already exists.`;
+        logger.error({ message: error, meta: { newOrder } });
+        return reject({ error });
+      }
+
       /* Find branch associated to de references given by the platform */
 
       let foundBranch = await branchModel
         .findOne({
           'platforms.branchReference': minOrders.branchReference,
-          'platforms.platform': this._platform._id,
+          'platforms.platform': this._platform._id
         })
         .lean();
 
@@ -521,7 +536,7 @@ class Platform {
             orderSaved = {
               id: res.posId,
               state: res.state,
-              branchId: res.order.branchId.toString(),
+              branchId: res.order.branchId.toString()
             };
           return resolve(orderSaved);
         })
@@ -534,7 +549,7 @@ class Platform {
   getOrderBranches(branchReference) {
     const query = {
       'platforms.platform': this._platform._id,
-      'platforms.branchReference': branchReference.toString(),
+      'platforms.branchReference': branchReference.toString()
     };
     return branchModel.aggregate([
       { $match: query },
@@ -545,32 +560,32 @@ class Platform {
           from: 'chains',
           localField: 'chain',
           foreignField: '_id',
-          as: 'joinChains',
-        },
+          as: 'joinChains'
+        }
       },
       {
         $lookup: {
           from: 'platforms',
           localField: 'platforms.platform',
           foreignField: '_id',
-          as: 'joinPlatforms',
-        },
+          as: 'joinPlatforms'
+        }
       },
       {
         $lookup: {
           from: 'clients',
           localField: 'client',
           foreignField: '_id',
-          as: 'joinClients',
-        },
+          as: 'joinClients'
+        }
       },
       {
         $lookup: {
           from: 'regions',
           localField: 'address.region',
           foreignField: '_id',
-          as: 'joinRegions',
-        },
+          as: 'joinRegions'
+        }
       },
       { $unwind: { path: '$joinChains', preserveNullAndEmptyArrays: true } },
       { $unwind: { path: '$joinClients', preserveNullAndEmptyArrays: true } },
@@ -588,12 +603,12 @@ class Platform {
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
           'client.businessName': '$joinClients.businessName',
-          'address.region': '$joinRegions.region',
-        },
+          'address.region': '$joinRegions.region'
+        }
       },
       {
-        $limit: 1,
-      },
+        $limit: 1
+      }
     ]);
   }
 
@@ -614,7 +629,7 @@ class Platform {
         posId,
         originalId,
         displayId,
-        branchReference,
+        branchReference
       } = this.parser.retriveMinimunData(order);
 
       try {
@@ -649,7 +664,7 @@ class Platform {
             displayId,
             originalId,
             branchId: branch.branchId,
-            order,
+            order
           };
 
           const newCreator = await this.parser.newsFromOrders(
@@ -658,7 +673,7 @@ class Platform {
             newsCode,
             stateCod,
             branch,
-            this.uuid,
+            this.uuid
           );
           /* If restaurant is closed, mark the new as viewed. */
           if (!isOpened) {
@@ -668,7 +683,7 @@ class Platform {
               rejectMessageId: rej.id,
               rejectMessageDescription: rej.name,
               rejectMessageNote: null,
-              entity: 'CONCENTRADOR',
+              entity: 'CONCENTRADOR'
             };
           } else if (!branch.platform.isActive) {
             newCreator.viewed = new Date();
@@ -677,38 +692,38 @@ class Platform {
               rejectMessageId: rej.id,
               rejectMessageDescription: rej.name,
               rejectMessageNote: null,
-              entity: 'CONCENTRADOR',
+              entity: 'CONCENTRADOR'
             };
           }
           trace = newsModel.createTrace({
             typeId: newCreator.typeId,
-            orderStatusId: newCreator.order.statusId,
+            orderStatusId: newCreator.order.statusId
           });
           trace.entity = 'PLATFORM';
 
           newCreator['traces'] = trace;
           const orderQuery = {
             internalCode: this._platform.internalCode,
-            originalId,
+            originalId
           };
           const newsQuery = {
             order: {
               id: displayId,
-              platformId: this._platform.internalCode,
-            },
+              platformId: this._platform.internalCode
+            }
           };
           const options = { new: true, upsert: true };
 
           promiseOrder = orderModel.findOneAndUpdate(
             orderQuery,
             orderCreator,
-            options,
+            options
           );
 
           promiseNew = newsModel.findOneAndUpdate(
             newsQuery,
             newCreator,
-            options,
+            options
           );
           orderProccessed = orderCreator;
 
@@ -717,14 +732,14 @@ class Platform {
           const msg = `News: ${originalId} can not be parsed correctly.`;
           const err = logger.error({
             message: msg,
-            meta: { error: error.toString() },
+            meta: { error: error.toString() }
           });
           throw err;
         }
       } catch (error) {
         reject({
           orderId: error.id,
-          error: `Order: ${error.id} can not be proccessed correctly.`,
+          error: `Order: ${error.id} can not be proccessed correctly.`
         });
       }
 
@@ -734,7 +749,7 @@ class Platform {
           //Save all news
           const [saveOrders, savedNews] = await Promise.all([
             promiseOrder,
-            promiseNew,
+            promiseNew
           ]);
 
           if (isOpened && branch.platform.isActive) {
@@ -755,17 +770,17 @@ class Platform {
     //Update all platform rejectedMessages to false
     await rejectedMessageModel.updateMany(
       {
-        platformId: this._platform.internalCode,
+        platformId: this._platform.internalCode
       },
       {
-        isActive: false,
-      },
+        isActive: false
+      }
     );
     //Upsert each parameter and mark as active
     const promises = rejectedMessages.map((rejectedMessage) => {
       const query = {
         platformId: this._platform.internalCode,
-        id: rejectedMessage.id,
+        id: rejectedMessage.id
       };
       const update = {
         $set: {
@@ -777,11 +792,11 @@ class Platform {
           forPickup: rejectedMessage.forPickup,
           id: rejectedMessage.id,
           isActive: true,
-          platformId: this._platform.internalCode,
-        },
+          platformId: this._platform.internalCode
+        }
       };
       const options = {
-        upsert: true,
+        upsert: true
       };
       return rejectedMessageModel.findOneAndUpdate(query, update, options);
     });
@@ -792,17 +807,17 @@ class Platform {
     //Update all platform deliveryTimes to false
     await deliveryTimeModel.updateMany(
       {
-        platformId: this._platform.internalCode,
+        platformId: this._platform.internalCode
       },
       {
-        isActive: false,
-      },
+        isActive: false
+      }
     );
     //Upsert each parameter and mark as active
     const promises = deliveryTimes.map((deliveryTime) => {
       const query = {
         platformId: this._platform.internalCode,
-        id: deliveryTime.id,
+        id: deliveryTime.id
       };
       const update = {
         $set: {
@@ -813,11 +828,11 @@ class Platform {
           order: deliveryTime.order,
           id: deliveryTime.id,
           isActive: true,
-          platformId: this._platform.internalCode,
-        },
+          platformId: this._platform.internalCode
+        }
       };
       const options = {
-        upsert: true,
+        upsert: true
       };
 
       return deliveryTimeModel.findOneAndUpdate(query, update, options);

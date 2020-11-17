@@ -7,7 +7,7 @@ class Aws {
   constructor() {
     AWS.config.setPromisesDependency();
     AWS.config.update({
-      region: config.AWS.REGION,
+      region: config.AWS.REGION
     });
   }
 
@@ -17,7 +17,7 @@ class Aws {
     });
     return ssm
       .getParameters({
-        Names: [key],
+        Names: [key]
       })
       .promise()
       .then((res) => res.Parameters.pop())
@@ -33,11 +33,12 @@ class Aws {
     const params = {
       MessageBody: JSON.stringify(newOrder),
       MessageGroupId: newOrder._id.toString(),
-      QueueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME.replace('##_', newOrder.branchId.toString()),
+      QueueUrl: config.AWS.SQS.ORDER_PRODUCER.NAME.replace(
+        '##_',
+        newOrder.branchId.toString()
+      )
     };
-    return sqs
-      .sendMessage(params)
-      .promise();
+    return sqs.sendMessage(params).promise();
   }
 
   pollFromQueue() {
@@ -48,18 +49,18 @@ class Aws {
         'MessageGroupId',
         'Messages',
         'ResponseMetadata',
-        'RequestId',
+        'RequestId'
       ],
       batchSize: 10,
-      handleMessageBatch: (messages) => {
-        messages.forEach(async (message) => {
+      handleMessageBatch: async (messages) => {
+        for (let message of messages) {
           const setNews = new SetNews(
             message.Attributes.MessageGroupId,
-            message.MessageId,
+            message.MessageId
           );
-          setNews.setNews(JSON.parse(message.Body));
-        });
-      },
+          await setNews.setNews(JSON.parse(message.Body));
+        }
+      }
     })
       .on('error', (err) => {
         console.error('ERR', err.message);

@@ -31,7 +31,7 @@ const initPlatform = (internalCode, uuid) => {
   const platformFactory = new PlatformFactory();
   platformFactory.createPlatform(
     PlatformSingleton.getByCod(internalCode),
-    uuid,
+    uuid
   );
 };
 
@@ -49,35 +49,35 @@ const login = async (req, res) => {
     /* Update last contact with the platform */
     await model.updateOne(
       {
-        'credential.data.thirdPartyId': req.body.thirdPartyId,
+        'credential.data.thirdPartyId': req.body.thirdPartyId
       },
       {
-        lastContact: new Date(),
-      },
+        lastContact: new Date()
+      }
     );
     const findParams = {
       id: true,
       name: true,
       'credentials.data.thirdPartyId': true,
       'credentials.data.thirdPartySecret': true,
-      internalCode: true,
+      internalCode: true
     };
     const filterParams = {
       id: true,
       name: true,
-      permissions: true,
+      permissions: true
     };
 
     req.body = {
       'credentials.data.thirdPartyId': req.body.thirdPartyId,
-      'credentials.data.thirdPartySecret': req.body.thirdPartySecret,
+      'credentials.data.thirdPartySecret': req.body.thirdPartySecret
     };
     return _helpers.login(model, req, res, findParams, filterParams, undefined);
   } catch (error) {
     const msg = 'Can not login to the platform.';
     logger.error({
       message: msg,
-      meta: { error: error.toString(), body: req.body },
+      meta: { error: error.toString(), body: req.body }
     });
     return res.status(400).json({ error: msg }).end();
   }
@@ -89,9 +89,20 @@ const saveOrder = (req, res) => {
   const platformFactory = new PlatformFactory();
   const platform = platformFactory.createPlatform(
     PlatformSingleton.getByCod(req.token.internalCode),
-    req.uuid,
+    req.uuid
   );
   if (isArray(req.body)) {
+    req.body.forEach(async (data) => {
+      let result = await req.body.filter((filtro) => filtro.id === data.id);
+      if (result.length > 1)
+        res
+          .status(400)
+          .json({
+            error: `The array has more than one order with the id:${data.id}`
+          })
+          .end();
+    });
+
     const resultProm = req.body.map((data) => platform.validateNewOrders(data));
 
     Promise.all(resultProm)
@@ -128,7 +139,7 @@ const findOrder = (req, res) => {
   const platformFactory = new PlatformFactory();
   const platform = platformFactory.createPlatform(
     PlatformSingleton.getByCod(req.token.internalCode),
-    req.uuid,
+    req.uuid
   );
 
   platform
@@ -146,5 +157,5 @@ module.exports = {
   login,
   saveOrder,
   cancelOrder,
-  findOrder,
+  findOrder
 };
