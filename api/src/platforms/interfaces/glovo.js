@@ -164,7 +164,7 @@ module.exports = {
     retriveMinimunData: function (data) {
         return {
             branchReference: data.store_id.toString(),
-            posId: data.order_id,
+            posId: parseInt(data.order_id, 10),
             originalId: data.order_id.toString(),
             displayId: data.order_code.toString()
         }

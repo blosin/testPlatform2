@@ -27,6 +27,8 @@ module.exports = {
 				try {
 					let order = {};
 					order.id = data.order.id;
+                    order.originalId =  data.order.id;
+                    order.displayId =  data.order.id;
 					order.platformId = platform.internalCode;
 					order.statusId = NewsStateSingleton.idByCod(stateCod);
 					order.orderTime = data.order.registeredDate;

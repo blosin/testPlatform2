@@ -31,11 +31,11 @@ module.exports = {
           reject(err);
         }
       }
-
+      
       const paymentenMapper = (payment) => {
         try {
           let paymentNews = {};
-          paymentNews.typeId = 3; //Efectivo
+          paymentNews.typeId = payment.online ? 2 : 3; //Credito o Efectivo
           paymentNews.online = payment.online;
           paymentNews.shipping = payment.shipping || 0;
           paymentNews.discount = payment.discount || 0;
