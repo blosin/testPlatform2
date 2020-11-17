@@ -4,16 +4,16 @@ import NewsTypeSingleton from '../../utils/newsType';
 const paymentType = {
   DEBIT: {
     paymentId: 1,
-    paymentName: 'Debit',
+    paymentName: 'Debit'
   },
   CREDIT: {
     paymentId: 2,
-    paymentName: 'Credit',
+    paymentName: 'Credit'
   },
   Efectivo: {
     paymentId: 3,
-    paymentName: 'Efectivo',
-  },
+    paymentName: 'Efectivo'
+  }
 };
 
 module.exports = {
@@ -26,8 +26,8 @@ module.exports = {
             details: [],
             payment: {},
             totalAmount: {},
-            driver: [],
-          },
+            driver: []
+          }
         };
         news.viewed = null;
 
@@ -52,15 +52,23 @@ module.exports = {
 
         let paymentenMapper = (payment) => {
           let paymentNews = {};
-          const estimated_total_price = payment.estimated_total_price ? (parseFloat(payment.estimated_total_price / 100)) : 0;
-          const customer_cash_payment_amount = payment.customer_cash_payment_amount ? (parseFloat(payment.customer_cash_payment_amount / 100)) : 0;
-          const delivery_fee = payment.delivery_fee ? (parseFloat(payment.delivery_fee / 100)) : 0;
+          const estimated_total_price = payment.estimated_total_price
+            ? parseFloat(payment.estimated_total_price / 100)
+            : 0;
+          const customer_cash_payment_amount = payment.customer_cash_payment_amount
+            ? parseFloat(payment.customer_cash_payment_amount / 100)
+            : 0;
+          const delivery_fee = payment.delivery_fee
+            ? parseFloat(payment.delivery_fee / 100)
+            : 0;
 
-          if (payment.payment_method == 'CASH' || payment.payment_method == 'DELAYED') {
+          if (
+            payment.payment_method == 'CASH' ||
+            payment.payment_method == 'DELAYED'
+          ) {
             paymentNews.typeId = paymentType.Efectivo.paymentId;
             paymentNews.online = false;
-          }
-          else {
+          } else {
             paymentNews.typeId = paymentType.CREDIT.paymentId;
             paymentNews.online = true;
           }
@@ -70,35 +78,38 @@ module.exports = {
           paymentNews.discount = 0;
           paymentNews.voucher = 0;
 
-          paymentNews.currency = '?'
-          if (payment.currency == 'ARS')
-            paymentNews.currency = '$';
-          else if (payment.currency == 'EUR')
-            paymentNews.currency = '€';
+          paymentNews.currency = '?';
+          if (payment.currency == 'ARS') paymentNews.currency = '$';
+          else if (payment.currency == 'EUR') paymentNews.currency = '€';
 
-          paymentNews.remaining = customer_cash_payment_amount - estimated_total_price;
-          if (customer_cash_payment_amount == 0)
-            paymentNews.remaining = 0;
+          paymentNews.remaining =
+            customer_cash_payment_amount - estimated_total_price;
+          if (customer_cash_payment_amount == 0) paymentNews.remaining = 0;
 
           paymentNews.partial = 0;
           paymentNews.note = '';
           return paymentNews;
-        }
+        };
 
         let customerMapper = (orderCustomer, address) => {
           let customer = {};
           customer.id = 0;
           customer.name = orderCustomer.name ? orderCustomer.name : '';
-          if (address != null && (address.label != undefined || address.label != null)) {
+          if (
+            address != null &&
+            (address.label != undefined || address.label != null)
+          ) {
             customer.address = address.label;
           } else {
             customer.address = '';
           }
-          customer.phone = orderCustomer.phone_number ? orderCustomer.phone_number : '';
+          customer.phone = orderCustomer.phone_number
+            ? orderCustomer.phone_number
+            : '';
           customer.email = '-';
           customer.dni = null;
           return customer;
-        }
+        };
 
         let detailsMapper = (order) => {
           let details = [];
@@ -106,7 +117,7 @@ module.exports = {
           for (let detail of order.products) {
             let det = {};
             det.count = detail.quantity;
-            det.price = (parseFloat(detail.price / 100));
+            det.price = parseFloat(detail.price / 100);
             det.promo = 0;
             det.groupId = '0';
             det.discount = 0;
@@ -116,15 +127,18 @@ module.exports = {
             const glovoSku = parseInt(detail.id, 10);
             let tmpSku;
             //If glovoSku isNaN transform it to -1
-            if (isNaN(glovoSku))
-              tmpSku = '-1';
+            if (isNaN(glovoSku)) tmpSku = '-1';
             else
-              tmpSku = glovoSku >= 90000 && glovoSku <= 99999 ? '99999' : glovoSku.toString();
+              tmpSku =
+                glovoSku >= 90000 && glovoSku <= 99999
+                  ? '99999'
+                  : glovoSku.toString();
 
             let optionsString = '';
             if (detail.attributes.length > 0)
               for (let attribute of detail.attributes) {
-                optionsString += ' ' + attribute.name + ' cantidad ' + attribute.quantity;
+                optionsString +=
+                  ' ' + attribute.name + ' cantidad ' + attribute.quantity;
                 /* If the product has an item with sku 99999. It's sku is inside toppings */
                 if (tmpSku == '99999') {
                   tmpSku = attribute.id;
@@ -136,17 +150,18 @@ module.exports = {
             details.push(det);
           }
           return details;
-        }
+        };
 
         let driverMapper = (retrivedDriver) => {
-          if (!retrivedDriver)
-            return null;
+          if (!retrivedDriver) return null;
           let driver = {
             name: retrivedDriver.name ? retrivedDriver.name : '',
-            phone: retrivedDriver.phone_number ? retrivedDriver.phone_number : '',
+            phone: retrivedDriver.phone_number
+              ? retrivedDriver.phone_number
+              : ''
           };
           return driver;
-        }
+        };
 
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
         news.branchId = data.branchId;
@@ -160,9 +175,14 @@ module.exports = {
         news.order = orderMapper(data, platform);
         news.order.details = detailsMapper(data.order);
         news.order.payment = paymentenMapper(data.order);
-        news.order.customer = customerMapper(data.order.customer, data.order.delivery_address);
+        news.order.customer = customerMapper(
+          data.order.customer,
+          data.order.delivery_address
+        );
         news.order.driver = driverMapper(data.order.courier);
-        news.order.totalAmount = data.order.estimated_total_price ? (parseFloat(data.order.estimated_total_price / 100)) : 0;
+        news.order.totalAmount = data.order.estimated_total_price
+          ? parseFloat(data.order.estimated_total_price / 100)
+          : 0;
         resolve(news);
       } catch (error) {
         reject(error);
@@ -171,10 +191,10 @@ module.exports = {
   },
   retriveMinimunData: function (data) {
     return {
-      branchReference: data.store_id.toString(),
+      branchReference: data.store_id,
       posId: parseInt(data.order_id, 10),
-      originalId: data.order_id.toString(),
-      displayId: data.order_code.toString()
-    }
+      originalId: data.order_id,
+      displayId: data.order_order_Idcode
+    };
   }
-}
+};

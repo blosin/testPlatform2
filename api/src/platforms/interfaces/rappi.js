@@ -240,7 +240,6 @@ module.exports = {
     });
   },
   retriveMinimunData: function (data) {
-    console.log(data);
     return {
       branchReference: data.store.id.toString(),
       posId: data.order.id,

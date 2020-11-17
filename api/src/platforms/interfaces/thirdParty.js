@@ -8,7 +8,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const orderMapper = (data, platform) => {
         try {
-          let order = {}
+          let order = {};
           order.id = data.posId;
           order.originalId = data.originalId;
           order.displayId = data.displayId;
@@ -21,17 +21,20 @@ module.exports = {
           order.preOrder = data.order.preOrder;
           order.observations = data.order.notes;
           order.ownDelivery = data.order.logistics;
-          if (data.order.pickup)
-            order.ownDelivery = false;
+          if (data.order.pickup) order.ownDelivery = false;
 
           return order;
         } catch (error) {
           const msg = 'No se pudo parsear la orden del ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
-      }
-      
+      };
+
       const paymentenMapper = (payment) => {
         try {
           let paymentNews = {};
@@ -48,10 +51,14 @@ module.exports = {
           return paymentNews;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
-      }
+      };
 
       const driverMapper = (order) => {
         try {
@@ -59,10 +66,14 @@ module.exports = {
           return driver;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
-      }
+      };
 
       const extraDataMapper = (branch, platform) => {
         try {
@@ -71,11 +82,15 @@ module.exports = {
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : ""
+            region: branch.address.region ? branch.address.region.region : '',
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
       };
@@ -92,10 +107,14 @@ module.exports = {
           return customer;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
-      }
+      };
 
       const detailsMapper = (order) => {
         try {
@@ -114,9 +133,11 @@ module.exports = {
             det.promotion = false;
             det.groupId = 0;
 
-            if (detail.promotion &&
+            if (
+              detail.promotion &&
               !!detail.optionGroups &&
-              !!detail.optionGroups.length) {
+              !!detail.optionGroups.length
+            ) {
               det.promo = 2;
               det.groupId = groupId;
               details.push(det);
@@ -140,11 +161,14 @@ module.exports = {
           return details;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de ThirdParty.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString(),
+          });
           reject(err);
         }
-      }
-
+      };
       try {
         let news = {};
         news.viewed = null;
@@ -157,11 +181,17 @@ module.exports = {
         news.order.payment = paymentenMapper(data.order.payment[0]);
         news.order.driver = driverMapper(data.order);
         news.extraData = extraDataMapper(branch, platform);
-        news.order.totalAmount = data.order.payment[0].subtotal - data.order.payment[0].discount;
+        news.order.totalAmount =
+          data.order.payment[0].subtotal -
+          (data.order.payment[0].discount ? data.order.payment[0].discount : 0);
         resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de un ThirdParty.';
-        const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+        const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+          data,
+          branch,
+          error: error.toString(),
+        });
         reject(err);
       }
     });
@@ -172,6 +202,6 @@ module.exports = {
       posId: data.id,
       originalId: data.id.toString(),
       displayId: data.id.toString(),
-    }
-  }
-}
+    };
+  },
+};
