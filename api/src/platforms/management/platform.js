@@ -501,7 +501,7 @@ class Platform {
       /* Validate  orders */
       let order = await orderModel
         .find({
-          originalId: { $in: minOrders.originalId },
+          originalId: minOrders.originalId,
           internalCode: this._platform.internalCode,
           state: { $ne: NewsStateSingleton.stateByCod('rej_closed') }
         })
