@@ -130,6 +130,10 @@ const branchSchema = new Schema(
     credentials: {
       aws_id: { type: String },
       aws_secret: { type: String }
+    },
+    updaterVersion: {
+      type: String,
+      maxlength: 50
     }
   },
   {
