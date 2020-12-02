@@ -17,8 +17,7 @@ const activeSoftwareSchema = new Schema(
       releaseDate: {
         type: Date,
         required: true
-      },
-      keyName: { type: String, required: true, maxlength: 150 }
+      }
     },
     notificator: {
       actualVersion: {
@@ -34,8 +33,7 @@ const activeSoftwareSchema = new Schema(
       releaseDate: {
         type: Date,
         required: true
-      },
-      keyName: { type: String, required: true, maxlength: 150 }
+      }
     },
     updaterVersion: {
       type: String,
