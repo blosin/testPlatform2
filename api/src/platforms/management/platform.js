@@ -603,7 +603,8 @@ class Platform {
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
           'client.businessName': '$joinClients.businessName',
-          'address.region': '$joinRegions.region'
+          'address.region': '$joinRegions.region',
+          smartfran_sw: '$smartfran_sw'
         }
       },
       {
@@ -752,7 +753,11 @@ class Platform {
             promiseNew
           ]);
 
-          if (isOpened && branch.platform.isActive) {
+          if (
+            isOpened &&
+            branch.platform.isActive &&
+            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24
+          ) {
             //Push all savedNews to the queue
             await this.aws.pushNewToQueue(savedNews);
           }
