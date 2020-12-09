@@ -58,7 +58,7 @@ const branchSchema = new Schema(
       {
         platform: { type: Schema.Types.ObjectId, ref: platformSchema },
         branchReference: { type: String },
-        branchIdReference: { type: Number },
+        branchIdReference: { type: String },
         lastGetNews: { type: Date },
         progClosed: [{ close: Date, open: Date, description: String }],
         isActive: { type: Boolean, default: true }
