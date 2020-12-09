@@ -34,7 +34,7 @@ class Platform {
    * */
   getDeliveryTimes() {
     return new Promise((resolve) => {
-      let data = require('../../assets/deliveryTimes').generic;
+      const data = require('../../assets/deliveryTimes').generic;
       data.forEach((obj) => (obj.platformId = this._platform.internalCode));
       resolve(data);
     });
@@ -46,7 +46,7 @@ class Platform {
   getRejectedMessages() {
     return new Promise((resolve) => {
       let data = require('../../assets/rejectedMessages').generic;
-      let negatives = require('../../assets/rejectedMessages').negatives;
+      const negatives = require('../../assets/rejectedMessages').negatives;
       data = data.concat(negatives);
       data.forEach((obj) => (obj.platformId = this._platform.internalCode));
       resolve(data);
@@ -145,7 +145,7 @@ class Platform {
   openRestaurant(branchId) {
     return new Promise(async (resolve, reject) => {
       try {
-        let dateNow = new Date();
+        const dateNow = new Date();
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
@@ -191,7 +191,7 @@ class Platform {
   closeRestaurant(branchId, timeToClose, description) {
     return new Promise(async (resolve, reject) => {
       try {
-        let dateNow = new Date();
+        const dateNow = new Date();
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
@@ -284,7 +284,7 @@ class Platform {
           }
         },
         {
-          state: state,
+          state,
           'order.state': state
         },
         {
@@ -388,7 +388,7 @@ class Platform {
           await this.updateOrderState({ originalId: orderId }, state);
           resolve({
             id: orderId,
-            state: state
+            state
           });
         } catch (error) {
           logger.error({ meta: { error: error.toString() } });

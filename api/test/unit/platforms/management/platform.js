@@ -170,7 +170,7 @@ const branches = [
     platforms: [
       {
         progClosed: [
-          { _id: 'dasdasdadasd', opened: new Date(), closed: new Date() }
+          { _id: 'dasdasdadasd', open: new Date(), close: new Date() }
         ],
         _id: '5d87cea59b0634004fd83c6b',
         platform: { _id: '5d87cea59b0634004fd83c6b' },
@@ -366,6 +366,36 @@ describe('Platform', function () {
       expect(updOrderStateStub.calledWith(order, stateId)).to.be.true;
 
       expect(res).to.eql(na);
+    });
+  });
+
+  describe('fn(): rejectPlatformOrder()', function () {
+    const stateCod = 'rej';
+    const stateId = 2;
+    const result = {
+      id: order.id,
+      state: stateId
+    };
+    it('should reject the Platform order correctly', async () => {
+      const platform = new Platform();
+      const stateIdByCodStub = sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(stateId);
+      const updOrderStateStub = sandbox
+        .stub(platform, 'updateOrderState')
+        .resolves(true);
+
+      const res = await platform.rejectPlatformOrder(order.id);
+
+      expect(stateIdByCodStub.callCount).to.equal(1);
+      expect(stateIdByCodStub.calledWith(stateCod)).to.be.true;
+
+      expect(updOrderStateStub.callCount).to.equal(1);
+      expect(updOrderStateStub.calledWith({ originalId: order.id }, stateId)).to
+        .be.true;
+
+      expect(res).to.eql(result);
     });
   });
 
@@ -638,12 +668,22 @@ describe('Platform', function () {
         internalCode: 10,
         _id: '5d87cea59b0634004fd83c6b'
       };
-      let res = await platform.isClosedRestaurant(
-        branches[0],
-        newOrders[0].orderId,
-        platformSaved
-      );
+      let res = await platform.isClosedRestaurant(branches[0].platforms);
       expect(res).to.eql(true);
+    });
+
+    it('should dont pass the validation', async function () {
+      let branchPlatforms = {
+        lastGetNews: '2020-11-04T18:35:29.670Z'
+      };
+
+      let platform = new Platform();
+      platform._platform = {
+        internalCode: 10,
+        _id: '5d87cea59b0634004fd83c6b'
+      };
+      let res = await platform.isClosedRestaurant(branchPlatforms);
+      expect(res).to.eql(false);
     });
   });
 
