@@ -39,7 +39,7 @@ clean:
   only: 
     - test_devops   
   tags:
-    - Smartfran
+    - runner-smartfran
 
 # unit-test:
 #   stage: unit-test
