@@ -6,11 +6,11 @@ variables:
     PROJ_IMG: "smartfran/platform-service"
     ECR_REPOSITORY: "$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com"
 
-# services:
-#   - docker:dind 
+services:
+  - docker:dind 
 
-# before_script:
-#   - BUILD_TAG="$CI_COMMIT_TAG"
+before_script:
+  - BUILD_TAG="$CI_COMMIT_TAG"
 
 cache:
   untracked: true
@@ -39,7 +39,7 @@ clean:
   only: 
     - test_devops   
   tags:
-    - smartfran
+    - Smartfran
 
 # unit-test:
 #   stage: unit-test
