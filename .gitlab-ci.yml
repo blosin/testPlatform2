@@ -1,0 +1,153 @@
+image: docker:stable
+include: 
+  - api/infra/docker-build.yml'
+  - api/infra/ecr-push.yml'
+  - api/infra/ecs-deploy.yml'
+
+variables:
+    AWS_ACCOUNT: 423857476668
+    ECR_REGION: "us-west-2"
+    PROJ_IMG: "smartfran/platform-service"
+    ECR_REPOSITORY: "$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com"
+
+# services:
+#   - docker:dind 
+
+# before_script:
+#   - BUILD_TAG="$CI_COMMIT_TAG"
+
+cache:
+  untracked: true
+  key: '$CI_BUILD_REF_NAME'
+  paths:
+    - node_modules/
+
+stages:
+  - clean
+  - unit-test
+  - static-test
+  - build
+  - restore-db
+  - push-image
+  - deploy
+
+clean:
+  stage: clean
+  script:
+    - echo "Removing all containers"
+    - test $(docker ps -aq) && docker rm -f $(docker ps -aq)
+    - echo "Prune all docker stuff without use"
+    - sudo docker system prune --force --all --volumes
+    - echo "Clean npm garbage"
+    - rm -rf node_modules package-lock.json yarn-lock.json
+  only: 
+    - test_devops   
+  tags:
+    - smartfran
+
+# unit-test:
+#   stage: unit-test
+#   before_script:
+#      - npm install
+#   script:
+#      - npm run test
+#   only:
+#     - develop
+#     - tags
+#     - schedules
+#   tags:
+#     - inviertis-backend
+
+
+# static-test:
+#   stage: static-test
+#   allow_failure: true
+#   script:
+#     - export SONAR_SCANNER_OPTS="-Xmx512m"
+#     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+#   only:
+#     - tags
+#   tags:
+#     - inviertis-backend
+  
+
+
+# build-test:
+#   extends: .build
+#   before_script:
+#     - BUILD_TAG="$CI_COMMIT_TAG"
+#   only:
+#     - tags
+#   environment: $CI_COMMIT_REF_SLUG
+
+
+# restore-db-test:
+#   stage: restore-db
+#   allow_failure: true
+#   before_script:
+#   script:
+#      - npm i
+#      - NODE_ENV=testing npm run seed
+#   tags:
+#     - inviertis-backend
+
+
+# push-test:
+#   extends: .push
+#   before_script:
+#     - BUILD_TAG="$CI_COMMIT_TAG"
+#   only:
+#     - tags
+#   environment: $CI_COMMIT_REF_SLUG
+
+  
+# deploy-testing:
+#   extends: .deploy
+#   before_script:
+#     - export BUILD_TAG="$CI_COMMIT_TAG"
+#   variables:
+#     ENV: tst
+#     CLUSTER: inviertis-common
+#     SERVICE: inviertis-api-$ENV-service
+#     TASK: inviertis-api-$ENV-task
+#     ECS_REGION: us-west-2
+#     ECS_TEMPLATE: ./infra-templates/ecs-ec2-container-definitions.json
+#   only:
+#     - tags
+#   environment: $CI_COMMIT_REF_SLUG
+
+# deploy-staging:
+#   extends: .deploy
+#   before_script:
+#     - export BUILD_TAG="$CI_COMMIT_TAG"
+#   variables:
+#     ENV: stg
+#     CLUSTER: inviertis-common
+#     SERVICE: inviertis-api-$ENV-service
+#     TASK: inviertis-api-$ENV-task
+#     ECS_REGION: us-west-2
+#     ECS_TEMPLATE: ./infra-templates/ecs-ec2-container-definitions.json
+#   when: manual
+#   only:
+#     - tags
+#   environment: $CI_COMMIT_REF_SLUG
+
+# deploy-production:
+#   extends: .deploy
+#   before_script:
+#     - export BUILD_TAG="$CI_COMMIT_TAG"
+#   variables:
+#     ENV: prod
+#     CLUSTER: inviertis-$ENV
+#     SERVICE: inviertis-api-$ENV-service
+#     TASK: inviertis-api-$ENV-task
+#     ECS_REGION: us-east-1
+#     ECS_TEMPLATE: ./infra-templates/ecs-fargate-container-definitions.json
+#   when: manual
+#   only:
+#     - tags
+#   environment: $CI_COMMIT_REF_SLUG
+
+
+
+

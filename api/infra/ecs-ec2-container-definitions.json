@@ -1,0 +1,48 @@
+{
+    "containerDefinitions": [
+      {
+        "portMappings": [
+          {
+            "hostPort": 0,
+            "protocol": "tcp",
+            "containerPort": 3087
+          }
+        ],
+        "cpu": 0,
+        "memory": 256,
+        "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${IMG_TAG}",
+        "essential": true,
+        "name": "${SERVICE_NAME}-${BRANCH_NAME}-container",
+        "entryPoint": [
+          "npm",
+          "run"
+        ],
+        "command": [
+          "serve"
+        ],
+        "environment": [
+          {
+            "name": "NODE_ENV",
+            "value": "${BRANCH_NAME}"
+          }
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "key": "Customer",
+        "value": "Smartfran"
+      },
+      {
+        "key": "Environment",
+        "value": "${BRANCH_NAME}"
+      },
+      {
+        "key": "Project",
+        "value": "Platform-service"
+      }
+    ],
+    "family": "${SERVICE_NAME}-${BRANCH_NAME}-task",
+    "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+  
+  }

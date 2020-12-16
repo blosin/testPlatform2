@@ -1,0 +1,13 @@
+.push:
+  stage: push-image
+  script:
+    - echo "Login to ECR"
+    - aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
+    - echo "Pushing image..."
+    - echo $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
+    - docker push $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
+  after_script:
+    - docker system prune --force --all --volumes
+  tags:
+    - inviertis-backend
+  environment: $CI_COMMIT_REF_SLUG
