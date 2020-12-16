@@ -21,19 +21,19 @@ stages:
   - push-image
   - deploy
 
-clean:
-  stage: clean
-  script:
-    - echo "Removing all containers"
-    #- test $(docker ps -aq) && docker rm -f $(docker ps -aq)
-    - echo "Prune all docker stuff without use"
-    - sudo docker system prune --force --all --volumes
-    - echo "Clean npm garbage"
-    - rm -rf node_modules package-lock.json yarn-lock.json
-  only: 
-    - test_devops   
-  tags:
-    - runner-smartfran
+# clean:
+#   stage: clean
+#   script:
+#     - echo "Removing all containers"
+#     #- test $(docker ps -aq) && docker rm -f $(docker ps -aq)
+#     - echo "Prune all docker stuff without use"
+#     - docker system prune --force --all --volumes
+#     - echo "Clean npm garbage"
+#     - rm -rf node_modules package-lock.json yarn-lock.json
+#   only: 
+#     - test_devops   
+#   tags:adad
+#     - runner-smartfran
 
 
 unit-test:
