@@ -31,7 +31,7 @@ clean:
   stage: clean
   script:
     - echo "Removing all containers"
-    - test $(docker ps -aq) && docker rm -f $(docker ps -aq)
+    #- test $(docker ps -aq) && docker rm -f $(docker ps -aq)
     - echo "Prune all docker stuff without use"
     - sudo docker system prune --force --all --volumes
     - echo "Clean npm garbage"
@@ -39,20 +39,19 @@ clean:
   only: 
     - test_devops   
   tags:
-    - Smartfran
+    - runner-smartfran
 
-# unit-test:
-#   stage: unit-test
-#   before_script:
-#      - npm install
-#   script:
-#      - npm run test
-#   only:
-#     - develop
-#     - tags
-#     - schedules
-#   tags:
-#     - inviertis-backend
+
+unit-test:
+  stage: unit-test
+  before_script:
+     - npm install
+  script:
+     - npm run test
+  only:
+    - test_devops
+  tags:
+    - runner-smartfran
 
 
 # static-test:
