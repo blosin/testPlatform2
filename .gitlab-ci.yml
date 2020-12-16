@@ -1,8 +1,8 @@
 image: docker:stable
 include: 
-  - api/infra/docker-build.yml'
-  - api/infra/ecr-push.yml'
-  - api/infra/ecs-deploy.yml'
+  - \\api\infra\docker-build.yml'
+  - \\api\infra\ecr-push.yml'
+  - \\api\infra\ecs-deploy.yml'
 
 variables:
     AWS_ACCOUNT: 423857476668
