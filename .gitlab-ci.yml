@@ -44,7 +44,7 @@ stages:
 unit-test:
   stage: unit-test
   before_script:
-    - cd api/src/platforms/sdk/pedidosYa && rm -rf node_modules package-lock.json && npm i && cd ../../../.. && npm i
+    - cd api/src/platforms/sdk/pedidosYa ; npm i ; cd ../../../.. ; npm i
   script:
     - npm run test
   only:
