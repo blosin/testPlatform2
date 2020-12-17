@@ -12,6 +12,12 @@ services:
 before_script:
   - set BUILD_TAG="$CI_COMMIT_TAG"
 
+cache:
+  untracked: true
+  key: '$CI_BUILD_REF_NAME'
+  paths:
+    - node_modules/
+
 stages:
   - clean
   - unit-test
