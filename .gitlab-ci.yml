@@ -54,24 +54,25 @@ unit-test:
 static-test:
   stage: static-test
   allow_failure: true
-  before_script:
-    - cd api/src
   script:
     - C:\sonar-scanner-4.2.0.1873-windows\bin\sonar-scanner.bat
-  
   only:
     - test_devops
-
   tags:
     - runner-smartfran
 
-# build-test:
-#   extends: .build
-#   before_script:
-#     - BUILD_TAG="$CI_COMMIT_TAG"
-#   only:
-#     - tags
-#   environment: $CI_COMMIT_REF_SLUG
+build-test:
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  script:
+    - echo "Building image..."
+    - docker build -t $PROJ_IMG .
+    - echo "Tagging image $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG "
+    - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
+  tags:
+    - runner-smartfran
+  environment: $CI_COMMIT_REF_SLUG
 
 # restore-db-test:
 #   stage: restore-db
