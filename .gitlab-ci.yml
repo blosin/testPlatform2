@@ -54,6 +54,7 @@ unit-test:
 static-test:
   stage: static-test
   allow_failure: true
+  before_script:
     - cd api/src
   script:
     - C:\sonar-scanner-4.2.0.1873-windows\bin\sonar-scanner.bat
