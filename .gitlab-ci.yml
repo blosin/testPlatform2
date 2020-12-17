@@ -12,12 +12,12 @@ services:
 before_script:
   - set BUILD_TAG="$CI_COMMIT_TAG"
 
-cache:
-  untracked: true
-  key: '$CI_BUILD_REF_NAME'
-  paths:
-    - api/node_modules/
-    - api/src/platforms/sdk/pedidosYa/node_modules/
+# cache:
+#   untracked: true
+#   key: '$CI_BUILD_REF_NAME'
+#   paths:
+#     - api/node_modules/
+#     - api/src/platforms/sdk/pedidosYa/node_modules/
 
 stages:
   - clean
