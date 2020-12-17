@@ -1,13 +1,13 @@
 image: docker:stable
 
 variables:
-    AWS_ACCOUNT: 423857476668
-    ECR_REGION: "us-west-2"
-    PROJ_IMG: "smartfran/platform-service"
-    ECR_REPOSITORY: "$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com"
+  AWS_ACCOUNT: 423857476668
+  ECR_REGION: 'us-west-2'
+  PROJ_IMG: 'smartfran/platform-service'
+  ECR_REPOSITORY: '$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com'
 
 services:
-  - docker:dind 
+  - docker:dind
 
 before_script:
   - set BUILD_TAG="$CI_COMMIT_TAG"
@@ -16,7 +16,7 @@ cache:
   untracked: true
   key: '$CI_BUILD_REF_NAME'
   paths:
-    - node_modules/
+    - api/node_modules/
 
 stages:
   - clean
@@ -36,24 +36,21 @@ stages:
 #     - docker system prune --force --all --volumes
 #     - echo "Clean npm garbage"
 #     - rm -rf node_modules package-lock.json yarn-lock.json
-#   only: 
-#     - test_devops   
+#   only:
+#     - test_devops
 #   tags:adad
 #     - runner-smartfran
-
 
 unit-test:
   stage: unit-test
   before_script:
-     - npm install --save-dev cross-env
+    - npm install --save-dev cross-env
   script:
-     - npm run test
+    - npm run test
   only:
     - test_devops
   tags:
     - runner-smartfran
-
-
 # static-test:
 #   stage: static-test
 #   allow_failure: true
@@ -64,8 +61,6 @@ unit-test:
 #     - tags
 #   tags:
 #     - inviertis-backend
-  
-
 
 # build-test:
 #   extends: .build
@@ -74,7 +69,6 @@ unit-test:
 #   only:
 #     - tags
 #   environment: $CI_COMMIT_REF_SLUG
-
 
 # restore-db-test:
 #   stage: restore-db
@@ -86,7 +80,6 @@ unit-test:
 #   tags:
 #     - inviertis-backend
 
-
 # push-test:
 #   extends: .push
 #   before_script:
@@ -95,7 +88,6 @@ unit-test:
 #     - tags
 #   environment: $CI_COMMIT_REF_SLUG
 
-  
 # deploy-testing:
 #   extends: .deploy
 #   before_script:
@@ -142,7 +134,4 @@ unit-test:
 #   only:
 #     - tags
 #   environment: $CI_COMMIT_REF_SLUG
-
-
-
 
