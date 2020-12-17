@@ -24,7 +24,7 @@ const glovo_order = {
     currency: 'ARS',
     courier: {
       name: 'Flash',
-      phone_number: '+34666666666',
+      phone_number: '+34666666666'
     },
     customer: {
       name: 'John Doe',
@@ -33,8 +33,8 @@ const glovo_order = {
       invoicing_details: {
         company_name: 'Acme Inc.',
         company_address: '42 Wallaby Way, Sydney',
-        tax_id: 'B12341234',
-      },
+        tax_id: 'B12341234'
+      }
     },
     order_code: 'BA7DWBUL',
     allergy_info: 'I am allergic to tomato',
@@ -53,25 +53,25 @@ const glovo_order = {
             quantity: 1,
             id: 'at1',
             name: 'Chocolate',
-            price: 3000,
+            price: 3000
           },
           {
             quantity: 1,
             id: 'at2',
             name: 'Limon',
-            price: 2000,
-          },
-        ],
-      },
+            price: 2000
+          }
+        ]
+      }
     ],
     delivery_address: {
       label: 'John Doe Address',
       latitude: 41.3971955,
-      longitude: 2.2001737,
+      longitude: 2.2001737
     },
     bundled_orders: ['order-id-1', 'order-id-2'],
-    pick_up_code: '433',
-  },
+    pick_up_code: '433'
+  }
 };
 const glovo_new = {
   extraData: {
@@ -79,7 +79,7 @@ const glovo_new = {
     chain: 'Grido',
     client: 'Perez Juan',
     platform: 'Glovo',
-    region: 'Noreste',
+    region: 'Noreste'
   },
   order: {
     customer: {
@@ -88,7 +88,7 @@ const glovo_new = {
       address: 'John Doe Address',
       phone: '3510000000',
       dni: null,
-      email: '-',
+      email: '-'
     },
     details: [
       {
@@ -101,8 +101,8 @@ const glovo_new = {
         description: 'Helado 1k',
         note: '',
         sku: '1',
-        optionalText: ' Chocolate cantidad 1 Limon cantidad 1',
-      },
+        optionalText: ' Chocolate cantidad 1 Limon cantidad 1'
+      }
     ],
     payment: {
       typeId: 3,
@@ -114,12 +114,12 @@ const glovo_new = {
       currency: '$',
       remaining: 19.2,
       partial: 0,
-      note: '',
+      note: ''
     },
     totalAmount: 30.8,
     driver: {
       name: 'Flash',
-      phone: '+34666666666',
+      phone: '+34666666666'
     },
     id: 'BA7DWBUL',
     platformId: 9,
@@ -132,11 +132,11 @@ const glovo_new = {
     deliveryTime: null,
     observations: 'I am allergic to tomato',
     preOrder: false,
-    displayId: 1050289,
+    displayId: 1050289
   },
   typeId: 1,
   branchId: '15',
-  viewed: null,
+  viewed: null
 };
 const platform = {
   name: 'Glovo',
@@ -144,7 +144,7 @@ const platform = {
   internalCode: 9,
   createdAt: '2019-09-22T19:45:40.111Z',
   updatedAt: '2019-09-22T19:45:40.111Z',
-  id: '5d87cf649b0634004fd83c6e',
+  id: '5d87cf649b0634004fd83c6e'
 };
 const branch = {
   address: { region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' } },
@@ -157,43 +157,43 @@ const branch = {
       _id: '5d87d35ec50f1f0068e92bc2',
       platform: { _id: 'a24d12527267ecfd0b946390', name: 'PedidosYa' },
       branchReference: 19,
-      lastGetNews: ' 2019-12-18T23:29:13.483Z',
+      lastGetNews: ' 2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc1',
       platform: { _id: 'f3fc2fb96e42d11cc7c65b4b', name: 'Rappi' },
       branchReference: 115001,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc0',
       platform: { _id: '2fa749ada05d3303fb00322b', name: 'PaD' },
       branchReference: 3593,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bbf',
       platform: { _id: 'c602426305e1e834cb7fcedc', name: 'Croni' },
       branchReference: 210,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e98acf',
       platform: { _id: 'c602426305e1e834cb7fcacec', name: 'Glovo' },
       branchReference: 19,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
-    },
+      lastGetNews: '2019-12-18T23:29:13.483Z'
+    }
   ],
   chain: { _id: '3b0ed8fa297fb07209439589', chain: 'Grido' },
   client: {
     _id: '0275758a0bc8e6dc0b269c5c',
     contact: 'Juan Perez',
-    businessName: 'Perez Juan',
-  },
+    businessName: 'Perez Juan'
+  }
 };
 describe('GLOVO - Platform parser', function () {
   beforeEach(() => {
@@ -215,13 +215,13 @@ describe('GLOVO - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       expect(return_new).to.eql(glovo_new);
     });
   });
 
-  describe('retrive minimun data order', function () {
+  /*   describe('retrive minimun data order', function () {
     context('order with platform format', function () {
       it('should return minium data of the order.', function () {
         let glovo_order = {
@@ -277,5 +277,5 @@ describe('GLOVO - Platform parser', function () {
         });
       });
     });
-  });
+  }); */
 });
