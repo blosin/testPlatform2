@@ -44,8 +44,9 @@ stages:
 unit-test:
   stage: unit-test
   before_script:
-    - npm install
+    - cd api
   script:
+    - npm install
     - npm run test
   only:
     - test_devops
