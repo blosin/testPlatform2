@@ -17,6 +17,7 @@ cache:
   key: '$CI_BUILD_REF_NAME'
   paths:
     - api/node_modules/
+    - api/src/platforms/sdk/pedidosYa/node_modules
 
 stages:
   - clean
