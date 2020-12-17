@@ -52,16 +52,16 @@ unit-test:
     - test_devops
   tags:
     - runner-smartfran
-# static-test:
-#   stage: static-test
-#   allow_failure: true
-#   script:
-#     - export SONAR_SCANNER_OPTS="-Xmx512m"
-#     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
-#   only:
-#     - tags
-#   tags:
-#     - inviertis-backend
+
+static-test:
+  stage: static-test
+  allow_failure: true
+  script:
+    - C:\sonar-scanner-4.2.0.1873-windows\bin
+  only:
+    - test_devops
+  tags:
+    - runner-smartfran
 
 # build-test:
 #   extends: .build
