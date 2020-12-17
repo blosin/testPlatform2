@@ -14,7 +14,6 @@ api/node_modules/
 .vscode
 api/dist/
 
-api/package-lock.json
 api/src/platforms/sdk/pedidosYa/node_modules/
 api/src/platforms/sdk/pedidosYa/package-lock.json
 
