@@ -63,8 +63,6 @@ static-test:
 
 build-test:
   stage: build
-  variables:
-    DOCKER_DRIVER: overlay2
   script:
     - echo "Building image..."
     - docker build -t $PROJ_IMG .
