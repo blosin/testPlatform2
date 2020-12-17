@@ -63,6 +63,8 @@ static-test:
 
 build-test:
   stage: build
+  before_script:
+    - cd api
   script:
     - echo "Building image..."
     - docker build -t ${PROJ_IMG} .
