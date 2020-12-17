@@ -48,8 +48,6 @@ unit-test:
     - cd api/src/platforms/sdk/pedidosYa ; npm i ; cd ../../../.. ; npm i
   script:
     - npm run test
-  only:
-    - test_devops
   tags:
     - runner-smartfran
 
@@ -57,9 +55,11 @@ static-test:
   stage: static-test
   allow_failure: true
   script:
-    - C:\sonar-scanner-4.2.0.1873-windows\bin
+    - C:\sonar-scanner-4.2.0.1873-windows\bin\sonar-scanner.bat
+  
   only:
     - test_devops
+
   tags:
     - runner-smartfran
 
