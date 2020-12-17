@@ -45,8 +45,10 @@ unit-test:
   stage: unit-test
   before_script:
     - cd api
-  script:
     - npm install
+    - cd src/platforms/sdk/pedidosYa
+    - npm install
+  script:
     - npm run test
   only:
     - test_devops
