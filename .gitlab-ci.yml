@@ -44,7 +44,7 @@ stages:
 unit-test:
   stage: unit-test
   before_script:
-    - npm install --save-dev cross-env
+    - npm install
   script:
     - npm run test
   only:
