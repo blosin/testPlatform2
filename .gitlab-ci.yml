@@ -65,9 +65,9 @@ build-test:
   stage: build
   script:
     - echo "Building image..."
-    - docker build -t $PROJ_IMG .
-    - echo "Tagging image $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG "
-    - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
+    - docker build -t ${PROJ_IMG} .
+    - echo "Tagging image ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG} "
+    - docker tag ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}
   tags:
     - runner-smartfran
   environment: $CI_COMMIT_REF_SLUG
