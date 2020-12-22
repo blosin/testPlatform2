@@ -1,16 +1,15 @@
-'use strict'
+'use strict';
 import PedidosYa from '../pedidosYa';
 
 class PedidosYaSingleton {
-    constructor() {
-    }
+  constructor() {}
 
-    static getInstance(platform) {
-        if (!PedidosYaSingleton.instance) {
-            PedidosYaSingleton.instance = new PedidosYa(platform);
-        }
-        return PedidosYaSingleton.instance;
+  static getInstance(platform) {
+    if (!PedidosYaSingleton.instance) {
+      PedidosYaSingleton.instance = new PedidosYa(platform);
     }
+    return PedidosYaSingleton.instance;
+  }
 }
 
 export default PedidosYaSingleton;

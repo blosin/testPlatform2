@@ -1,17 +1,16 @@
-'use strict'
+'use strict';
 
 import Croni from '../croni';
 
 class CroniSingleton {
-    constructor() {
-    }
+  constructor() {}
 
-    static getInstance(platform) {
-        if (!CroniSingleton.instance) {
-            CroniSingleton.instance = new Croni(platform);
-        }
-        return CroniSingleton.instance;
+  static getInstance(platform) {
+    if (!CroniSingleton.instance) {
+      CroniSingleton.instance = new Croni(platform);
     }
+    return CroniSingleton.instance;
+  }
 }
 
 export default CroniSingleton;
