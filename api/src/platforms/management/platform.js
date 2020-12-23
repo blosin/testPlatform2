@@ -636,7 +636,6 @@ class Platform {
       try {
         let branches = await this.getOrderBranches(branchReference);
         branch = branches[0];
-
         if (!branch) throw 'There is no branch for this order';
 
         let trace, stateCod, newsCode, orderCreator;
@@ -752,7 +751,6 @@ class Platform {
             promiseOrder,
             promiseNew
           ]);
-
           if (
             isOpened &&
             branch.platform.isActive &&

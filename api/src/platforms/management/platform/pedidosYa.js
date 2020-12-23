@@ -28,32 +28,34 @@ class PedidosYa extends Platform {
     if (
       this._platform &&
       this._platform.credentials &&
-      this._platform.credentials.data &&
-      this._platform.credentials.data.clientId &&
-      this._platform.credentials.data.clientSecret &&
-      this._platform.credentials.data.environment
-    ) {
-      try {
-        this.credentials = new Credentials();
-        this.credentials.clientId = this._platform.credentials.data.clientId;
-        this.credentials.clientSecret = this._platform.credentials.data.clientSecret;
-        this.credentials.environment =
-          Environments[this._platform.credentials.data.environment];
-        this._api = new ApiClient(this.credentials);
-        this.getOrders();
-        console.log(`${this._platform.name}.\t Inicializated.`);
-      } catch (error) {
+      this._platform.credentials.data
+    )
+      if (
+        this._platform.credentials.data.clientId &&
+        this._platform.credentials.data.clientSecret &&
+        this._platform.credentials.data.environment
+      ) {
+        try {
+          this.credentials = new Credentials();
+          this.credentials.clientId = this._platform.credentials.data.clientId;
+          this.credentials.clientSecret = this._platform.credentials.data.clientSecret;
+          this.credentials.environment =
+            Environments[this._platform.credentials.data.environment];
+          this._api = new ApiClient(this.credentials);
+          this.getOrders();
+          console.log(`${this._platform.name}.\t Inicializated.`);
+        } catch (error) {
+          const msg = 'Can not initializate PY.';
+          new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
+            platform: this._platform
+          });
+        }
+      } else {
         const msg = 'Can not initializate PY.';
         new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
-          platform: this._platform,
+          platform: this._platform
         });
       }
-    } else {
-      const msg = 'Can not initializate PY.';
-      new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
-        platform: this._platform,
-      });
-    }
   }
 
   /**
@@ -65,6 +67,7 @@ class PedidosYa extends Platform {
   }
 
   async getOrders() {
+    console.log(9999999999999999999, this._api.order);
     await this._api.order.getAll(
       null,
       PaginationOptions.create(),
@@ -76,9 +79,9 @@ class PedidosYa extends Platform {
         const msg = 'Fallo al obtener ordenes de PY.';
         new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
           orderId: order.id,
-          platformError: error.toString(),
+          platformError: error.toString()
         });
-      },
+      }
     );
   }
 
@@ -106,9 +109,10 @@ class PedidosYa extends Platform {
   initRestaurant(idRef) {
     return new Promise(async (resolve, reject) => {
       try {
-        let version = {};
-        version.os = 'Docker container';
-        version.app = '0.0.1';
+        const version = {
+          os: 'Docker container',
+          app: '0.0.1'
+        };
         await this._api.event.initialization(version, idRef);
         resolve();
       } catch (error) {
@@ -116,7 +120,7 @@ class PedidosYa extends Platform {
         const msg = 'No se pudo inicializar el restaurant.';
         const err = new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
           idRef,
-          platformError: error.toString(),
+          platformError: error.toString()
         });
         reject(err);
       }
@@ -128,7 +132,7 @@ class PedidosYa extends Platform {
     try {
       const savedOrder = await orderModel.findOne({
         orderId: data.id,
-        internalCode: this._platform.internalCode,
+        internalCode: this._platform.internalCode
       });
       if (data.state == NewsStateSingleton.stateByCod('pend')) {
         if (!savedOrder) {
@@ -162,7 +166,7 @@ class PedidosYa extends Platform {
             rejectMessageId: parseInt(rej.id, 10),
             rejectMessageDescription: rej.name,
             rejectMessageNote: null,
-            entity: 'PLATFORM',
+            entity: 'PLATFORM'
           };
           await this.updateNewsState(
             savedOrder.order,
@@ -170,7 +174,7 @@ class PedidosYa extends Platform {
             typeId,
             viewed,
             'PLATFORM',
-            rejectedExtraData,
+            rejectedExtraData
           );
         } catch (error) {
           throw error;
@@ -180,7 +184,7 @@ class PedidosYa extends Platform {
       const msg = 'No se pudo procesar la orden entrante.';
       new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
         orderId: data.id,
-        platformError: error.toString(),
+        platformError: error.toString()
       });
     }
   }
@@ -195,7 +199,7 @@ class PedidosYa extends Platform {
         const branch = await branchModel.findOne({ branchId: order.branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const idRef = platformBranch.branchReference.toString();
         let res = await this._api.event.reception(order.id, idRef);
@@ -205,7 +209,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -222,7 +226,7 @@ class PedidosYa extends Platform {
         const branch = await branchModel.findOne({ branchId: order.branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const idRef = platformBranch.branchReference.toString();
         const state = NewsStateSingleton.stateByCod('view');
@@ -236,7 +240,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
         const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -265,7 +269,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -288,14 +292,14 @@ class PedidosYa extends Platform {
         const res = await this._api.order.reject(
           order.id,
           rejectMessageId,
-          rejectMessageNote,
+          rejectMessageNote
         );
         resolve(res);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -319,7 +323,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         return resolve(err);
       }
@@ -332,7 +336,7 @@ class PedidosYa extends Platform {
         if (branch && branch.platforms) {
           const platformBranch = this.getBranchPlatform(
             branch.platforms,
-            this._platform._id,
+            this._platform._id
           );
 
           if (platformBranch) {
@@ -354,7 +358,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to call the heartbeat.';
         const err = new CustomError(APP_PLATFORM.HEARTBEAT, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -372,11 +376,11 @@ class PedidosYa extends Platform {
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const closedProg = branchModel.findProgClosedToOpen(
           platformBranch,
-          dateNow,
+          dateNow
         );
 
         if (typeof closedProg == 'string') {
@@ -395,16 +399,16 @@ class PedidosYa extends Platform {
         await branchModel.updateOne(
           {
             branchId: branch.branchId,
-            'platforms.platform': this._platform._id,
+            'platforms.platform': this._platform._id
           },
           {
             $set: {
-              'platforms.$.progClosed.$[i].open': dateFromUTC,
-            },
+              'platforms.$.progClosed.$[i].open': dateFromUTC
+            }
           },
           {
-            arrayFilters: [{ 'i._id': closedProg._id }],
-          },
+            arrayFilters: [{ 'i._id': closedProg._id }]
+          }
         );
         this.updateLastContact();
         resolve(opened);
@@ -432,12 +436,12 @@ class PedidosYa extends Platform {
         let dateNow = new Date();
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
-          this._platform._id,
+          this._platform._id
         );
         const validatedClosed = branchModel.validateNewProgClosed(
           platformBranch,
           dateNow,
-          timeToClose,
+          timeToClose
         );
 
         const dateFrom = moment(dateNow)
@@ -459,23 +463,23 @@ class PedidosYa extends Platform {
           idRef,
           dateFrom,
           dateTo,
-          description,
+          description
         );
 
         await branchModel.updateOne(
           {
             branchId: branch.branchId,
-            'platforms.platform': this._platform._id,
+            'platforms.platform': this._platform._id
           },
           {
             $push: {
               'platforms.$.progClosed': {
                 close: dateFromUTC,
                 open: dateToUTC,
-                description,
-              },
-            },
-          },
+                description
+              }
+            }
+          }
         );
         this.updateLastContact;
         resolve(closed);
@@ -495,7 +499,7 @@ class PedidosYa extends Platform {
         name: 'Sin Informacion',
         driver: null,
         pickupDate: null,
-        estimatedDeliveryDate: null,
+        estimatedDeliveryDate: null
       };
       try {
         let resPY = await this._api.order.tracking(order.id);
@@ -512,7 +516,7 @@ class PedidosYa extends Platform {
         const msg = 'No se pudo obtener el driver de la orden.';
         new CustomError(APP_PLATFORM.DRIVER, msg, this.uuid, {
           orderId: order.id,
-          platformError: error.toString(),
+          platformError: error.toString()
         });
       }
       resolve(orderTracking);
