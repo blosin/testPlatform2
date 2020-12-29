@@ -67,7 +67,6 @@ class PedidosYa extends Platform {
   }
 
   async getOrders() {
-    console.log(9999999999999999999, this._api.order);
     await this._api.order.getAll(
       null,
       PaginationOptions.create(),
@@ -78,7 +77,6 @@ class PedidosYa extends Platform {
       (error) => {
         const msg = 'Fallo al obtener ordenes de PY.';
         new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
-          orderId: order.id,
           platformError: error.toString()
         });
       }

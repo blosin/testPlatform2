@@ -11,6 +11,7 @@
     "serve:prd": "NODE_ENV=production npm run serve",
     "start": " nodemon --inspect=127.0.0.1:9230  src/index.js --watch src --exec babel-node",
     "start:dev": " cross-env AWS_PROFILE=smartfran NODE_ENV=development npm run start",
+    "start:per": " cross-env AWS_PROFILE=smartfran NODE_ENV=performance npm run start",
     "start:tst": "cross-env AWS_PROFILE=smartfran NODE_ENV=testing npm run start",
     "start:stg": "cross-env AWS_PROFILE=smartfran NODE_ENV=staging npm run start",
     "test": "cross-env ./node_modules/mocha/bin/mocha test/unit --require @babel/register --recursive --exit",

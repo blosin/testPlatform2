@@ -182,7 +182,6 @@ class Rapiboy extends Platform {
         };
         const url = `${this.baseUrl}${this.urlDeliveryTime}`;
         const deliveryTimesRes = await axios.get(url, {}, headers);
-
         const deliveryTimes = deliveryTimesRes.data.map((obj, index) => {
           const minutes =
             parseInt(obj.m_Item2.split(':')[0], 10) * 60 +
@@ -200,9 +199,10 @@ class Rapiboy extends Platform {
         resolve(deliveryTimes);
       } catch (error) {
         const msg = 'Can not get parameters of PaD.';
-        new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
+        const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error
         });
+        resolve(err);
       }
     });
   }
@@ -237,9 +237,10 @@ class Rapiboy extends Platform {
         resolve(data);
       } catch (error) {
         const msg = 'Can not get parameters of PaD.';
-        new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
+        const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error
         });
+        resolve(err);
       }
     });
   }

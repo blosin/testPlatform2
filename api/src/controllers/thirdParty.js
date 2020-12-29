@@ -29,7 +29,7 @@ const updateOne = (req, res) => {
 
 const initPlatform = (internalCode, uuid) => {
   const platformFactory = new PlatformFactory();
-  platformFactory.createPlatform(
+  return platformFactory.createPlatform(
     PlatformSingleton.getByCod(internalCode),
     uuid
   );
@@ -86,30 +86,27 @@ const login = async (req, res) => {
 const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
 
-  const platformFactory = new PlatformFactory();
-  const platform = platformFactory.createPlatform(
-    PlatformSingleton.getByCod(req.token.internalCode),
-    req.uuid
-  );
+  const platform = initPlatform(req.token.internalCode, req.uuid);
+
   if (isArray(req.body)) {
     req.body.forEach(async (data) => {
       let result = await req.body.filter((filtro) => filtro.id === data.id);
       if (result.length > 1)
-        res
+        return res
           .status(400)
           .json({
             error: `The array has more than one order with the id:${data.id}`
           })
           .end();
     });
-
     const resultProm = req.body.map((data) => platform.validateNewOrders(data));
-
     Promise.all(resultProm)
       .then((resultPromise) => {
         res.status(200).send(resultPromise).end();
       })
-      .catch((error) => res.status(400).json(error).end());
+      .catch((error) => {
+        res.status(400).json(error).end();
+      });
   } else
     platform
       .validateNewOrders(req.body)
@@ -124,24 +121,19 @@ const cancelOrder = async (req, res) => {
     if (!req.body.id || !req.body.branchId) {
       const msg = 'Insuficient parameters.';
       logger.error({ message: msg, meta: { body: req.body } });
-      res.status(400).json({ error: msg }).end();
+      return res.status(400).json({ error: msg }).end();
     }
     const setNews = new SetNews(req.token);
     let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };
     const result = await setNews.setNews(newToSet, req.body.id);
     res.status(200).send(result).end();
   } catch (error) {
-    res.status(400).json(error).end();
+    return res.status(400).json(error).end();
   }
 };
 
 const findOrder = (req, res) => {
-  const platformFactory = new PlatformFactory();
-  const platform = platformFactory.createPlatform(
-    PlatformSingleton.getByCod(req.token.internalCode),
-    req.uuid
-  );
-
+  const platform = initPlatform(req.token.internalCode, req.uuid);
   platform
     .findOrder(parseInt(req.params.id, 10))
     .then((foundOrder) => res.status(200).send(foundOrder).end())

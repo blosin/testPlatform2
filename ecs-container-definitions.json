@@ -1,0 +1,56 @@
+{
+  "containerDefinitions": [
+    {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/platform-service-performance-task",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 3087,
+          "protocol": "tcp",
+          "containerPort": 3087
+        }
+      ],
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:per-3.0.3",
+      "essential": true,
+      "name": "platform-service-performance-container",
+      "entryPoint": [
+        "npm",
+        "run"
+      ],
+      "command": [
+        "serve"
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "performance"
+        }
+      ]
+    }
+  ],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "performance"
+    },
+    {
+      "key": "Project",
+      "value": "platform-service"
+    }
+  ],
+  "family": "platform-service-performance-task",
+  "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
+}

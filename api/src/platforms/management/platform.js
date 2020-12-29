@@ -527,7 +527,6 @@ class Platform {
         logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
       }
-
       this.saveNewOrders(newOrder)
         .then((res) => {
           if (!res) throw 'Orders could not been processed.';
@@ -541,7 +540,7 @@ class Platform {
           return resolve(orderSaved);
         })
         .catch((error) => {
-          reject({ error: error.toString() });
+          reject(error);
         });
     });
   }
@@ -595,7 +594,6 @@ class Platform {
         $project: {
           name: '$name',
           branchId: '$branchId',
-          name: '$name',
           'chain.chain': '$joinChains.chain',
           'platform.name': '$joinPlatforms.name',
           'platform.platform': '$joinPlatforms._id',
@@ -632,16 +630,21 @@ class Platform {
         displayId,
         branchReference
       } = this.parser.retriveMinimunData(order);
-
       try {
         let branches = await this.getOrderBranches(branchReference);
+
+        if (branches.length == 0)
+          reject({
+            error: 'There is no branch for this order'
+          });
+
         branch = branches[0];
-        if (!branch) throw 'There is no branch for this order';
 
         let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(branch.platform);
+
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
@@ -666,7 +669,6 @@ class Platform {
             branchId: branch.branchId,
             order
           };
-
           const newCreator = await this.parser.newsFromOrders(
             orderCreator,
             this._platform,
@@ -675,6 +677,7 @@ class Platform {
             branch,
             this.uuid
           );
+
           /* If restaurant is closed, mark the new as viewed. */
           if (!isOpened) {
             newCreator.viewed = new Date();
@@ -700,7 +703,6 @@ class Platform {
             orderStatusId: newCreator.order.statusId
           });
           trace.entity = 'PLATFORM';
-
           newCreator['traces'] = trace;
           const orderQuery = {
             internalCode: this._platform.internalCode,
@@ -713,20 +715,17 @@ class Platform {
             }
           };
           const options = { new: true, upsert: true };
-
           promiseOrder = orderModel.findOneAndUpdate(
             orderQuery,
             orderCreator,
             options
           );
-
           promiseNew = newsModel.findOneAndUpdate(
             newsQuery,
             newCreator,
             options
           );
           orderProccessed = orderCreator;
-
           newProccessed = newCreator;
         } catch (error) {
           const msg = `News: ${originalId} can not be parsed correctly.`;

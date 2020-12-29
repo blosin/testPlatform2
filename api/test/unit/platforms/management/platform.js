@@ -798,8 +798,8 @@ describe('Platform', function () {
     });
   });
 
-  describe('fn(): saveNewOrders()', function () {
-    beforeEach(() => {
+  describe.only('fn(): saveNewOrders()', function () {
+    /*     beforeEach(() => {
       sandbox.stub(branchModel, 'find').returns({
         populate: () => {
           return {
@@ -818,143 +818,90 @@ describe('Platform', function () {
     });
     afterEach(() => {
       sandbox.restore();
-    });
+    }); */
 
     it('Platform - should save the news correctly', async function () {
-      const sandboxPY = sinon.createSandbox();
+      /*       const sandboxPY = sinon.createSandbox();
       sandboxPY.stub(newsModel, 'createTrace').returns();
       sandboxPY.stub(orderModel, 'create').returns();
-      sandboxPY.stub(newsModel, 'create').returns();
-      const pedidosYa_orders = [
-        {
-          id: 134177935,
-          code: 'CBL3C9HA',
-          state: 'PENDING',
-          pickup: false,
-          notes: '',
-          timestamp: 1575131641792,
-          registeredDate: '2019-11-30T13:34:00Z',
-          pickupDate: null,
-          deliveryDate: '2019-11-30T14:11:00Z',
-          responseDate: null,
-          dispatchDate: null,
-          whiteLabel: null,
-          application: 'WEB',
-          pushed: false,
-          express: false,
-          preOrder: false,
-          logistics: false,
-          integrationCode: null,
-          preparationTime: null,
-          preparationBuffer: null,
-          portal: {
-            id: 1,
-            name: 'Pedidos Ya'
+      sandboxPY.stub(newsModel, 'create').returns(); */
+      const branch = {
+        address: { region: 'Noreste' },
+        chain: { chain: 'Grido' },
+        client: { businessName: 'Perez Juan' },
+        name: 'Surcusal 800000',
+        branchId: 800000,
+        platform: {
+          name: 'PediGrido',
+          platform: '4766746bc57516b955f29f39',
+          lastGetNews: '2020-12-29T18:32:45.733Z',
+          progClosed: [],
+          isActive: true
+        },
+        smartfran_sw: {
+          agent: {
+            installedVersion: '1.26',
+            installedDate: '2019-09-23T19:44:20.562Z',
+            nextVersionToInstall: '1.26',
+            nextVersionUrl:
+              'https://artifacts-agent-notification.s3-us-west-2.amazonaws.com/SmartFranAgente_v_1.25.zip'
           },
-          user: {
-            id: 15233746,
-            name: 'Alain',
-            lastName: 'Kraupl',
-            email: 'alain.kraupl@ross.com.ar',
-            identityCard: '36095544',
-            isNew: false,
-            type: 'WEB_USER',
-            orderCount: 16,
-            platform: 'PEDIDOS_YA',
-            company: {
-              name: '',
-              document: ''
-            }
-          },
-          address: {
-            description: 'Obispo trejo 1000 esquina arasda',
-            coordinates: '-31.427,-64.1903',
-            phone: '1130765437',
-            notes: '',
-            zipCode: null,
-            area: 'Nueva Córdoba',
-            city: 'Córdoba',
-            cityId: 137,
-            doorNumber: '1000',
-            street: 'Obispo trejo',
-            corner: 'arasda',
-            complement: ''
-          },
-          payment: {
-            id: 87,
-            notes: '',
-            total: 220,
-            shipping: 50,
-            shippingNoDiscount: 50,
-            amountNoDiscount: 220,
-            paymentAmount: 270,
-            online: true,
-            currencySymbol: '$',
-            discount: 0,
-            discountType: 'NONE',
-            discountNotes: '',
-            stampsDiscount: 0,
-            card: {
-              brand: 'CABAL',
-              operationType: 'CREDIT',
-              issuer: null
-            },
-            method: 'Pago online',
-            tax: 0,
-            subtotal: 270
-          },
-          discounts: [],
-          restaurant: {
-            id: 62702,
-            name: 'Grido Helados - Obispo Trejo',
-            integrationCode: '15',
-            integrationName: 'Integración Smartfran',
-            country: {
-              id: 3,
-              name: 'Argentina',
-              shortName: 'ar',
-              url: 'https://www.pedidosya.com.ar',
-              timeOffset: -180,
-              currencySymbol: '$',
-              culture: 'es_AR'
-            },
-            deliveryTime: {
-              id: 2,
-              description: null,
-              minMinutes: 30,
-              maxMinutes: 45
-            }
-          },
-          details: [
-            {
-              id: 244550766,
-              unitPrice: 220,
-              discount: 0,
-              total: 220,
-              quantity: 1,
-              subtotal: 220,
-              notes: '',
-              product: {
-                id: 8739989,
-                integrationCode: '60',
-                integrationName: '',
-                name: 'Crocantino (10 porciones)',
-                image: '942522-95743d7e-ace3-4554-ac4b-3364b5fc1afb.jpg',
-                index: 3,
-                globalIndex: 0,
-                section: {
-                  id: 942522,
-                  name: 'Postres',
-                  index: 4,
-                  integrationCode: '',
-                  integrationName: ''
-                }
-              },
-              optionGroups: []
-            }
-          ]
+          notificator: {
+            installedVersion: '1.55',
+            installedDate: '2019-09-23T19:44:20.562Z',
+            nextVersionToInstall: '1.55',
+            nextVersionUrl:
+              'https://artifacts-agent-notification.s3-us-west-2.amazonaws.com/SmartFranAlertas_v_1.55.zip'
+          }
         }
-      ];
+      };
+      const pedidosYa_orders = {
+        id: 4000379,
+        state: 'PENDING',
+        preOrder: false,
+        registeredDate: '2019-09-23T16:40:32Z',
+        deliveryDate: null,
+        pickup: false,
+        pickupDate: null,
+        notes: 'observacion',
+        logistics: false,
+        user: {
+          platform: 'thirdParty',
+          name: 'Daley',
+          lastName: 'Paley',
+          id: 10455712,
+          email: 'daley.paley@gmail.com',
+          dni: 37897458
+        },
+        address: {
+          description: 'Obispo trejo 1420 esquina rew qwre',
+          phone: '4324232'
+        },
+        details: [
+          {
+            id: 150,
+            unitPrice: 220,
+            quantity: 1,
+            promo: 1,
+            promotion: false,
+            optionGroups: [],
+            discount: 0,
+            name: 'Crocantino (10 porciones)',
+            sku: '150',
+            notes: 'nota'
+          }
+        ],
+        payment: [
+          {
+            method: 'Efectivo',
+            online: false,
+            paymentAmount: 55,
+            subtotal: 245
+          }
+        ],
+        branchId: '800000'
+      };
+
       const newsSaved = [
         {
           thirdParty: 'PedidosYa',
@@ -962,10 +909,74 @@ describe('Platform', function () {
           state: 'PENDING',
           orderId: 134177935,
           branchId: 2,
-          order: pedidosYa_orders[0]
+          order: pedidosYa_orders
         }
       ];
+
+      const newCreator = {
+        viewed: null,
+        typeId: 1,
+        branchId: 800000,
+        order: {
+          id: 4000381,
+          originalId: '4000381',
+          displayId: '4000381',
+          platformId: 7,
+          statusId: 1,
+          orderTime: '2019-09-23T16:40:32Z',
+          deliveryTime: null,
+          pickupOnShop: false,
+          pickupDateOnShop: null,
+          preOrder: false,
+          observations: 'observacion',
+          ownDelivery: false,
+          customer: {
+            name: 'Daley Paley',
+            address: 'Obispo trejo 1420 esquina rew qwre',
+            phone: '4324232',
+            id: 10455712,
+            dni: 37897458,
+            email: 'daley.paley@gmail.com'
+          },
+          details: [[Object]],
+          payment: {
+            typeId: 3,
+            online: false,
+            shipping: 0,
+            discount: 0,
+            voucher: '',
+            subtotal: 245,
+            currency: '$',
+            remaining: 55,
+            partial: 0,
+            note: ''
+          },
+          driver: null,
+          totalAmount: 245
+        },
+        extraData: {
+          branch: 'Surcusal 800000',
+          chain: 'Grido',
+          platform: 'PediGrido',
+          client: 'Perez Juan',
+          region: undefined
+        }
+      };
       const platformObj = new Platform();
+      platformObj._platform = {
+        internalCode: 7,
+        name: 'PediGrido'
+      };
+      sinon.stub(platformObj, 'getOrderBranches').returns([branch]);
+      sinon.stub(platformObj, 'isClosedRestaurant').returns(true);
+      sinon
+        .stub(thirdParty, 'retriveMinimunData')
+        .returns({ posId: 2, originalId: 2, displayId: 2, branchReference: 2 });
+      sinon.stub(thirdParty, 'newsFromOrders').returns(newCreator);
+      sinon.stub(orderModel, 'findOneAndUpdate').returns(true);
+      sinon.stub(newsModel, 'findOneAndUpdate').returns(true);
+      sinon.stub(platformObj, 'pushNewToQueue').returns(true);
+
       const result = await platformObj.saveNewOrders(pedidosYa_orders);
       sandboxPY.restore();
       expect(result).to.eql(newsSaved);

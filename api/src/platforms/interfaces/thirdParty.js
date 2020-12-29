@@ -29,7 +29,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -54,7 +54,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -69,7 +69,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -82,14 +82,14 @@ module.exports = {
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : '',
+            region: branch.address.region ? branch.address.region.region : ''
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -110,7 +110,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -164,7 +164,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -190,7 +190,7 @@ module.exports = {
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,
           branch,
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -201,7 +201,7 @@ module.exports = {
       branchReference: data.branchId.toString(),
       posId: data.id,
       originalId: data.id.toString(),
-      displayId: data.id.toString(),
+      displayId: data.id.toString()
     };
-  },
+  }
 };
