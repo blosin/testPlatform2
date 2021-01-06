@@ -3,7 +3,7 @@ image: docker:stable
 variables:
  AWS_ACCOUNT: 382381053403
  ECR_REGION: "us-east-2"
- PROJ_IMG: smartfran/platform-service
+ PROJ_IMG: "smartfran/platform-service"
  ECR_REPOSITORY: "$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com"
 
 services:
@@ -57,8 +57,6 @@ unit-test:
 
 build-test:
   stage: build
-  variables:
-    DOCKER_DRIVER: overlay2
   before_script:
     - cd api
   script:
