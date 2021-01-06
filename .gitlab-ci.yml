@@ -49,7 +49,8 @@ unit-test:
   script:
     - npm run test
   tags:
-    - runner-smartfran
+    - smartfran-runner
+
 
 build-test:
   stage: build
@@ -61,7 +62,9 @@ build-test:
     - echo "Tagging image ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG} "
     - docker tag ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}
   tags:
-    - runner-smartfran
+    - smartfran-runner
+
+
 
 # restore-db-test:
 #   stage: restore-db
