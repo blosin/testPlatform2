@@ -57,6 +57,8 @@ unit-test:
 
 build-test:
   stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
   before_script:
     - cd api
   script:
