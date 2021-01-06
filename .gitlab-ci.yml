@@ -2,7 +2,7 @@ image: docker:stable
 
 variables:
   AWS_ACCOUNT: 423857476668
-  ECR_REGION: 'us-west-2'
+  ECR_REGION: 'us-east-2'
   PROJ_IMG: 'smartfran/platform-service'
   ECR_REPOSITORY: '$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com'
 
