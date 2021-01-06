@@ -72,6 +72,19 @@ build-test:
   only:
     - test_devops
 
+push:
+  stage: push-image
+  script:
+   - echo "Login to ECR"
+   - aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
+   - echo "Pushing image..."
+   - echo $ECR_REPOSITORY/$PROJ_IMG:$IMAGE_TAG
+   - docker push $ECR_REPOSITORY/$PROJ_IMG:$IMAGE_TAG
+  after_script:
+   - docker system prune --force --all --volumes
+  tags:
+   - runner-smartfran
+
 
 
 # restore-db-test:
