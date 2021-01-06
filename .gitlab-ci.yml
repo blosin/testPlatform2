@@ -51,16 +51,6 @@ unit-test:
   tags:
     - runner-smartfran
 
-static-test:
-  stage: static-test
-  allow_failure: true
-  script:
-    - C:\sonar-scanner-4.2.0.1873-windows\bin\sonar-scanner.bat
-  only:
-    - test_devops
-  tags:
-    - runner-smartfran
-
 build-test:
   stage: build
   before_script:
@@ -72,7 +62,6 @@ build-test:
     - docker tag ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}
   tags:
     - runner-smartfran
-  environment: $CI_COMMIT_REF_SLUG
 
 # restore-db-test:
 #   stage: restore-db
