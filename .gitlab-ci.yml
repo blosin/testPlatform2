@@ -60,6 +60,7 @@ build-test:
   script:
    - pwd
    - echo "Building image..."
+   - echo $BUILD_TAG
    - docker build -t $PROJ_IMG .
    - echo "Tagging image..."
    - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
