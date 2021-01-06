@@ -10,7 +10,7 @@ services:
   - docker:dind
 
 before_script:
-  - set BUILD_TAG="$CI_COMMIT_TAG"
+  - BUILD_TAG="$CI_COMMIT_TAG"
 
 # cache:
 #   untracked: true
