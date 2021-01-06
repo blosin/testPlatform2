@@ -11,6 +11,7 @@ services:
 
 before_script:
   - BUILD_TAG="$CI_COMMIT_TAG"
+  - echo $BUILD_TAG
 
 # cache:
 #   untracked: true
@@ -57,11 +58,12 @@ build-test:
   before_script:
     - cd api
   script:
-    - echo "Building image..."
-    - docker build -t ${PROJ_IMG} .
-    - echo "Tagging image ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG} "
-    - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
-
+   - pwd
+   - echo "Building image..."
+   - docker build -t $PROJ_IMG .
+   - echo "Tagging image..."
+   - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$BUILD_TAG
+   - echo "Pushing image..."
   tags:
     - smartfran-runner
 
