@@ -51,7 +51,8 @@ unit-test:
     - npm run test
   tags:
     - smartfran-runner
-
+  only:
+    - test_devops
 
 build-test:
   stage: build
@@ -67,6 +68,8 @@ build-test:
    - echo "Pushing image..."
   tags:
     - smartfran-runner
+  only:
+    - test_devops
 
 
 
