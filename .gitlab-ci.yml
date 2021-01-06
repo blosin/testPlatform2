@@ -5,13 +5,13 @@ variables:
  ECR_REGION: "us-east-2"
  PROJ_IMG: "smartfran/platform-service"
  ECR_REPOSITORY: "$AWS_ACCOUNT.dkr.ecr.$ECR_REGION.amazonaws.com"
+ IMG_TAG: "prueba0.1"
 
 services:
   - docker:dind
 
 before_script:
   - pip3 install awscli
-  - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
   - echo $BUILD_TAG
 
 # cache:
