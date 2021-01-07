@@ -5,14 +5,13 @@ variables:
  ECR_REGION: "us-east-2"
  PROJ_IMG: "smartfran/platform-service"
  ECR_REPOSITORY: "382381053403.dkr.ecr.us-east-2.amazonaws.com"
- BUILD_TAG: $CI_BUILD_TAG
+
 services:
   - docker:dind
 
 before_script:
   - pip3 install awscli
   - echo $BUILD_TAG
-  
 
 # cache:
 #   untracked: true
@@ -65,7 +64,7 @@ build-test:
    - echo $IMAGE_TAG
    - docker build -t $PROJ_IMG .
    - echo "Tagging image..."
-   - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$CI_BUILD_TAG
+   - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:latest
    - echo "Pushing image..."
   tags:
     - smartfran-runner
