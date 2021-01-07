@@ -88,16 +88,16 @@ push:
 deploy.testing:
   stage: deploy-testing
   variables:
-   BRANCH_NAME: "testing"
-   SERVICE_NAME: "platform-service"
-   ECS_REGION: "us-east-2"
-   CLUSTER: "smartfran-pedidos-common"
-   SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
-   TASK: "${SERVICE_NAME}-${BRANCH_NAME}-task"
-   PROJ_IMG: "smartfran/${SERVICE_NAME}"
-   ECR_REPOSITORY: "382381053403.dkr.ecr.us-east-2.amazonaws.com"
-   PROFILE: "smartfran"
-   ENV: "testing"
+  BRANCH_NAME: "testing"
+  SERVICE_NAME: "platform-service"
+  ECS_REGION: "us-east-2"
+  CLUSTER: "smartfran-pedidos-common"
+  SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
+  TASK: "${SERVICE_NAME}-${BRANCH_NAME}-task"
+  PROJ_IMG: "smartfran/${SERVICE_NAME}"
+  ECR_REPOSITORY: "382381053403.dkr.ecr.us-east-2.amazonaws.com"
+  PROFILE: "smartfran"
+  ENV: "testing"
 
 script:
   - cd api
