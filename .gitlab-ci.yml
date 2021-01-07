@@ -27,7 +27,7 @@ stages:
   - build
   - restore-db
   - push-image
-  - deploy
+  - deploy-testing
 
 # clean:
 #   stage: clean
@@ -100,12 +100,12 @@ deploy.testing:
    ENV: "testing"
 
 script:
-    - cd api
-    - echo "Deploying version $PROJ_IMG"
-    - echo $PROJ_IMG
-    - echo $ECS_TEMPLATE
-    - envsubst < container-definitions-mock.json > ecs-container-definitions.json
-    - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
+  - cd api
+  - echo "Deploying version $PROJ_IMG"
+  - echo $PROJ_IMG
+  - echo $ECS_TEMPLATE
+  - envsubst < container-definitions-mock.json > ecs-container-definitions.json
+  - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
 # deploy-production:
 #   extends: .deploy
 #   before_script:
