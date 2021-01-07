@@ -28,6 +28,7 @@ stages:
   - restore-db
   - push-image
   - deploy-testing
+  - deploy-staging
 
 # clean:
 #   stage: clean
@@ -120,7 +121,7 @@ deploy.staging:
     - export BUILD_TAG="$CI_COMMIT_TAG"
   variables:
    BRANCH_NAME: "staging"
-   SERVICE_NAME: "concentrador-service"
+   SERVICE_NAME: "platforms-service"
    ECS_REGION: "us-east-2"
    CLUSTER: "smartfran-pedidos-common"
    SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
