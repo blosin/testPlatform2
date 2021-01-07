@@ -77,12 +77,14 @@ push:
    - echo "Login to ECR"
    - aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
    - echo "Pushing image..."
-   - echo $ECR_REPOSITORY/$PROJ_IMG:$CI_BUILD_TAG
-   - docker push $ECR_REPOSITORY/$PROJ_IMG:$CI_BUILD_TAG
+   - echo $ECR_REPOSITORY/$PROJ_IMG:latest
+   - docker push $ECR_REPOSITORY/$PROJ_IMG:latest
   after_script:
    - docker system prune --force --all --volumes
   tags:
    - runner-smartfran
+  only:
+   - test_devops
 
 
 
