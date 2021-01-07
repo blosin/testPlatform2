@@ -82,7 +82,8 @@ push:
   after_script:
    - docker system prune --force --all --volumes
   tags:
-   - runner-smartfran
+   - smartfran-runner
+      
 
 
 # restore-db-test:
