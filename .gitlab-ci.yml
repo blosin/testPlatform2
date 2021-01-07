@@ -109,7 +109,6 @@ deploy.testing:
     - echo $ECS_TEMPLATE
     - envsubst < container-definitions-mock.json > ecs-container-definitions.json
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
-    - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
 
   tags:
     - smartfran-runner
