@@ -79,8 +79,7 @@ push:
    - echo "Pushing image..."
    - echo $ECR_REPOSITORY/$PROJ_IMG:latest
    - docker push $ECR_REPOSITORY/$PROJ_IMG:latest
-  after_script:
-   - docker system prune --force --all --volumes
+
   tags:
    - smartfran-runner
       
@@ -109,10 +108,8 @@ deploy.testing:
     - echo $ECS_TEMPLATE
     - envsubst < container-definitions-mock.json > ecs-container-definitions.json
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
-
-
   tags:
-    - runner-smartfran
+    - smartfran-runner
 # deploy-production:
 #   extends: .deploy
 #   before_script:
