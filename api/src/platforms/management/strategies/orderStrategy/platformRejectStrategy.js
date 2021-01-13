@@ -4,6 +4,8 @@ import NewsStateSingleton from '../../../../utils/newsState';
 import news from '../../../../models/news';
 import NewsTypeSingleton from '../../../../utils/newsType';
 import Aws from '../../../../platforms/provider/aws';
+import branch from '../../../../models/branch';
+import PlatformController from '../../platform';
 
 class PlatformRejectStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -72,7 +74,24 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
         }
         const result = await this.updateNew(findQuery, updateQuery, options);
         const aws = new Aws();
-        await aws.pushNewToQueue(result);
+
+        const searchBranch = (
+          await branch.find({ branchId: this.savedNew.branchId }).lean()
+        ).pop();
+        const platformController = new PlatformController();
+
+        const isOpened = await platformController.isClosedRestaurant(
+          searchBranch.platforms
+        );
+
+        if (
+          isOpened &&
+          searchBranch.platforms[0].isActive &&
+          parseFloat(searchBranch.smartfran_sw.agent.installedVersion) > 1.24
+        ) {
+          //Push all savedNews to the queue
+          await aws.pushNewToQueue(result);
+        }
         if (!isValid)
           return reject({
             orderId: this.order.id,
@@ -80,7 +99,7 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
           });
         return resolve(platformResult);
       } catch (error) {
-        console.log(error);
+        console.log(1, error);
         return reject(error);
       }
     });

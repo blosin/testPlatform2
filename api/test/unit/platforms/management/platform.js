@@ -840,9 +840,9 @@ describe('Platform', function () {
         },
         smartfran_sw: {
           agent: {
-            installedVersion: '1.26',
+            installedVersion: '1.24',
             installedDate: '2019-09-23T19:44:20.562Z',
-            nextVersionToInstall: '1.26',
+            nextVersionToInstall: '1.24',
             nextVersionUrl:
               'https://artifacts-agent-notification.s3-us-west-2.amazonaws.com/SmartFranAgente_v_1.25.zip'
           },
@@ -975,10 +975,10 @@ describe('Platform', function () {
       sinon.stub(thirdParty, 'newsFromOrders').returns(newCreator);
       sinon.stub(orderModel, 'findOneAndUpdate').returns(true);
       sinon.stub(newsModel, 'findOneAndUpdate').returns(true);
-      sinon.stub(platformObj, 'pushNewToQueue').returns(true);
+      //sinon.stub(platformObj, 'pushNewToQueue').returns(true);
 
       const result = await platformObj.saveNewOrders(pedidosYa_orders);
-      sandboxPY.restore();
+      //sandboxPY.restore();
       expect(result).to.eql(newsSaved);
     });
   });

@@ -16,8 +16,8 @@ module.exports = {
   database: {
     username: 'pruebaperfomance',
     password: 'performance123.-',
-    host: 'pruebaperfomance.et7kv.mongodb.net',
-    name: 'SmartfranPedidosPerformance',
+    host: 'pruebaperformance.et7kv.mongodb.net',
+    name: 'PruebaPerformance',
     port: 27017
   },
   AWS: {
