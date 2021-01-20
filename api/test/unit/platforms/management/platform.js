@@ -659,6 +659,25 @@ describe('Platform', function () {
       expect(idByCodStub.callCount).to.equal(1);
       expect(idByCodStub.calledWith(typeCod)).to.be.true;
     });
+    it('should dont udpate news state', async function () {
+      const findOneAndUpdateStub = sandbox
+        .stub(newsModel, 'findOneAndUpdate')
+        .rejects();
+
+      let platform = new Platform();
+      platform._platform = { internalCode: 10 };
+      try {
+        await platform.updateNewsState(
+          savedOrder,
+          statusId,
+          typeId,
+          viewed,
+          entity
+        );
+      } catch (error) {
+        expect(error).to.eql('Failed to update news state.');
+      }
+    });
   });
 
   describe('fn(): isClosedRestaurant()', function () {
@@ -668,13 +687,30 @@ describe('Platform', function () {
         internalCode: 10,
         _id: '5d87cea59b0634004fd83c6b'
       };
-      let res = await platform.isClosedRestaurant(branches[0].platforms);
+      const branchPlatform = {
+        name: 'PediGrido',
+        platform: '4766746bc57516b955f29f39',
+        lastGetNews: '2023-01-14T15:25:22.912Z',
+        progClosed: [
+          {
+            _id: 'dasdasdadasd',
+            open: '2023-01-14T15:25:22.912Z',
+            close: '2023-01-14T15:25:22.912Z'
+          }
+        ],
+        isActive: true
+      };
+      let res = await platform.isClosedRestaurant(branchPlatform);
       expect(res).to.eql(true);
     });
 
-    it('should dont pass the validation', async function () {
+    it('should dont pass the validation 1', async function () {
       let branchPlatforms = {
-        lastGetNews: '2020-11-04T18:35:29.670Z'
+        name: 'PediGrido',
+        platform: '4766746bc57516b955f29f39',
+        lastGetNews: '2020-01-14T15:25:22.912Z',
+        progClosed: [],
+        isActive: true
       };
 
       let platform = new Platform();
@@ -693,8 +729,10 @@ describe('Platform', function () {
       internalCode: 10,
       _id: '5d87cea59b0634004fd83c6b'
     };
+
     const thirdPartyOrders = {
       id: 1,
+      originalId: 1,
       state: 'PENDING',
       preOrder: false,
       registeredDate: '2020-02-26 18:32:16',
@@ -767,6 +805,14 @@ describe('Platform', function () {
         }
       ]
     };
+
+    const minOrder = {
+      branchReference: '2',
+      posId: 1,
+      originalId: '1',
+      displayId: '1'
+    };
+
     it('should save the order', async function () {
       const stateCod = 'rej_closed';
       const state = 'REJECTED';
@@ -796,36 +842,320 @@ describe('Platform', function () {
       expect(findOneStub.callCount).to.equal(1);
       expect(findOrderStub.callCount).to.equal(1);
     });
+
+    it('should dont save the order', async function () {
+      const stateCod = 'rej_closed';
+      const state = 'REJECTED';
+
+      sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+
+      const findOrderStub = sandbox
+        .stub(orderModel, 'find')
+        .returns({ lean: () => Promise.resolve([minOrder]) });
+      try {
+        await platform.validateNewOrders(thirdPartyOrders);
+      } catch (error) {
+        expect(error).to.eql({ error: 'Order: 1 already exists.' });
+        expect(findOrderStub.callCount).to.equal(1);
+      }
+    });
+    it('should dont save the order', async function () {
+      const stateCod = 'rej_closed';
+      const state = 'REJECTED';
+
+      sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+
+      const findOrderStub = sandbox
+        .stub(orderModel, 'find')
+        .returns({ lean: () => Promise.resolve([]) });
+
+      const findOneStub = sandbox
+        .stub(branchModel, 'findOne')
+        .returns({ lean: () => Promise.resolve() });
+
+      try {
+        await platform.validateNewOrders(thirdPartyOrders);
+      } catch (error) {
+        expect(error).to.eql({ error: 'The branch not exists. 2' });
+        expect(findOneStub.callCount).to.equal(1);
+        expect(findOrderStub.callCount).to.equal(1);
+      }
+    });
+    it('should  dont save the order', async function () {
+      const stateCod = 'rej_closed';
+      const state = 'REJECTED';
+
+      sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+
+      const findOrderStub = sandbox
+        .stub(orderModel, 'find')
+        .returns({ lean: () => Promise.resolve([]) });
+
+      const findOneStub = sandbox
+        .stub(branchModel, 'findOne')
+        .returns({ lean: () => Promise.resolve(branchThirdParty) });
+
+      const saveNewOrderStub = sandbox
+        .stub(platform, 'saveNewOrders')
+        .withArgs(thirdPartyOrders)
+        .resolves();
+
+      try {
+        await platform.validateNewOrders(thirdPartyOrders);
+      } catch (error) {
+        console.log(error);
+        expect(error).to.eql('Orders could not been processed.');
+        expect(saveNewOrderStub.callCount).to.equal(1);
+        expect(findOneStub.callCount).to.equal(1);
+        expect(findOrderStub.callCount).to.equal(1);
+      }
+    });
   });
 
-  describe.only('fn(): saveNewOrders()', function () {
-    /*     beforeEach(() => {
-      sandbox.stub(branchModel, 'find').returns({
-        populate: () => {
-          return {
-            populate: () => {
-              return {
-                populate: () => {
-                  return { populate: () => [branch] };
-                }
-              };
-            }
-          };
+  describe('fn(): saveNewOrders()', function () {
+    const stateCod = 'rej_closed';
+    const state = 'REJECTED';
+
+    const branch = {
+      address: { region: 'Noreste' },
+      chain: { chain: 'Grido' },
+      client: { businessName: 'Perez Juan' },
+      name: 'Surcusal 800000',
+      branchId: 800000,
+      platform: {
+        name: 'PediGrido',
+        platform: '4766746bc57516b955f29f39',
+        lastGetNews: '2020-12-29T18:32:45.733Z',
+        progClosed: [],
+        isActive: true
+      },
+      smartfran_sw: {
+        agent: {
+          installedVersion: '1.24',
+          installedDate: '2019-09-23T19:44:20.562Z',
+          nextVersionToInstall: '1.24',
+          nextVersionUrl:
+            'https://artifacts-agent-notification.s3-us-west-2.amazonaws.com/SmartFranAgente_v_1.25.zip'
+        },
+        notificator: {
+          installedVersion: '1.55',
+          installedDate: '2019-09-23T19:44:20.562Z',
+          nextVersionToInstall: '1.55',
+          nextVersionUrl:
+            'https://artifacts-agent-notification.s3-us-west-2.amazonaws.com/SmartFranAlertas_v_1.55.zip'
         }
-      });
-      sinon.stub(Platform.prototype, 'isClosedRestaurant').returns();
-      sinon.stub(Platform.prototype, 'saveNewOrders').resolves(newOrders);
-    });
-    afterEach(() => {
-      sandbox.restore();
-    }); */
+      }
+    };
+    const thirdParty_orders = {
+      orderId: 4000379,
+      originalId: 4000379,
+      state: 'PENDING',
+      preOrder: false,
+      registeredDate: '2019-09-23T16:40:32Z',
+      deliveryDate: null,
+      pickup: false,
+      pickupDate: null,
+      notes: 'observacion',
+      logistics: false,
+      user: {
+        platform: 'thirdParty',
+        name: 'Daley',
+        lastName: 'Paley',
+        id: 10455712,
+        email: 'daley.paley@gmail.com',
+        dni: 37897458
+      },
+      address: {
+        description: 'Obispo trejo 1420 esquina rew qwre',
+        phone: '4324232'
+      },
+      details: [
+        {
+          id: 150,
+          unitPrice: 220,
+          quantity: 1,
+          promo: 1,
+          promotion: false,
+          optionGroups: [],
+          discount: 0,
+          name: 'Crocantino (10 porciones)',
+          sku: '150',
+          notes: 'nota'
+        }
+      ],
+      payment: [
+        {
+          method: 'Efectivo',
+          online: false,
+          paymentAmount: 55,
+          subtotal: 245
+        }
+      ],
+      branchId: '800000'
+    };
+
+    const newsSaved = [
+      {
+        thirdParty: 'PediGrido',
+        internalCode: 7,
+        state: 'PENDING',
+        posId: 800000,
+        displayId: 800000,
+        originalId: 800000,
+        branchId: 800000,
+        order: thirdParty_orders
+      }
+    ];
+
+    const newCreator = {
+      viewed: null,
+      typeId: 1,
+      branchId: 800000,
+      order: {
+        id: 4000381,
+        originalId: '4000381',
+        displayId: '4000381',
+        platformId: 7,
+        statusId: 1,
+        orderTime: '2019-09-23T16:40:32Z',
+        deliveryTime: null,
+        pickupOnShop: false,
+        pickupDateOnShop: null,
+        preOrder: false,
+        observations: 'observacion',
+        ownDelivery: false,
+        customer: {
+          name: 'Daley Paley',
+          address: 'Obispo trejo 1420 esquina rew qwre',
+          phone: '4324232',
+          id: 10455712,
+          dni: 37897458,
+          email: 'daley.paley@gmail.com'
+        },
+        details: [[Object]],
+        payment: {
+          typeId: 3,
+          online: false,
+          shipping: 0,
+          discount: 0,
+          voucher: '',
+          subtotal: 245,
+          currency: '$',
+          remaining: 55,
+          partial: 0,
+          note: ''
+        },
+        driver: null,
+        totalAmount: 245
+      },
+      extraData: {
+        branch: 'Surcusal 800000',
+        chain: 'Grido',
+        platform: 'PediGrido',
+        client: 'Perez Juan',
+        region: undefined
+      }
+    };
+
+    const platformObj = new Platform();
+    platformObj._platform = {
+      internalCode: 7,
+      name: 'PediGrido'
+    };
 
     it('Platform - should save the news correctly', async function () {
-      /*       const sandboxPY = sinon.createSandbox();
-      sandboxPY.stub(newsModel, 'createTrace').returns();
-      sandboxPY.stub(orderModel, 'create').returns();
-      sandboxPY.stub(newsModel, 'create').returns(); */
-      const branch = {
+      sandbox.stub(platformObj, 'getOrderBranches').returns([branch]);
+      sandbox.stub(platformObj, 'isClosedRestaurant').returns(true);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      sandbox.stub(thirdParty, 'newsFromOrders').returns(newCreator);
+      sandbox.stub(orderModel, 'findOneAndUpdate').returns(true);
+      sandbox.stub(newsModel, 'findOneAndUpdate').returns(true);
+
+      const result = await platformObj.saveNewOrders(thirdParty_orders);
+      expect([result]).to.eql(newsSaved);
+    });
+    it('Platform - should dont save the news correctly 1', async function () {
+      const stubgetOrderBranches = sandbox
+        .stub(platformObj, 'getOrderBranches')
+        .returns([]);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      try {
+        await platformObj.saveNewOrders(thirdParty_orders);
+      } catch (error) {
+        expect(error).to.eql({ error: 'There is no branch for this order' });
+        expect(stubgetOrderBranches.callCount).to.equal(1);
+      }
+    });
+    it('Platform - should dont save the news correctly 2', async function () {
+      const stubgetOrderBranches = sandbox
+        .stub(platformObj, 'getOrderBranches')
+        .returns([branch]);
+      sandbox.stub(platformObj, 'isClosedRestaurant').returns(false);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      try {
+        await platformObj.saveNewOrders(thirdParty_orders);
+      } catch (error) {
+        expect(error).to.eql({
+          orderId: 800000,
+          error: 'Order: 800000 can not be proccessed correctly.'
+        });
+        expect(stubgetOrderBranches.callCount).to.equal(1);
+      }
+    });
+    it('Platform - should dont save the news correctly 3', async function () {
+      const stubgetOrderBranches = sandbox
+        .stub(platformObj, 'getOrderBranches')
+        .returns([branch]);
+      sandbox.stub(platformObj, 'isClosedRestaurant').returns(false);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      const stateIdByCodStub = sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+      sandbox.stub(thirdParty, 'newsFromOrders').returns(newCreator);
+      const rejectedMessagesStub = sandbox
+        .stub(RejectedMessagesSingleton, 'closedResRejectedMessages')
+        .get(() => {
+          return { id: 1, name: 'Orden rechazada por local cerrado' };
+        });
+      sandbox.stub(orderModel, 'findOneAndUpdate').rejects();
+      try {
+        await platformObj.saveNewOrders(thirdParty_orders);
+      } catch (error) {
+        expect(error).to.eql('Failed to create orders.');
+      }
+    });
+    it('Platform - should dont save the news correctly 4', async function () {
+      const branchIsDontActive = {
         address: { region: 'Noreste' },
         chain: { chain: 'Grido' },
         client: { businessName: 'Perez Juan' },
@@ -836,7 +1166,7 @@ describe('Platform', function () {
           platform: '4766746bc57516b955f29f39',
           lastGetNews: '2020-12-29T18:32:45.733Z',
           progClosed: [],
-          isActive: true
+          isActive: false
         },
         smartfran_sw: {
           agent: {
@@ -855,131 +1185,326 @@ describe('Platform', function () {
           }
         }
       };
-      const pedidosYa_orders = {
-        id: 4000379,
-        state: 'PENDING',
-        preOrder: false,
-        registeredDate: '2019-09-23T16:40:32Z',
-        deliveryDate: null,
-        pickup: false,
-        pickupDate: null,
-        notes: 'observacion',
-        logistics: false,
-        user: {
-          platform: 'thirdParty',
-          name: 'Daley',
-          lastName: 'Paley',
-          id: 10455712,
-          email: 'daley.paley@gmail.com',
-          dni: 37897458
-        },
-        address: {
-          description: 'Obispo trejo 1420 esquina rew qwre',
-          phone: '4324232'
-        },
-        details: [
-          {
-            id: 150,
-            unitPrice: 220,
-            quantity: 1,
-            promo: 1,
-            promotion: false,
-            optionGroups: [],
-            discount: 0,
-            name: 'Crocantino (10 porciones)',
-            sku: '150',
-            notes: 'nota'
-          }
-        ],
-        payment: [
-          {
-            method: 'Efectivo',
-            online: false,
-            paymentAmount: 55,
-            subtotal: 245
-          }
-        ],
-        branchId: '800000'
-      };
+      const stubgetOrderBranches = sandbox
+        .stub(platformObj, 'getOrderBranches')
+        .returns([branchIsDontActive]);
+      sandbox.stub(platformObj, 'isClosedRestaurant').returns(true);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      const stateIdByCodStub = sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+      sandbox.stub(thirdParty, 'newsFromOrders').returns(newCreator);
+      const rejectedMessagesStub = sandbox
+        .stub(RejectedMessagesSingleton, 'inactiveResRejectedMessages')
+        .get(() => {
+          return { id: 1, name: 'Orden rechazada por local inactivo' };
+        });
+      sandbox.stub(orderModel, 'findOneAndUpdate').rejects();
+      try {
+        await platformObj.saveNewOrders(thirdParty_orders);
+      } catch (error) {
+        expect(error).to.eql('Failed to create orders.');
+      }
+    });
+    it('Platform - should dont save the news correctly 5', async function () {
+      const stubgetOrderBranches = sandbox
+        .stub(platformObj, 'getOrderBranches')
+        .returns([branch]);
+      sandbox.stub(platformObj, 'isClosedRestaurant').returns(false);
+      sandbox.stub(thirdParty, 'retriveMinimunData').returns({
+        posId: 800000,
+        originalId: 800000,
+        displayId: 800000,
+        branchReference: 800000
+      });
+      const stateIdByCodStub = sandbox
+        .stub(NewsStateSingleton, 'stateByCod')
+        .withArgs(stateCod)
+        .returns(state);
+      sandbox.stub(thirdParty, 'newsFromOrders').rejects(newCreator);
 
-      const newsSaved = [
-        {
-          thirdParty: 'PedidosYa',
-          internalCode: 1,
-          state: 'PENDING',
-          orderId: 134177935,
-          branchId: 2,
-          order: pedidosYa_orders
-        }
-      ];
+      try {
+        await platformObj.saveNewOrders(thirdParty_orders);
+      } catch (error) {
+        expect(error).to.eql({
+          orderId: 800000,
+          error: 'Order: 800000 can not be proccessed correctly.'
+        });
+      }
+    });
+  });
 
-      const newCreator = {
-        viewed: null,
-        typeId: 1,
-        branchId: 800000,
-        order: {
-          id: 4000381,
-          originalId: '4000381',
-          displayId: '4000381',
-          platformId: 7,
-          statusId: 1,
-          orderTime: '2019-09-23T16:40:32Z',
-          deliveryTime: null,
-          pickupOnShop: false,
-          pickupDateOnShop: null,
-          preOrder: false,
-          observations: 'observacion',
-          ownDelivery: false,
-          customer: {
-            name: 'Daley Paley',
-            address: 'Obispo trejo 1420 esquina rew qwre',
-            phone: '4324232',
-            id: 10455712,
-            dni: 37897458,
-            email: 'daley.paley@gmail.com'
-          },
-          details: [[Object]],
-          payment: {
-            typeId: 3,
-            online: false,
-            shipping: 0,
-            discount: 0,
-            voucher: '',
-            subtotal: 245,
-            currency: '$',
-            remaining: 55,
-            partial: 0,
-            note: ''
-          },
-          driver: null,
-          totalAmount: 245
-        },
-        extraData: {
-          branch: 'Surcusal 800000',
-          chain: 'Grido',
-          platform: 'PediGrido',
-          client: 'Perez Juan',
-          region: undefined
-        }
-      };
-      const platformObj = new Platform();
-      platformObj._platform = {
-        internalCode: 7,
-        name: 'PediGrido'
-      };
-      sinon.stub(platformObj, 'getOrderBranches').returns([branch]);
-      sinon.stub(platformObj, 'isClosedRestaurant').returns(true);
-      sinon
-        .stub(thirdParty, 'retriveMinimunData')
-        .returns({ posId: 2, originalId: 2, displayId: 2, branchReference: 2 });
-      sinon.stub(thirdParty, 'newsFromOrders').returns(newCreator);
-      sinon.stub(orderModel, 'findOneAndUpdate').returns(true);
-      sinon.stub(newsModel, 'findOneAndUpdate').returns(true);
-      //sinon.stub(platformObj, 'pushNewToQueue').returns(true);
-
-      const result = await platformObj.saveNewOrders(pedidosYa_orders);
-      //sandboxPY.restore();
-      expect(result).to.eql(newsSaved);
+  describe('fn(): getRejectedMessages()', function () {
+    const rejectMsgReturn = [
+      {
+        id: 11,
+        name: 'Cliente reclama pedido no entredago',
+        descriptionES: 'Cliente reclama pedido no entredago',
+        descriptionPT: 'Cliente reclama pedido no entredago',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 6,
+        name: 'Zona peligrosa',
+        descriptionES: 'Zona peligrosa',
+        descriptionPT: 'Zona peligrosa',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 5,
+        name: 'Cliente cancela pedido',
+        descriptionES: 'Cliente cancela pedido',
+        descriptionPT: 'Cliente cancela pedido',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 7,
+        name: 'Sin cambio',
+        descriptionES: 'Sin cambio',
+        descriptionPT: 'Sin cambio',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 2,
+        name: 'Domicilio erroneo',
+        descriptionES: 'Domicilio erroneo',
+        descriptionPT: 'Domicilio erroneo',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 10,
+        name: 'Zona no corresponde',
+        descriptionES: 'Zona no corresponde',
+        descriptionPT: 'Zona no corresponde',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 1,
+        name: 'Sin producto/variedad',
+        descriptionES: 'Sin producto/variedad',
+        descriptionPT: 'Sin producto/variedad',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 4,
+        name: 'Repartidor accidentado',
+        descriptionES: 'Repartidor accidentado',
+        descriptionPT: 'Repartidor accidentado',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 3,
+        name: 'Sin repartidor',
+        descriptionES: 'Sin repartidor',
+        descriptionPT: 'Sin repartidor',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 8,
+        name: 'Cliente no solicita pedido',
+        descriptionES: 'Cliente no solicita pedido',
+        descriptionPT: 'Cliente no solicita pedido',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: 9,
+        name: 'No sale nadie',
+        descriptionES: 'No sale nadie',
+        descriptionPT: 'No sale nadie',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        id: -1,
+        name: 'Orden expirada por tiempo',
+        descriptionES: 'Orden expirada por tiempo',
+        descriptionPT: 'Orden expirada por tiempo',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      },
+      {
+        name: 'Orden rechazada por local cerrado',
+        descriptionES: 'Orden rechazada por local cerrado',
+        descriptionPT: 'Orden rechazada por local cerrado',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        id: -3,
+        platformId: 10
+      },
+      {
+        id: -2,
+        name: 'Orden rechazada por plataforma',
+        descriptionES: 'Orden rechazada por plataforma',
+        descriptionPT: 'Orden rechazada por plataforma',
+        forRestaurant: true,
+        forLogistics: true,
+        forPickup: true,
+        platformId: 10
+      }
+    ];
+    it('should get Refect Messages', async function () {
+      let platform = new Platform();
+      platform._platform = { internalCode: 10 };
+      let result = await platform.getRejectedMessages();
+      expect(result).to.eql(rejectMsgReturn);
+    });
+  });
+  describe('fn(): getBranchPlatform()', function () {
+    const platformResult = {
+      progClosed: [],
+      _id: '5d87d35ec50f1f0068e92bc1',
+      platform: '5d87ced89b0634004fd83c6c',
+      branchReference: 115005,
+      lastGetNews: '2019-11-01T18:19:55.436Z'
+    };
+    it('should get Platform Parameters', async function () {
+      let platform = new Platform();
+      let result = await platform.getBranchPlatform(
+        branches[0].platforms,
+        '5d87ced89b0634004fd83c6c'
+      );
+      expect(result).to.eql(platformResult);
+    });
+  });
+  describe('fn(): getDeliveryTimes()', function () {
+    const deliveryTimeResult = [
+      {
+        description: '12 horas',
+        id: 10,
+        maxMinutes: 720,
+        minMinutes: 720,
+        name: 'Horas12',
+        order: 8,
+        platformId: 10
+      },
+      {
+        description: "Entre 120' y 150'",
+        id: 9,
+        maxMinutes: 150,
+        minMinutes: 120,
+        name: 'Entre120Y150',
+        order: 6,
+        platformId: 10
+      },
+      {
+        description: "Entre 45' y 60'",
+        id: 3,
+        maxMinutes: 60,
+        minMinutes: 45,
+        name: 'Entre45Y60',
+        order: 3,
+        platformId: 10
+      },
+      {
+        description: "Entre 90' y 120'",
+        id: 5,
+        maxMinutes: 120,
+        minMinutes: 90,
+        name: 'Entre90Y120',
+        order: 5,
+        platformId: 10
+      },
+      {
+        description: '72 horas',
+        id: 8,
+        maxMinutes: 4320,
+        minMinutes: 4320,
+        name: 'Horas72',
+        order: 11,
+        platformId: 10
+      },
+      {
+        description: "Entre 60' y 90'",
+        id: 4,
+        maxMinutes: 90,
+        minMinutes: 60,
+        name: 'Entre60Y90',
+        order: 4,
+        platformId: 10
+      },
+      {
+        description: '24 horas',
+        id: 6,
+        maxMinutes: 1440,
+        minMinutes: 1440,
+        name: 'Horas24',
+        order: 9,
+        platformId: 10
+      },
+      {
+        description: "Entre 15' y 30'",
+        id: 1,
+        maxMinutes: 30,
+        minMinutes: 15,
+        name: 'Entre15Y30',
+        order: 1,
+        platformId: 10
+      },
+      {
+        description: '48 horas',
+        id: 7,
+        maxMinutes: 2880,
+        minMinutes: 2880,
+        name: 'Horas48',
+        order: 10,
+        platformId: 10
+      },
+      {
+        description: "Entre 30' y 45'",
+        id: 2,
+        maxMinutes: 45,
+        minMinutes: 30,
+        name: 'Entre30Y45',
+        order: 2,
+        platformId: 10
+      }
+    ];
+    it('should get Delivery Time', async function () {
+      let platform = new Platform();
+      platform._platform = { internalCode: 10 };
+      let result = await platform.getDeliveryTimes();
+      expect(result).to.eql(deliveryTimeResult);
     });
   });
 });

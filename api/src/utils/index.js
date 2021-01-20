@@ -13,7 +13,7 @@ module.exports.initUtils = () => {
       NewsTypeSingleton.getInstance(),
       NewsStateSingleton.getInstance(),
       RejectedMessagesSingleton.getInstance(),
-      PlatformSingleton.getInstance(),
+      PlatformSingleton.getInstance()
     ]);
 
     /* Load all platforms after getting them */

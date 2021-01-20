@@ -332,7 +332,7 @@ class Platform {
       );
     } catch (error) {
       const msg = 'Failed to update news state.';
-      error = {
+      const formatError = {
         order,
         statusId,
         typeId,
@@ -340,7 +340,7 @@ class Platform {
         entity,
         error: error.toString()
       };
-      logger.error({ message: msg, meta: error });
+      logger.error({ message: msg, meta: formatError });
       return Promise.reject(msg);
     }
   }
@@ -465,13 +465,13 @@ class Platform {
           .asMinutes();
 
         let closed = false;
-        if (branchPlatform.progClosed && !!branchPlatform.progClosed.length)
+        if (branchPlatform.progClosed && !!branchPlatform.progClosed.length) {
           closed =
             branchPlatform.progClosed.some(
               (cp) =>
                 new Date(cp.close) <= dateNow && new Date(cp.open) >= dateNow
             ) || diffLastGetNews > timeToClose;
-        else if (diffLastGetNews > timeToClose) closed = true;
+        } else if (diffLastGetNews > timeToClose) closed = true;
         return resolve(!closed);
       } catch (error) {
         error = { error: error.toString() };
@@ -644,7 +644,6 @@ class Platform {
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(branch.platform);
-
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
@@ -656,7 +655,7 @@ class Platform {
         } catch (error) {
           const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
           logger.error({ message: msg, meta: { error: error.toString() } });
-          throw { orderId: id, error };
+          throw { orderId: originalId, error };
         }
         try {
           orderCreator = {
@@ -737,11 +736,10 @@ class Platform {
         }
       } catch (error) {
         reject({
-          orderId: error.id,
-          error: `Order: ${error.id} can not be proccessed correctly.`
+          orderId: originalId,
+          error: `Order: ${originalId} can not be proccessed correctly.`
         });
       }
-
       /* Save all orders and news generated. */
       try {
         if (promiseNew) {
@@ -750,6 +748,7 @@ class Platform {
             promiseOrder,
             promiseNew
           ]);
+
           if (
             isOpened &&
             branch.platform.isActive &&
@@ -763,7 +762,7 @@ class Platform {
       } catch (error) {
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
-        reject(error.toString());
+        reject(msg);
       }
     });
   }
