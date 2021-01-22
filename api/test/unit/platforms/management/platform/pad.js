@@ -319,8 +319,6 @@ describe('PAD management.', function () {
 
       const saved = await pad.confirmOrder({});
 
-      console.log(JSON.stringify(saved.codeError));
-      console.log(saved.codeError);
       expect(saved.codeError).to.eql(error);
 
       expect(stateIdByCodStub.callCount).to.equal(1);

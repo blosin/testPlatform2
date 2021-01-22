@@ -912,7 +912,6 @@ describe('Platform', function () {
       try {
         await platform.validateNewOrders(thirdPartyOrders);
       } catch (error) {
-        console.log(error);
         expect(error).to.eql('Orders could not been processed.');
         expect(saveNewOrderStub.callCount).to.equal(1);
         expect(findOneStub.callCount).to.equal(1);

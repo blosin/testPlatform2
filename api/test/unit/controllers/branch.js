@@ -2,17 +2,21 @@ const model = require('../../../src/models/branch');
 
 const expect = require('chai').expect;
 const sinon = require('sinon');
-
+import PlatformFactory from '../../../src/platforms/management/factory_platform';
+import PlatformSingleton from '../../../src/utils/platforms';
 const rewire = require('rewire');
 const branch = rewire('../../../src/controllers/branch');
 const logger = require('../../../src/config/logger');
+import SetNews from '../../../src/platforms/management/strategies/set-news';
+
 let sandbox;
 
-const mockRequest = (authorization, params, body, token) => ({
+const mockRequest = (authorization, params, body, token, uuid) => ({
   headers: { authorization },
   params,
   body,
-  token
+  token,
+  uuid
 });
 
 const mockResponse = () => {
@@ -115,35 +119,62 @@ describe('Branch controllers.', function () {
            });
        });
    
-       describe('fn(): getNews()', function () {
-           it('should get news of branch', async function () {
-               const req = mockRequest(null, null, null, { branchId: 'asdasd554' });
-               const res = mockResponse();
-               sandbox.stub(newsModel, 'find').resolves(res);
-               sandbox.stub(pedidosYa, 'callHeartBeat').resolves();
-               const result = await branch.getNews(req, res);
-               expect(result).to.eql(res);
-           });
-           it('should get news of branch', async function () {
-               const req = mockRequest();
-               const res = mockResponse();
-               sandbox.stub(newsModel, 'find').resolves(res);
-               sandbox.stub(pedidosYa, 'callHeartBeat').resolves();
-               const result = await branch.getNews(req, res);
-               expect(result).to.eql(res);
-           });
-       });
-   
-       describe('fn(): setNews()', function () {
-           it('should set news of branch', async function () {
-               const body = [{ typeId: 1, id: 'adasdasd123' }]
-               const req = mockRequest(null, null, body, { branchId: 'asdasd554' });
-               const res = mockResponse();
-               sandbox.stub(newsStrategy, 'setNews').resolves('adasdasd123');
-               const result = await branch.setNews(req, res);
-               expect(result).to.eql(res);
-           });
-       }); */
+  describe('fn(): getNews()', function () {
+    it('should get news of branch', async function () {
+      const req = mockRequest(null, null, null, { branchId: 'asdasd554' });
+      const res = mockResponse();
+      sandbox.stub(newsModel, 'find').resolves(res);
+      sandbox.stub(pedidosYa, 'callHeartBeat').resolves();
+      const result = await branch.getNews(req, res);
+      expect(result).to.eql(res);
+    });
+    it('should get news of branch', async function () {
+      const req = mockRequest();
+      const res = mockResponse();
+      sandbox.stub(newsModel, 'find').resolves(res);
+      sandbox.stub(pedidosYa, 'callHeartBeat').resolves();
+      const result = await branch.getNews(req, res);
+      expect(result).to.eql(res);
+    });
+  });*/
+
+  describe('fn(): setNews()', function () {
+    it('should set news of branch', async function () {
+      const body = [{ typeId: 1, id: 'adasdasd123' }, { typeId: 20 }];
+      const req = mockRequest(null, null, body, { branchId: 'asdasd554' });
+      const res = mockResponse();
+      sandbox.stub(SetNews.prototype, 'setNews').resolves('adasdasd123');
+      const result = await branch.setNews(req, res);
+      expect(result).to.eql(res);
+      res.status.calledWith(200).should.be.ok;
+    });
+    it('should faild set news of branch but return 200', async function () {
+      const body = [{ typeId: 1, id: 'adasdasd123' }, { typeId: 20 }];
+      const req = mockRequest(null, null, body, { branchId: 'asdasd554' });
+      const res = mockResponse();
+      sandbox.stub(SetNews.prototype, 'setNews').rejects();
+      const result = await branch.setNews(req, res);
+      expect(result).to.eql(res);
+      res.status.calledWith(200).should.be.ok;
+    });
+    it('should faild set news of branch return 400', async function () {
+      const req = mockRequest(null, null, null, { branchId: 'asdasd554' });
+      const res = mockResponse();
+      sandbox.stub(SetNews.prototype, 'setNews').rejects();
+      const result = await branch.setNews(req, res);
+      expect(result).to.eql(res);
+      res.status.calledWith(400).should.be.ok;
+    });
+    it('should faild set news of  return 400', async function () {
+      const body = [{ id: 'adasdasd123' }, { typeId: 20 }];
+      const req = mockRequest(null, null, body, { branchId: 'asdasd554' });
+      const res = mockResponse();
+      sandbox.stub(SetNews.prototype, 'setNews').rejects();
+      const result = await branch.setNews(req, res);
+      expect(result).to.eql(res);
+      res.status.calledWith(400).should.be.ok;
+    });
+  });
 
   describe('fn(): udpdateLastGetNews()', function () {
     it('should udpdateLastGetNews', async function () {
@@ -158,15 +189,34 @@ describe('Branch controllers.', function () {
     });
   });
   describe('fn(): updateDate()', function () {
-    it.only('should update Date', async function () {
-      const req = mockRequest(1);
-      const res = mockResponse();
-      await branch.updateDate(req, res);
-    });
+    const platform = {
+      _id: 1,
+      internalCode: 1,
+      name: 'PedidosYa',
+      credentials: {
+        type: 'sdk',
+        data: {
+          clientId: 'integration_smartfran',
+          clientSecret: '1',
+          environment: 'DEVELOPMENT'
+        }
+      }
+    };
+    const token = {
+      _id: 'e3afa3ba2cbb8eaa4fa6b54d',
+      name: 'Surcusal 700000',
+      branchId: 700000,
+      branchTimeout: '20'
+    };
     it('should fail update Date', async function () {
-      const updOneStub = sandbox.stub(model, 'updateOne').rejects();
-      await branch.updateDate('');
-      expect(updOneStub.callCount).to.equal(1);
+      const req = mockRequest();
+      const res = mockResponse();
+      req.token = token;
+      req.uuid = '1';
+      sandbox.stub(PlatformFactory.prototype, 'createPlatform').rejects();
+      sandbox.stub(PlatformSingleton, 'getByCod').resolves(platform);
+      await branch.updateDate(req, res);
+      res.status.calledWith(400).should.be.ok;
     });
   });
 });

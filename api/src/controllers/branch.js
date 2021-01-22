@@ -67,7 +67,6 @@ const setNews = (req, res) => {
     logger.error({ error: msg, meta: { body: req.body } });
     return res.status(400).json({ error: msg }).end();
   }
-
   if (req.body.some((n) => !n || !n.typeId)) {
     const msg = 'The new has no typeId.';
     logger.error({ error: msg, meta: { body: req.body } });
@@ -140,5 +139,6 @@ const updateDate = async (req, res) => {
 module.exports = {
   getNews,
   setNews,
-  updateDate
+  updateDate,
+  udpdateLastGetNews
 };

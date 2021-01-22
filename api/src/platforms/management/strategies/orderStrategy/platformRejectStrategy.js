@@ -99,7 +99,6 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
           });
         return resolve(platformResult);
       } catch (error) {
-        console.log(1, error);
         return reject(error);
       }
     });
