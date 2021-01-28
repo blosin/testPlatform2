@@ -27,7 +27,7 @@ docker push ${ECR_REPOSITORY}/${PROJ_IMG}:${IMG_TAG}
 docker rmi -f ${ECR_REPOSITORY}/${PROJ_IMG}:${IMG_TAG}
 
 # Deploy
-envsubst < container-definitions-mock.json > ecs-container-definitions.json
+envsubst <  container-definitions.json > ecs-container-definitions.json
 aws ecs register-task-definition\
         --cli-input-json file://ecs-container-definitions.json\
         --region ${REGION}\

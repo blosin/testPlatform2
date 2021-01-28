@@ -101,7 +101,8 @@ module.exports = {
           customer.name = order.user.name + ' ' + order.user.lastName;
           customer.address = order.address.description;
           customer.phone = order.address.phone;
-          customer.id = order.user.id;
+          customer.id =
+            !order.user.id || order.user.id == 'null' ? 1 : order.user.id;
           customer.dni = order.user.dni;
           customer.email = order.user.email;
           return customer;
