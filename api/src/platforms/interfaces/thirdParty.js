@@ -102,7 +102,11 @@ module.exports = {
           customer.address = order.address.description;
           customer.phone = order.address.phone;
           customer.id =
-            !order.user.id || order.user.id == 'null' ? 1 : order.user.id;
+            !order.user.id ||
+            order.user.id == 'null' ||
+            typeof order.user.id !== 'number'
+              ? 0
+              : order.user.id;
           customer.dni = order.user.dni;
           customer.email = order.user.email;
           return customer;
