@@ -314,8 +314,10 @@ class PedidosYa extends Platform {
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
-
-        const res = await this._api.order.dispatch(order);
+        let res = {};
+        if (order.ownDelivery) {
+          res = await this._api.order.dispatch(order);
+        }
         return resolve(res);
       } catch (error) {
         if (!error) error = '';
