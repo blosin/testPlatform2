@@ -5,7 +5,7 @@
         {
           "hostPort": 0,
           "protocol": "tcp",
-          "containerPort": 3086
+          "containerPort": 3087
         }
       ],
       "cpu": 0,

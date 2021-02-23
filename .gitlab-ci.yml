@@ -25,9 +25,12 @@ before_script:
 stages:
   - clean
   - unit-test
+#  - static-test
+# - versionado
   - build
   - push-image
   - deploy-testing
+#  - integration-test
   - deploy-staging
 #  - deploy-production
 clean:
