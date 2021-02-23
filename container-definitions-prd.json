@@ -1,0 +1,56 @@
+{
+  "containerDefinitions": [
+    {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/concentrador-service-production-task",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 3086,
+          "protocol": "tcp",
+          "containerPort": 3086
+        }
+      ],
+      "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}",
+      "essential": true,
+      "name": "concentrador-service-production-container",
+      "entryPoint": [
+        "npm",
+        "run"
+      ],
+      "command": [
+        "serve"
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ]
+    }
+  ],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::382381053403:role/ecsTaskExecutionRole",
+  "tags": [
+    {
+      "key": "Environment",
+      "value": "Production"
+    },
+    {
+      "key": "Project",
+      "value": "Concentrador"
+    }
+  ],
+  "family": "concentrador-service-production-task",
+  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+}
