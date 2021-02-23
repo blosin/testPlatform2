@@ -1,4 +1,4 @@
-image: docker:stable
+image: docker:latest
 
 variables:
  AWS_ACCOUNT: 382381053403
@@ -10,8 +10,9 @@ services:
   - docker:dind
 
 before_script:
-  - pip3 install awscli
-  - echo $BUILD_TAG
+  #- pip3 install awscli
+  #- echo $BUILD_TAG
+  - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
 
 
 # cache:
@@ -24,68 +25,69 @@ before_script:
 stages:
   - clean
   - unit-test
-  - static-test
   - build
-  - restore-db
   - push-image
   - deploy-testing
   - deploy-staging
-  - deploy-production
-# clean:
-#   stage: clean
-#   script:
-#     - echo "Removing all containers"
-#     #- test $(docker ps -aq) && docker rm -f $(docker ps -aq)
-#     - echo "Prune all docker stuff without use"
-#     - docker system prune --force --all --volumes
-#     - echo "Clean npm garbage"
-#     - rm -rf node_modules package-lock.json yarn-lock.json
-#   only:
-#     - test_devops
-#   tags:adad
-#     - runner-smartfran
+#  - deploy-production
+clean:
+  stage: clean
+  script:
+    - echo "Removing all containers"
+    - test $(docker ps -aq) && docker rm -f $(docker ps -aq)
+    - echo "Prune all docker stuff without use"
+    - docker system prune --force --all --volumes
+    - echo "Clean npm garbage"
+    - rm -rf node_modules package-lock.json yarn-lock.json
+    - echo "Cleaning gitlab-runner cache"
+    - rm -rf /home/gitlab-runner/cache/
+  only:
+    - test_devops
+  tags:
+    - runner-smartfran
 
 unit-test:
   stage: unit-test
   before_script:
-    - cd api/src/platforms/sdk/pedidosYa ; npm i ; cd ../../../.. ; npm i
+    - cd api
+    - npm install
   script:
     - npm run test
-  tags:
-    - smartfran-runner
   only:
     - test_devops
+  tags:
+    - runner-smartfran
 
-build-test:
+build:
   stage: build
-  before_script:
-    - cd api
+  variables:
+    DOCKER_DRIVER: overlay2
   script:
    - pwd
+   - cd api
    - echo "Building image..."
-   - echo $IMAGE_TAG
    - docker build -t $PROJ_IMG .
    - echo "Tagging image..."
-   - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:latest
+   - docker tag $PROJ_IMG $ECR_REPOSITORY/$PROJ_IMG:$IMAGE_TAG
    - echo "Pushing image..."
+   - docker ps -a
   tags:
-    - smartfran-runner
+   - runner-smartfran
   only:
-    - test_devops
+   - test_devops
 
-push:
+push-image:
   stage: push-image
   script:
    - echo "Login to ECR"
    - aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
    - echo "Pushing image..."
-   - echo $ECR_REPOSITORY/$PROJ_IMG:latest
-   - docker push $ECR_REPOSITORY/$PROJ_IMG:latest
-
+   - echo $ECR_REPOSITORY/$PROJ_IMG:$IMAGE_TAG
+   - docker push $ECR_REPOSITORY/$PROJ_IMG:$IMAGE_TAG
+  after_script:
+   - docker system prune --force --all --volumes
   tags:
-   - smartfran-runner
-      
-
+   - runner-smartfran
 
 deploy.testing:
   stage: deploy-testing
@@ -93,7 +95,7 @@ deploy.testing:
     - export BUILD_TAG="$CI_COMMIT_TAG"
   variables:
    BRANCH_NAME: "testing"
-   SERVICE_NAME: "platforms-service"
+   SERVICE_NAME: "platform-service"
    ECS_REGION: "us-east-2"
    CLUSTER: "smartfran-pedidos-common"
    SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
@@ -104,17 +106,15 @@ deploy.testing:
    ENV: "testing"
 
   script:
-    - cd api
     - echo "Deploying version $PROJ_IMG"
     - echo $PROJ_IMG
     - echo $ECS_TEMPLATE
-    - envsubst < container-definitions-mock.json > ecs-container-definitions.json
+    - envsubst < container-definitions.json > ecs-container-definitions.json
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
     - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
 
   tags:
-    - smartfran-runner
-
+    - runner-smartfran
 
 deploy.staging:
   stage: deploy-staging
@@ -122,7 +122,7 @@ deploy.staging:
     - export BUILD_TAG="$CI_COMMIT_TAG"
   variables:
    BRANCH_NAME: "staging"
-   SERVICE_NAME: "platforms-service"
+   SERVICE_NAME: "platform-service"
    ECS_REGION: "us-east-2"
    CLUSTER: "smartfran-pedidos-common"
    SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
@@ -133,44 +133,42 @@ deploy.staging:
    ENV: "staging"
 
   script:
-    - cd api
     - echo "Deploying version $PROJ_IMG"
     - echo $PROJ_IMG
     - echo $ECS_TEMPLATE
-    - envsubst < container-definitions-stg1.json > ecs-container-definitions.json
+    - envsubst < container-definitions.json > ecs-container-definitions.json
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
     - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
 
   tags:
-    - smartfran-runner
+    - runner-smartfran
 
+# deploy.production:
+#   stage: deploy-production
+#   before_script:
+#     - export BUILD_TAG="$CI_COMMIT_TAG"
+#   variables:
+#    BRANCH_NAME: "production"
+#    SERVICE_NAME: "platforms-service"
+#    ECS_REGION: "us-east-1"
+#    CLUSTER: "smartfran-pedidos-common"
+#    SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
+#    TASK: "${SERVICE_NAME}-${BRANCH_NAME}-task"
+#    PROJ_IMG: "smartfran/${SERVICE_NAME}"
+#    ECR_REPOSITORY: "382381053403.dkr.ecr.us-east-2.amazonaws.com"
+#    PROFILE: "smartfran"
+#    ENV: "production"
 
-deploy.production:
-  stage: deploy-production
-  before_script:
-    - export BUILD_TAG="$CI_COMMIT_TAG"
-  variables:
-   BRANCH_NAME: "production"
-   SERVICE_NAME: "platforms-service"
-   ECS_REGION: "us-east-1"
-   CLUSTER: "smartfran-pedidos-common"
-   SERVICE: "${SERVICE_NAME}-${BRANCH_NAME}-service"
-   TASK: "${SERVICE_NAME}-${BRANCH_NAME}-task"
-   PROJ_IMG: "smartfran/${SERVICE_NAME}"
-   ECR_REPOSITORY: "382381053403.dkr.ecr.us-east-2.amazonaws.com"
-   PROFILE: "smartfran"
-   ENV: "production"
-
-  script:
-    - echo "Deploying version $PROJ_IMG"
-    - echo $PROJ_IMG
-    - echo $ECS_TEMPLATE
-    - envsubst < container-definitions-prd.json > ecs-container-definitions.json
-    - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
-    - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
+#   script:
+#     - echo "Deploying version $PROJ_IMG"
+#     - echo $PROJ_IMG
+#     - echo $ECS_TEMPLATE
+#     - envsubst < container-definitions-prd.json > ecs-container-definitions.json
+#     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
+#     - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
   
-  when: manual
+#   when: manual
   
-  tags:
-    - smartfran-runner
+#   tags:
+#     - smartfran-runner
 
