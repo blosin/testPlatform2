@@ -10,7 +10,7 @@ services:
   - docker:dind
 
 before_script:
-  #- echo $BUILD_TAG
+  - echo $BUILD_TAG
   - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
 
 
@@ -24,7 +24,7 @@ before_script:
 stages:
   - clean
   - unit-test
-#  - static-test
+  - static-test
 # - versionado
 #   - build
 #   - push-image
