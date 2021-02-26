@@ -39,7 +39,7 @@ class Rappi extends Platform {
     } else {
       const msg = 'Can not initializate Rappi.';
       new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
-        platform: this._platform,
+        platform: this._platform
       });
     }
   }
@@ -53,7 +53,7 @@ class Rappi extends Platform {
         if (!error) error = '';
         const msg = 'Failed to login.';
         new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
       });
   }
@@ -63,7 +63,7 @@ class Rappi extends Platform {
       try {
         const url = this.baseUrl + this.urlLogin;
         let response = await axios.post(url, {
-          token: this.token,
+          token: this.token
         });
         if (!response) throw 'Can not login to rappi.';
         this.updateLastContact();
@@ -72,7 +72,7 @@ class Rappi extends Platform {
         if (!error) error = '';
         const msg = 'Failed to login.';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -91,17 +91,16 @@ class Rappi extends Platform {
           method: 'GET',
           headers: {
             accept: 'application/json',
-            'x-auth-int': xAuth,
-          },
+            'x-auth-int': xAuth
+          }
         };
-
         const url = this.baseUrl + this.urlGetOrders;
         const response = await axios.get(url, options);
         var result, saved;
-
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
-            this.saveNewOrders(data, this._platform));
+            this.saveNewOrders(data, this._platform)
+          );
           if (saved) {
             await Promise.allSettled(saved).then((resultProm) => {
               result = resultProm
@@ -110,13 +109,12 @@ class Rappi extends Platform {
             });
           }
         }
-
         resolve(result);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to get orders.';
         const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -128,23 +126,22 @@ class Rappi extends Platform {
    * @param {*} order
    * @override
    */
-  confirmOrder(order) {
+  receiveOrder(order) {
     return new Promise(async (resolve) => {
       try {
         /* LOGIN  */
         const xAuth = await this.loginToRappi();
 
         /* UPDATE ORDER */
-        const state = NewsStateSingleton.stateByCod('confirm');
+        // const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-
         /* SEND CONFIRMED */
         const options = {
           method: 'GET',
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            'x-auth-int': xAuth,
-          },
+            'x-auth-int': xAuth
+          }
         };
         const url = this.baseUrl + this.urlConfirmOrders + order.id;
         const res = await axios.get(url, options);
@@ -155,7 +152,7 @@ class Rappi extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }
@@ -182,12 +179,12 @@ class Rappi extends Platform {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'x-auth-int': xAuth,
-          },
+            'x-auth-int': xAuth
+          }
         };
         const data = {
           order_id: order.id,
-          reason: rejectDesc,
+          reason: rejectDesc
         };
         const url = this.baseUrl + this.urlRejectOrders;
         const res = await axios.post(url, data, options);
@@ -198,7 +195,7 @@ class Rappi extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         resolve(err);
       }

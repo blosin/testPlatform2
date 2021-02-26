@@ -19,7 +19,7 @@ async function udpdateLastGetNews(branchId) {
         branchId: branchId
       },
       {
-        'platforms.$[].lastGetNews': new Date()
+        lastGetNews: new Date()
       },
       { new: true, runValidators: true, context: 'query' }
     );

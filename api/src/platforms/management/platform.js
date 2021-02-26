@@ -448,7 +448,7 @@ class Platform {
     If it's closed, reject the order automatically and return false.
     @param branchPlatform 
     */
-  isClosedRestaurant(branchPlatform) {
+  isClosedRestaurant(branchPlatform, lastGetNew) {
     return new Promise(async (resolve) => {
       try {
         const timeToClose = 3;
@@ -456,14 +456,10 @@ class Platform {
         const diffLastGetNews = moment
           .duration(
             moment(dateNow, 'DD/MM/YYYY HH:mm:ss').diff(
-              moment(
-                new Date(branchPlatform.lastGetNews),
-                'DD/MM/YYYY HH:mm:ss'
-              )
+              moment(new Date(lastGetNew), 'DD/MM/YYYY HH:mm:ss')
             )
           )
           .asMinutes();
-
         let closed = false;
         if (branchPlatform.progClosed && !!branchPlatform.progClosed.length) {
           closed =
@@ -497,7 +493,6 @@ class Platform {
     return new Promise(async (resolve, reject) => {
       let orderSaved;
       const minOrders = this.parser.retriveMinimunData(newOrder);
-
       /* Validate  orders */
       let order = await orderModel
         .find({
@@ -597,7 +592,7 @@ class Platform {
           'chain.chain': '$joinChains.chain',
           'platform.name': '$joinPlatforms.name',
           'platform.platform': '$joinPlatforms._id',
-          'platform.lastGetNews': '$platforms.lastGetNews',
+          lastGetNews: '$lastGetNews',
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
           'client.businessName': '$joinClients.businessName',
@@ -632,18 +627,18 @@ class Platform {
       } = this.parser.retriveMinimunData(order);
       try {
         let branches = await this.getOrderBranches(branchReference);
-
         if (branches.length == 0)
           reject({
             error: 'There is no branch for this order'
           });
-
         branch = branches[0];
-
         let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
-          isOpened = await this.isClosedRestaurant(branch.platform);
+          isOpened = await this.isClosedRestaurant(
+            branch.platform,
+            branch.lastGetNews
+          );
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';

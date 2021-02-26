@@ -81,7 +81,8 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
         const platformController = new PlatformController();
 
         const isOpened = await platformController.isClosedRestaurant(
-          searchBranch.platforms
+          searchBranch.platforms,
+          searchBranch.lastGetNews
         );
 
         if (
