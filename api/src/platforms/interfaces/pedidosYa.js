@@ -6,21 +6,20 @@ import { APP_PLATFORM } from '../../utils/errors/codeError';
 const paymentType = {
   DEBIT: {
     paymentId: 1,
-    paymentName: 'Debit',
+    paymentName: 'Debit'
   },
   CREDIT: {
     paymentId: 2,
-    paymentName: 'Credit',
+    paymentName: 'Credit'
   },
   Efectivo: {
     paymentId: 3,
-    paymentName: 'Efectivo',
-  },
+    paymentName: 'Efectivo'
+  }
 };
 
 module.exports = {
   newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
-
     return new Promise((resolve, reject) => {
       const orderMapper = (data, platform) => {
         try {
@@ -37,15 +36,18 @@ module.exports = {
           order.preOrder = data.order.preOrder;
           order.observations = data.order.notes;
           order.ownDelivery = !data.order.logistics;
-          if (data.order.pickup)
-            order.ownDelivery = false;
+          if (data.order.pickup) order.ownDelivery = false;
           return order;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de PY.';
-          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, { data, branch, error: error.toString() });
+          const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
+            data,
+            branch,
+            error: error.toString()
+          });
           reject(err);
         }
-      }
+      };
 
       const paymentenMapper = (payment, discounts, thirdParty) => {
         try {
@@ -94,7 +96,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -115,7 +117,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -128,7 +130,7 @@ module.exports = {
             name: retrivedDriver.name,
             status: retrivedDriver.status,
             pickUpDatetime: retrivedDriver.pickUpDatetime,
-            estimatedDeliveryDate: retrivedDriver.estimatedDeliveryDate,
+            estimatedDeliveryDate: retrivedDriver.estimatedDeliveryDate
           };
           return driver;
         } catch (error) {
@@ -136,7 +138,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -161,7 +163,11 @@ module.exports = {
               detHeader.groupId = numberOfPromotions;
               detHeader.discount = detail.discount;
               detHeader.description = detail.product.name;
-              detHeader.sku = detail.product.integrationCode;
+              detHeader.sku =
+                detail.product.integrationCode == null ||
+                detail.product.integrationCode.match(/[A-Za-z]/g) === null
+                  ? detail.product.integrationCode
+                  : 99999;
               detHeader.note = detail.notes;
 
               details.push(detHeader);
@@ -174,7 +180,11 @@ module.exports = {
                 detDetails.groupId = numberOfPromotions;
                 detDetails.description = optionsGroups.name;
 
-                let skuComparator = optionsGroups.integrationCode;
+                let skuComparator =
+                  optionsGroups.integrationCode == null ||
+                  optionsGroups.integrationCode.match(/[A-Za-z]/g) === null
+                    ? optionsGroups.integrationCode
+                    : 99999;
 
                 let optionsString = '';
                 if (!!optionsGroups.options.length)
@@ -183,11 +193,16 @@ module.exports = {
                       optionsString +=
                         ' ' + option.name + ' cantidad ' + option.quantity;
                     } else {
-                      skuComparator = option.integrationCode;
+                      skuComparator =
+                        option.integrationCode == null ||
+                        option.integrationCode.match(/[A-Za-z]/g) === null
+                          ? option.integrationCode
+                          : 99999;
                       optionsString = option.name;
                       detDetails.sku = skuComparator;
                       detDetails.optionalText = optionsString;
                       detDetails.count = option.quantity;
+                      if (option.amount > 0) detDetails.price = option.amount;
                       const optionDetail = Object.assign({}, detDetails);
                       details.push(optionDetail);
                     }
@@ -209,25 +224,57 @@ module.exports = {
               det.groupId = '0';
               det.discount = detail.discount;
               det.description = detail.product.name;
-              let skuComparator = detail.product.integrationCode;
+              let skuComparator =
+                detail.product.integrationCode == null ||
+                detail.product.integrationCode.match(/[A-Za-z]/g) === null
+                  ? detail.product.integrationCode
+                  : 99999;
               det.note = detail.notes;
-
+              let adicional = [];
               let optionsString = '';
               if (detail.optionGroups.length > 0) {
                 for (let optionsGroups of detail.optionGroups) {
-                  optionsString += ' ' + optionsGroups.name;
+                  if (
+                    optionsGroups.integrationName.trim().toLowerCase() ==
+                    'adicional'
+                  ) {
+                    for (let options of optionsGroups.options) {
+                      let det = {};
 
-                  for (let options of optionsGroups.options) {
-                    if (
-                      options.integrationCode &&
-                      options.integrationCode != '' &&
-                      options.integrationCode != '99999'
-                    ) {
-                      skuComparator = options.integrationCode;
-                      optionsString += ' ' + options.name;
-                    } else {
-                      optionsString +=
-                        ' ' + options.name + ' cantidad ' + options.quantity;
+                      det.sku =
+                        options.integrationCode == null ||
+                        options.integrationCode.match(/[A-Za-z]/g) === null
+                          ? options.integrationCode
+                          : 99999;
+                      det.productId = options.id;
+                      det.count = options.quantity;
+                      det.price = options.amount;
+                      det.promo = 0;
+                      det.groupId = '0';
+                      det.discount = 0;
+                      det.description = optionsGroups.name;
+                      det.optionalText = options.name;
+                      adicional.push(det);
+                    }
+                  } else {
+                    optionsString += ' ' + optionsGroups.name;
+
+                    for (let options of optionsGroups.options) {
+                      if (
+                        options.integrationCode &&
+                        options.integrationCode != '' &&
+                        options.integrationCode != '99999'
+                      ) {
+                        skuComparator =
+                          options.integrationCode == null ||
+                          options.integrationCode.match(/[A-Za-z]/g) === null
+                            ? options.integrationCode
+                            : 99999;
+                        optionsString += ' ' + options.name;
+                      } else {
+                        optionsString +=
+                          ' ' + options.name + ' cantidad ' + options.quantity;
+                      }
                     }
                   }
                 }
@@ -236,6 +283,9 @@ module.exports = {
               det.sku = skuComparator;
               det.optionalText = optionsString;
               details.push(det);
+              adicional.forEach((det) => {
+                details.push(det);
+              });
             }
           }
           return details;
@@ -245,7 +295,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -258,14 +308,14 @@ module.exports = {
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : '',
+            region: branch.address.region ? branch.address.region.region : ''
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de PY.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -278,8 +328,8 @@ module.exports = {
             details: [],
             payment: {},
             totalAmount: {},
-            driver: [],
-          },
+            driver: []
+          }
         };
         news.viewed = null;
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
@@ -291,7 +341,7 @@ module.exports = {
         news.order.payment = paymentenMapper(
           data.order.payment,
           data.order.discounts,
-          data.thirdParty,
+          data.thirdParty
         );
         news.order.driver = driverMapper(data.driver);
         news.extraData = extraDataMapper(branch, platform);
@@ -304,7 +354,7 @@ module.exports = {
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,
           branch,
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -315,7 +365,7 @@ module.exports = {
       branchReference: data.restaurant.integrationCode,
       posId: data.id,
       originalId: data.id.toString(),
-      displayId: data.id.toString(),
+      displayId: data.id.toString()
     };
-  },
+  }
 };

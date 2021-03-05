@@ -88,7 +88,10 @@ module.exports = {
               detHeader.groupId = numberOfPromotions;
               detHeader.discount = 0;
               detHeader.description = detail.name;
-              detHeader.sku = detail.sku;
+              detHeader.sku =
+                detail.sku == null || detail.sku.match(/[A-Za-z]/g) === null
+                  ? detail.sku
+                  : 99999;
               detHeader.note = detail.comments;
 
               details.push(detHeader);
@@ -100,7 +103,10 @@ module.exports = {
                 detDetails.promo = 1;
                 detDetails.groupId = numberOfPromotions;
                 detDetails.description = product.name;
-                detDetails.sku = product.sku;
+                detDetails.sku =
+                  product.sku == null || product.sku.match(/[A-Za-z]/g) === null
+                    ? product.sku
+                    : 99999;
 
                 let number = 0;
                 detDetails.optionalText = '';
@@ -110,7 +116,11 @@ module.exports = {
                     /* If the product has an item with sku 99999. It's sku is inside toppings */
                     if (product.sku == '99999') {
                       detDetails.productId = parseInt(topping.sku, 10);
-                      detDetails.sku = topping.sku;
+                      detDetails.sku =
+                        topping.sku == null ||
+                        topping.sku.match(/[A-Za-z]/g) === null
+                          ? topping.sku
+                          : 99999;
                     }
                     if (number == 0) {
                       detDetails.optionalText += topping.name;
@@ -125,7 +135,10 @@ module.exports = {
               numberOfPromotions += 1;
             } else {
               det.productId = parseInt(detail.sku, 10);
-              det.sku = detail.sku;
+              det.sku =
+                detail.sku == null || detail.sku.match(/[A-Za-z]/g) === null
+                  ? detail.sku
+                  : 99999;
               det.count = detail.units;
               det.price = parseFloat(detail.price);
               det.promo = 0;
@@ -141,7 +154,11 @@ module.exports = {
                   /* If the product has an item with sku 99999. It's sku is inside toppings */
                   if (detail.sku == '99999') {
                     det.productId = parseInt(topping.sku, 10);
-                    det.sku = topping.sku;
+                    det.sku =
+                      topping.sku == null ||
+                      topping.sku.match(/[A-Za-z]/g) === null
+                        ? topping.sku
+                        : 99999;
                   }
                   if (number == 0) {
                     det.optionalText += topping.name;

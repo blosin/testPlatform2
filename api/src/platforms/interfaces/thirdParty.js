@@ -132,7 +132,10 @@ module.exports = {
             det.price = detail.unitPrice;
             det.discount = detail.discount;
             det.description = detail.name;
-            det.sku = detail.sku;
+            det.sku =
+              detail.sku == null || detail.sku.match(/[A-Za-z]/g) === null
+                ? detail.sku
+                : 99999;
             det.optionalText = detail.notes;
             det.promo = 0;
             det.promotion = false;
@@ -153,7 +156,10 @@ module.exports = {
                 optionalDet.productId = option.id;
                 optionalDet.groupId = groupId;
                 optionalDet.description = option.name;
-                optionalDet.sku = option.sku;
+                optionalDet.sku =
+                  option.sku == null || option.sku.match(/[A-Za-z]/g) === null
+                    ? option.sku
+                    : 99999;
                 optionalDet.optionalText = option.notes;
                 optionalDet.count = option.quantity || 1;
                 details.push(optionalDet);
