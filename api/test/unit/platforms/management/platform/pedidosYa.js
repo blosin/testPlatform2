@@ -27,6 +27,7 @@ const order = {
   pushed: false,
   express: false,
   preOrder: false,
+  ownDelivery:true,
   logistics: false,
   integrationCode: null,
   preparationTime: null,

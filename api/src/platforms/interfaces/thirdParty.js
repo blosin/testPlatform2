@@ -29,7 +29,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -54,7 +54,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -69,7 +69,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -82,14 +82,14 @@ module.exports = {
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : '',
+            region: branch.address.region ? branch.address.region.region : ''
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -101,7 +101,12 @@ module.exports = {
           customer.name = order.user.name + ' ' + order.user.lastName;
           customer.address = order.address.description;
           customer.phone = order.address.phone;
-          customer.id = order.user.id;
+          customer.id =
+            !order.user.id ||
+            order.user.id == 'null' ||
+            typeof order.user.id !== 'number'
+              ? 0
+              : order.user.id;
           customer.dni = order.user.dni;
           customer.email = order.user.email;
           return customer;
@@ -110,7 +115,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -127,7 +132,10 @@ module.exports = {
             det.price = detail.unitPrice;
             det.discount = detail.discount;
             det.description = detail.name;
-            det.sku = detail.sku;
+            det.sku =
+              detail.sku == null || detail.sku.match(/[A-Za-z]/g) === null
+                ? detail.sku
+                : 99999;
             det.optionalText = detail.notes;
             det.promo = 0;
             det.promotion = false;
@@ -148,7 +156,10 @@ module.exports = {
                 optionalDet.productId = option.id;
                 optionalDet.groupId = groupId;
                 optionalDet.description = option.name;
-                optionalDet.sku = option.sku;
+                optionalDet.sku =
+                  option.sku == null || option.sku.match(/[A-Za-z]/g) === null
+                    ? option.sku
+                    : 99999;
                 optionalDet.optionalText = option.notes;
                 optionalDet.count = option.quantity || 1;
                 details.push(optionalDet);
@@ -164,7 +175,7 @@ module.exports = {
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
-            error: error.toString(),
+            error: error.toString()
           });
           reject(err);
         }
@@ -190,7 +201,7 @@ module.exports = {
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,
           branch,
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -201,7 +212,7 @@ module.exports = {
       branchReference: data.branchId.toString(),
       posId: data.id,
       originalId: data.id.toString(),
-      displayId: data.id.toString(),
+      displayId: data.id.toString()
     };
-  },
+  }
 };

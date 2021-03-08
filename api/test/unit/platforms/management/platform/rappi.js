@@ -274,22 +274,14 @@ describe('RAPPI management.', function () {
     });
   });
 
-  describe('fn(): confirmOrder()', function () {
+/*   describe('fn(): confirmOrder()', function () {
     const stateCod = 'confirm';
     const stateId = 5;
 
     it('should confirm order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
-      const stateIdByCodStub = sandbox
-        .stub(NewsStateSingleton, 'stateByCod')
-        .withArgs(stateCod)
-        .returns(stateId);
-
-      const updOrderStateStub = sandbox
-        .stub(Rappi.prototype, 'updateOrderState')
-        .resolves(newOrders);
-
+   
       const loginStub = sandbox
         .stub(Rappi.prototype, 'loginToRappi')
         .resolves('token');
@@ -297,7 +289,7 @@ describe('RAPPI management.', function () {
       const axiosStub = sandbox
         .stub(axios, 'get')
         .resolves({ data: newOrders });
-      let saved = await rappi.confirmOrder(orders[0]);
+      let saved = await rappi.receiveOrder(orders[0]);
 
       expect(saved).to.eql(newOrders);
 
@@ -334,7 +326,7 @@ describe('RAPPI management.', function () {
         .resolves('token');
       const axiosStub = sandbox.stub(axios, 'get').rejects('Error+++');
 
-      let saved = await rappi.confirmOrder(orders[0]);
+      let saved = await rappi.receiveOrder(orders[0]);
 
       expect(saved.metadata.error).to.eql('Error+++');
 
@@ -359,7 +351,7 @@ describe('RAPPI management.', function () {
         .rejects('Error');
 
       try {
-        await rappi.confirmOrder(orders[0]);
+        await rappi.receiveOrder(orders[0]);
       } catch (error) {
         expect(error.error).to.eql('Error');
 
@@ -368,7 +360,7 @@ describe('RAPPI management.', function () {
       }
     });
   });
-
+ */
   describe('fn(): branchRejectOrder()', function () {
     const stateCod = 'rej';
     const stateId = 4;

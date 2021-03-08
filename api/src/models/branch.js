@@ -58,12 +58,12 @@ const branchSchema = new Schema(
       {
         platform: { type: Schema.Types.ObjectId, ref: platformSchema },
         branchReference: { type: String },
-        branchIdReference: { type: Number },
-        lastGetNews: { type: Date },
+        branchIdReference: { type: String },
         progClosed: [{ close: Date, open: Date, description: String }],
         isActive: { type: Boolean, default: true }
       }
     ],
+    lastGetNews: { type: Date },
     smartfran_sw: {
       agent: {
         installedVersion: {
@@ -130,6 +130,10 @@ const branchSchema = new Schema(
     credentials: {
       aws_id: { type: String },
       aws_secret: { type: String }
+    },
+    updaterVersion: {
+      type: String,
+      maxlength: 50
     }
   },
   {

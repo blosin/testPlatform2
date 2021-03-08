@@ -34,7 +34,7 @@ class Platform {
    * */
   getDeliveryTimes() {
     return new Promise((resolve) => {
-      let data = require('../../assets/deliveryTimes').generic;
+      const data = require('../../assets/deliveryTimes').generic;
       data.forEach((obj) => (obj.platformId = this._platform.internalCode));
       resolve(data);
     });
@@ -46,7 +46,7 @@ class Platform {
   getRejectedMessages() {
     return new Promise((resolve) => {
       let data = require('../../assets/rejectedMessages').generic;
-      let negatives = require('../../assets/rejectedMessages').negatives;
+      const negatives = require('../../assets/rejectedMessages').negatives;
       data = data.concat(negatives);
       data.forEach((obj) => (obj.platformId = this._platform.internalCode));
       resolve(data);
@@ -145,7 +145,7 @@ class Platform {
   openRestaurant(branchId) {
     return new Promise(async (resolve, reject) => {
       try {
-        let dateNow = new Date();
+        const dateNow = new Date();
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
@@ -191,7 +191,7 @@ class Platform {
   closeRestaurant(branchId, timeToClose, description) {
     return new Promise(async (resolve, reject) => {
       try {
-        let dateNow = new Date();
+        const dateNow = new Date();
         const branch = await branchModel.findOne({ branchId });
         const platformBranch = this.getBranchPlatform(
           branch.platforms,
@@ -284,7 +284,7 @@ class Platform {
           }
         },
         {
-          state: state,
+          state,
           'order.state': state
         },
         {
@@ -332,7 +332,7 @@ class Platform {
       );
     } catch (error) {
       const msg = 'Failed to update news state.';
-      error = {
+      const formatError = {
         order,
         statusId,
         typeId,
@@ -340,7 +340,7 @@ class Platform {
         entity,
         error: error.toString()
       };
-      logger.error({ message: msg, meta: error });
+      logger.error({ message: msg, meta: formatError });
       return Promise.reject(msg);
     }
   }
@@ -388,7 +388,7 @@ class Platform {
           await this.updateOrderState({ originalId: orderId }, state);
           resolve({
             id: orderId,
-            state: state
+            state
           });
         } catch (error) {
           logger.error({ meta: { error: error.toString() } });
@@ -448,7 +448,7 @@ class Platform {
     If it's closed, reject the order automatically and return false.
     @param branchPlatform 
     */
-  isClosedRestaurant(branchPlatform) {
+  isClosedRestaurant(branchPlatform, lastGetNew) {
     return new Promise(async (resolve) => {
       try {
         const timeToClose = 3;
@@ -456,22 +456,18 @@ class Platform {
         const diffLastGetNews = moment
           .duration(
             moment(dateNow, 'DD/MM/YYYY HH:mm:ss').diff(
-              moment(
-                new Date(branchPlatform.lastGetNews),
-                'DD/MM/YYYY HH:mm:ss'
-              )
+              moment(new Date(lastGetNew), 'DD/MM/YYYY HH:mm:ss')
             )
           )
           .asMinutes();
-
         let closed = false;
-        if (branchPlatform.progClosed && !!branchPlatform.progClosed.length)
+        if (branchPlatform.progClosed && !!branchPlatform.progClosed.length) {
           closed =
             branchPlatform.progClosed.some(
               (cp) =>
                 new Date(cp.close) <= dateNow && new Date(cp.open) >= dateNow
             ) || diffLastGetNews > timeToClose;
-        else if (diffLastGetNews > timeToClose) closed = true;
+        } else if (diffLastGetNews > timeToClose) closed = true;
         return resolve(!closed);
       } catch (error) {
         error = { error: error.toString() };
@@ -497,7 +493,6 @@ class Platform {
     return new Promise(async (resolve, reject) => {
       let orderSaved;
       const minOrders = this.parser.retriveMinimunData(newOrder);
-
       /* Validate  orders */
       let order = await orderModel
         .find({
@@ -527,7 +522,6 @@ class Platform {
         logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
       }
-
       this.saveNewOrders(newOrder)
         .then((res) => {
           if (!res) throw 'Orders could not been processed.';
@@ -541,7 +535,7 @@ class Platform {
           return resolve(orderSaved);
         })
         .catch((error) => {
-          reject({ error: error.toString() });
+          reject(error);
         });
     });
   }
@@ -595,15 +589,15 @@ class Platform {
         $project: {
           name: '$name',
           branchId: '$branchId',
-          name: '$name',
           'chain.chain': '$joinChains.chain',
           'platform.name': '$joinPlatforms.name',
           'platform.platform': '$joinPlatforms._id',
-          'platform.lastGetNews': '$platforms.lastGetNews',
+          lastGetNews: '$lastGetNews',
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
           'client.businessName': '$joinClients.businessName',
-          'address.region': '$joinRegions.region'
+          'address.region': '$joinRegions.region',
+          smartfran_sw: '$smartfran_sw'
         }
       },
       {
@@ -631,17 +625,20 @@ class Platform {
         displayId,
         branchReference
       } = this.parser.retriveMinimunData(order);
-
       try {
         let branches = await this.getOrderBranches(branchReference);
+        if (branches.length == 0)
+          reject({
+            error: 'There is no branch for this order'
+          });
         branch = branches[0];
-
-        if (!branch) throw 'There is no branch for this order';
-
         let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
-          isOpened = await this.isClosedRestaurant(branch.platform);
+          isOpened = await this.isClosedRestaurant(
+            branch.platform,
+            branch.lastGetNews
+          );
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
@@ -653,7 +650,7 @@ class Platform {
         } catch (error) {
           const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
           logger.error({ message: msg, meta: { error: error.toString() } });
-          throw { orderId: id, error };
+          throw { orderId: originalId, error };
         }
         try {
           orderCreator = {
@@ -666,7 +663,6 @@ class Platform {
             branchId: branch.branchId,
             order
           };
-
           const newCreator = await this.parser.newsFromOrders(
             orderCreator,
             this._platform,
@@ -675,6 +671,7 @@ class Platform {
             branch,
             this.uuid
           );
+
           /* If restaurant is closed, mark the new as viewed. */
           if (!isOpened) {
             newCreator.viewed = new Date();
@@ -700,7 +697,6 @@ class Platform {
             orderStatusId: newCreator.order.statusId
           });
           trace.entity = 'PLATFORM';
-
           newCreator['traces'] = trace;
           const orderQuery = {
             internalCode: this._platform.internalCode,
@@ -713,20 +709,17 @@ class Platform {
             }
           };
           const options = { new: true, upsert: true };
-
           promiseOrder = orderModel.findOneAndUpdate(
             orderQuery,
             orderCreator,
             options
           );
-
           promiseNew = newsModel.findOneAndUpdate(
             newsQuery,
             newCreator,
             options
           );
           orderProccessed = orderCreator;
-
           newProccessed = newCreator;
         } catch (error) {
           const msg = `News: ${originalId} can not be parsed correctly.`;
@@ -738,11 +731,10 @@ class Platform {
         }
       } catch (error) {
         reject({
-          orderId: error.id,
-          error: `Order: ${error.id} can not be proccessed correctly.`
+          orderId: originalId,
+          error: `Order: ${originalId} can not be proccessed correctly.`
         });
       }
-
       /* Save all orders and news generated. */
       try {
         if (promiseNew) {
@@ -752,7 +744,11 @@ class Platform {
             promiseNew
           ]);
 
-          if (isOpened && branch.platform.isActive) {
+          if (
+            isOpened &&
+            branch.platform.isActive &&
+            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24
+          ) {
             //Push all savedNews to the queue
             await this.aws.pushNewToQueue(savedNews);
           }
@@ -761,7 +757,7 @@ class Platform {
       } catch (error) {
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
-        reject(error.toString());
+        reject(msg);
       }
     });
   }

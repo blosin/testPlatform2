@@ -239,11 +239,11 @@ describe('GLOVO - Platform parser', function () {
             platform: 'glovo',
             name: 'Daley',
             lastName: 'Paley',
-            id: 10455712,
+            id: 10455712
           },
           address: {
             description: 'Obispo trejo 1420 esquina rew qwre',
-            phone: '4324232',
+            phone: '4324232'
           },
           details: [
             {
@@ -256,25 +256,25 @@ describe('GLOVO - Platform parser', function () {
               discount: 0,
               name: 'Crocantino (10 porciones)',
               sku: '4568487',
-              notes: 'nota',
-            },
+              notes: 'nota'
+            }
           ],
           payment: [
             {
               method: 'Efectivo',
               online: false,
               paymentAmount: 55,
-              subtotal: 245,
-            },
+              subtotal: 245
+            }
           ],
-          branchId: '15',
+          branchId: '15'
         };
-        expect(glovo.retriveMinimunData(glovo_order)).to.eql({
+        /* expect(glovo.retriveMinimunData(glovo_order)).to.eql({
           branchReference: '15',
           posId: 'BA7DWBUL',
           originalId: 'BA7DWBUL',
           displayId: 'BA7DWBUL',
-        });
+        }); */
       });
     });
   }); */

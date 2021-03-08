@@ -1,0 +1,64 @@
+{
+  "containerDefinitions": [
+    {
+      "portMappings": [
+        {
+          "hostPort": 0,
+          "protocol": "tcp",
+          "containerPort": 3087
+        }
+      ],
+      "cpu": 0,
+      "memory": 256,
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:0.0.2",
+      "essential": true,
+      "name": "platform-service-testing-container",
+      "links": ["mock-container"],   
+      "entryPoint": [
+        "npm",
+        "run"
+      ],
+      "command": [
+        "serve"
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "testing"
+        }
+      ]
+    }, 
+    {
+      "cpu": 0,
+      "memory": 256,
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/mock/testing:latest",
+      "essential": true,
+      "name": "mock-container",
+      
+      "portMappings":[
+          {
+            "hostPort": 0,
+            "protocol": "tcp",
+            "containerPort": 8080
+          }]
+    }
+  ],
+  "tags": [
+    {
+      "key": "Customer",
+      "value": "Smartfran"
+    },
+    {
+      "key": "Environment",
+      "value": "testing"
+    },
+    {
+      "key": "Project",
+      "value": "Concentrador"
+    }
+  ],
+  "networkMode": "bridge",
+  "family": "platform-service-testing-task",
+  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+
+}

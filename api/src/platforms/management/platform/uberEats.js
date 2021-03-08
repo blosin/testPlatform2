@@ -15,11 +15,9 @@ class UberEats extends Platform {
       this._platform.credentials.data.store_id +
       '/created-orders';
     this.urlGetDetailsOrder = 'https://api.uber.com/v2/eats/order/';
-    if (process.env.NODE_ENV != 'testing') {
-      this.init();
-      this.cronGetPlatformParameters();
-      console.log(`${this._platform.name}.\t Inicializated.`);
-    }
+    this.init();
+    this.cronGetPlatformParameters();
+    console.log(`${this._platform.name}.\t Inicializated.`);
   }
 
   async init() {
@@ -44,7 +42,7 @@ class UberEats extends Platform {
     } else {
       const msg = 'Can not initializate UberEats.';
       new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
-        platform: this._platform,
+        platform: this._platform
       });
     }
   }
@@ -58,7 +56,7 @@ class UberEats extends Platform {
         if (!error) error = '';
         const msg = 'Failed to login.';
         new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
       });
   }
@@ -72,12 +70,12 @@ class UberEats extends Platform {
           client_id: this._platform.credentials.data.clientId,
           client_secret: this._platform.credentials.data.clientSecret,
           grant_type: 'client_credentials',
-          scope: scope,
+          scope: scope
         };
         const config = {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         };
         let response = await axios.post(url, qs.stringify(payload), config);
         if (!response) throw 'Can not login to uberEats.';
@@ -87,7 +85,7 @@ class UberEats extends Platform {
         if (!error) error = '';
         const msg = 'Failed to login.';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
@@ -106,8 +104,8 @@ class UberEats extends Platform {
           method: 'GET',
           headers: {
             accept: 'application/json',
-            Authorization: 'Bearer ' + token,
-          },
+            Authorization: 'Bearer ' + token
+          }
         };
 
         const url = this.urlGetOrders;
@@ -118,52 +116,43 @@ class UberEats extends Platform {
           return axios.get(urlDetails, options);
         });
         let ordersDetails = await Promise.all(ordersDetail);
-        let orderArray = [];
         ordersDetails.forEach((singleOrder) =>
-          orderArray.push(singleOrder.data),
+          this.saveNewOrders(singleOrder.data).then(() =>
+            this.loginToUberEats('eats.order').then((confirmToken) => {
+              this.sendPosConfirmation(singleOrder.data, confirmToken);
+            })
+          )
         );
-        this.saveNewOrders(orderArray).then(() =>
-          this.loginToUberEats('eats.order').then((confirmToken) => {
-            if (orderArray.length)
-              this.sendPosConfirmation(orderArray, confirmToken);
-          }),
-        );
-
         resolve();
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to get orders.';
         const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
-          error: error.toString(),
+          error: error.toString()
         });
         reject(err);
       }
     });
   }
 
-  async sendPosConfirmation(orders, token) {
+  async sendPosConfirmation(order, token) {
     try {
       const options = {
         headers: {
           accept: 'application/json',
-          Authorization: 'Bearer ' + token,
-        },
+          Authorization: 'Bearer ' + token
+        }
       };
       const payload = { reason: 'Order has been accepted.' };
-      let orderConfirmationPromise = orders.map((order) => {
-        const urlToConfirm =
-          'https://api.uber.com/v1/eats/orders/' +
-          order.id +
-          '/accept_pos_order';
-        return axios.post(urlToConfirm, payload, options);
-      });
-      let ordersConfirmation = await Promise.all(orderConfirmationPromise);
+      const urlToConfirm =
+        'https://api.uber.com/v1/eats/orders/' + order.id + '/accept_pos_order';
+      let ordersConfirmation = await axios.post(urlToConfirm, payload, options);
       return ordersConfirmation;
     } catch (error) {
       if (!error) error = '';
       const msg = 'Failed to confirm orders.';
       const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
-        error: error.toString(),
+        error: error.toString()
       });
       return err;
     }
