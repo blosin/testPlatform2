@@ -134,7 +134,7 @@ class Rappi extends Platform {
 
         /* UPDATE ORDER */
         // const state = NewsStateSingleton.stateByCod('confirm');
-        await this.updateOrderState(order, state);
+        //await this.updateOrderState(order, state);
         /* SEND CONFIRMED */
         const options = {
           method: 'GET',

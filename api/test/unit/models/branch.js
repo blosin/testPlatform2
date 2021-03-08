@@ -14,12 +14,12 @@ describe('Validations Branch schema.', function () {
           platform: '3b0ed8fa297fb07209439589',
           branchReference: 2,
           branchIdReference: 2,
-          lastGetNews: new Date(),
           progClosed: [
             { close: new Date(), open: new Date(), description: 'descripcion' }
           ]
         }
       ],
+      lastGetNews: new Date(),
       tzo: -3
     });
     const err = branch.validateSync();
@@ -67,10 +67,10 @@ describe('Validations Branch schema.', function () {
           platform: 14,
           branchReference: 14,
           branchIdReference: '123',
-          lastGetNews: 'not date',
           progClosed: [{ close: 'not date', open: 'not date' }]
         }
       ],
+      lastGetNews: 'not date',
       tzo: 'not number'
     });
 
@@ -78,7 +78,7 @@ describe('Validations Branch schema.', function () {
     expect(err.errors['branchId'].name).to.equal('CastError');
     expect(err.errors['branchTimeout'].name).to.equal('CastError');
     expect(err.errors['startDate'].name).to.equal('CastError');
-    expect(err.errors['platforms.0.lastGetNews'].name).to.equal('CastError');
+    expect(err.errors['lastGetNews'].name).to.equal('CastError');
     expect(err.errors['platforms.0.progClosed.0.close'].name).to.equal(
       'CastError'
     );
