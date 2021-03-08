@@ -34,7 +34,7 @@ clean:
     - echo "Cleaning gitlab-runner cache"
     - rm -rf /home/gitlab-runner/cache/
   only:
-    - test_devops
+    - master
   tags:
     - runner-smartfran
 
@@ -46,7 +46,7 @@ unit-test:
   script:
     - npm run test
   only:
-    - test_devops
+    - master
   tags:
     - runner-smartfran
 
@@ -59,7 +59,7 @@ static-test:
   after_script:
     - rm -rf .scannerwork
   only:
-    - test_devops
+    - master
   tags:
     - runner-smartfran
 
@@ -77,7 +77,7 @@ build:
    - echo "Pushing image..."
    - docker ps -a
   only:
-   - test_devops
+   - master
   tags:
    - runner-smartfran
   
@@ -93,7 +93,7 @@ push-image:
   after_script:
    - docker system prune --force --all --volumes
   only:
-   - test_devops
+   - master
   tags:
    - runner-smartfran
 
@@ -121,7 +121,7 @@ deploy.testing:
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
     - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
   only:
-    - test_devops
+    - master
   tags:
     - runner-smartfran
 
@@ -149,7 +149,7 @@ deploy.staging:
     - aws ecs register-task-definition --cli-input-json file://ecs-container-definitions.json --region $ECS_REGION
     - aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK --region $ECS_REGION --force-new-deployment
   only:
-    - test_devops
+    - master
   tags:
     - runner-smartfran
 
