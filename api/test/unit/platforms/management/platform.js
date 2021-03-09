@@ -687,10 +687,11 @@ describe('Platform', function () {
         internalCode: 10,
         _id: '5d87cea59b0634004fd83c6b'
       };
+      let lastGetNews = '2023-01-14T15:25:22.912Z';
+
       const branchPlatform = {
         name: 'PediGrido',
         platform: '4766746bc57516b955f29f39',
-        lastGetNews: '2023-01-14T15:25:22.912Z',
         progClosed: [
           {
             _id: 'dasdasdadasd',
@@ -700,7 +701,7 @@ describe('Platform', function () {
         ],
         isActive: true
       };
-      let res = await platform.isClosedRestaurant(branchPlatform);
+      let res = await platform.isClosedRestaurant(branchPlatform, lastGetNews);
       expect(res).to.eql(true);
     });
 
@@ -708,17 +709,17 @@ describe('Platform', function () {
       let branchPlatforms = {
         name: 'PediGrido',
         platform: '4766746bc57516b955f29f39',
-        lastGetNews: '2020-01-14T15:25:22.912Z',
+
         progClosed: [],
         isActive: true
       };
-
+      let lastGetNews = '2020-01-14T15:25:22.912Z';
       let platform = new Platform();
       platform._platform = {
         internalCode: 10,
         _id: '5d87cea59b0634004fd83c6b'
       };
-      let res = await platform.isClosedRestaurant(branchPlatforms);
+      let res = await platform.isClosedRestaurant(branchPlatforms, lastGetNews);
       expect(res).to.eql(false);
     });
   });
