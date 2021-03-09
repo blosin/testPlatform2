@@ -11,18 +11,11 @@
     "serve:prd": "NODE_ENV=production npm run serve",
     "start": " nodemon --inspect=127.0.0.1:9230  src/index.js --watch src --exec babel-node",
     "start:dev": " cross-env AWS_PROFILE=smartfran NODE_ENV=development npm run start",
-<<<<<<< HEAD
-    "start:tst": "cross-env AWS_PROFILE=smartfran NODE_ENV=testing npm run start",
-    "start:stg": "cross-env AWS_PROFILE=smartfran NODE_ENV=staging npm run start",
-    "test": "cross-env ./node_modules/mocha/bin/mocha test/unit --require @babel/register --recursive --exit",
-    "test:coverage": "nyc --reporter=lcov ./node_modules/mocha/bin/mocha  api/test/unit --require @babel/register -x **/sdk/pedidosYa/**,**/config/**,**/assets/**,**/routes/** --recursive --exit",
-=======
     "start:per": " cross-env AWS_PROFILE=smartfran NODE_ENV=performance npm run start",
     "start:tst": "cross-env AWS_PROFILE=smartfran NODE_ENV=testing npm run start",
     "start:stg": "cross-env AWS_PROFILE=smartfran NODE_ENV=staging npm run start",
     "test": "cross-env ./node_modules/mocha/bin/mocha test/unit --require @babel/register --recursive --exit",
     "test:coverage": "cross-env nyc --reporter=lcov ./node_modules/mocha/bin/mocha  test/unit --require @babel/register -x **/sdk/pedidosYa/**,**/config/**,**/assets/**,**/routes/** --recursive --exit",
->>>>>>> 4f637bb3cb874281a48575fb727895a71066de41
     "test:integration": "./node_modules/newman/bin/newman.js run --bail --verbose --environment 'test/integration/environment.json' 'test/integration/collection.json' --delay-request 2000 --export-environment 'test/integration/environment.json'",
     "seed": "cross-env  NODE_ENV=development node ./seeders/helpers/data_generator.js && cross-env DEBUG=mongo-seeding node seeders/index.js",
     "seed-start": "npm-run-all seed serve",
