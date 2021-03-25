@@ -49,6 +49,16 @@ module.exports = {
         }
       };
 
+      const validationSKU = (sku) => {
+        if (
+          (sku == null || sku.match(/[A-Za-z]/g) === null) &&
+          sku != '9999' &&
+          sku != '999999'
+        )
+          return true;
+        return false;
+      };
+
       const paymentenMapper = (payment, discounts, thirdParty) => {
         try {
           let paymentNews = {};
@@ -163,11 +173,9 @@ module.exports = {
               detHeader.groupId = numberOfPromotions;
               detHeader.discount = detail.discount;
               detHeader.description = detail.product.name;
-              detHeader.sku =
-                detail.product.integrationCode == null ||
-                detail.product.integrationCode.match(/[A-Za-z]/g) === null
-                  ? detail.product.integrationCode
-                  : 99999;
+              detHeader.sku = validationSKU(detail.product.integrationCode)
+                ? detail.product.integrationCode
+                : 99999;
               detHeader.note = detail.notes;
 
               details.push(detHeader);
@@ -180,11 +188,9 @@ module.exports = {
                 detDetails.groupId = numberOfPromotions;
                 detDetails.description = optionsGroups.name;
 
-                let skuComparator =
-                  optionsGroups.integrationCode == null ||
-                  optionsGroups.integrationCode.match(/[A-Za-z]/g) === null
-                    ? optionsGroups.integrationCode
-                    : 99999;
+                let skuComparator = validationSKU(optionsGroups.integrationCode)
+                  ? optionsGroups.integrationCode
+                  : 99999;
 
                 let optionsString = '';
                 if (!!optionsGroups.options.length)
@@ -193,11 +199,9 @@ module.exports = {
                       optionsString +=
                         ' ' + option.name + ' cantidad ' + option.quantity;
                     } else {
-                      skuComparator =
-                        option.integrationCode == null ||
-                        option.integrationCode.match(/[A-Za-z]/g) === null
-                          ? option.integrationCode
-                          : 99999;
+                      skuComparator = validationSKU(option.integrationCode)
+                        ? option.integrationCode
+                        : 99999;
                       optionsString = option.name;
                       detDetails.sku = skuComparator;
                       detDetails.optionalText = optionsString;
@@ -224,11 +228,9 @@ module.exports = {
               det.groupId = '0';
               det.discount = detail.discount;
               det.description = detail.product.name;
-              let skuComparator =
-                detail.product.integrationCode == null ||
-                detail.product.integrationCode.match(/[A-Za-z]/g) === null
-                  ? detail.product.integrationCode
-                  : 99999;
+              let skuComparator = validationSKU(detail.product.integrationCode)
+                ? detail.product.integrationCode
+                : 99999;
               det.note = detail.notes;
               let adicional = [];
               let optionsString = '';
@@ -241,11 +243,9 @@ module.exports = {
                     for (let options of optionsGroups.options) {
                       let det = {};
 
-                      det.sku =
-                        options.integrationCode == null ||
-                        options.integrationCode.match(/[A-Za-z]/g) === null
-                          ? options.integrationCode
-                          : 99999;
+                      det.sku = validationSKU(options.integrationCode)
+                        ? options.integrationCode
+                        : 99999;
                       det.productId = options.id;
                       det.count = options.quantity;
                       det.price = options.amount;
@@ -265,11 +265,9 @@ module.exports = {
                         options.integrationCode != '' &&
                         options.integrationCode != '99999'
                       ) {
-                        skuComparator =
-                          options.integrationCode == null ||
-                          options.integrationCode.match(/[A-Za-z]/g) === null
-                            ? options.integrationCode
-                            : 99999;
+                        skuComparator = validationSKU(options.integrationCode)
+                          ? options.integrationCode
+                          : 99999;
                         optionsString += ' ' + options.name;
                       } else {
                         optionsString +=

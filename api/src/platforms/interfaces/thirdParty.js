@@ -60,6 +60,16 @@ module.exports = {
         }
       };
 
+      const validationSKU = (sku) => {
+        if (
+          (sku == null || sku.match(/[A-Za-z]/g) === null) &&
+          sku != '9999' &&
+          sku != '999999'
+        )
+          return true;
+        return false;
+      };
+
       const driverMapper = (order) => {
         try {
           let driver = null;
@@ -132,10 +142,7 @@ module.exports = {
             det.price = detail.unitPrice;
             det.discount = detail.discount;
             det.description = detail.name;
-            det.sku =
-              detail.sku == null || detail.sku.match(/[A-Za-z]/g) === null
-                ? detail.sku
-                : 99999;
+            det.sku = validationSKU(detail.sku) ? detail.sku : 99999;
             det.optionalText = detail.notes;
             det.promo = 0;
             det.promotion = false;
@@ -156,10 +163,9 @@ module.exports = {
                 optionalDet.productId = option.id;
                 optionalDet.groupId = groupId;
                 optionalDet.description = option.name;
-                optionalDet.sku =
-                  option.sku == null || option.sku.match(/[A-Za-z]/g) === null
-                    ? option.sku
-                    : 99999;
+                optionalDet.sku = validationSKU(option.sku)
+                  ? option.sku
+                  : 99999;
                 optionalDet.optionalText = option.notes;
                 optionalDet.count = option.quantity || 1;
                 details.push(optionalDet);
