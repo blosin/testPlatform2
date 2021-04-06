@@ -115,7 +115,7 @@ module.exports = {
             det.note = '';
 
             const uberSku = parseInt(detail.external_data, 10);
-            if (isNaN(uberSku)) uberSku = -1;
+            if (isNaN(uberSku)) uberSku = 99999;
             let tmpSku =
               uberSku >= 90000 && uberSku <= 99999
                 ? '99999'

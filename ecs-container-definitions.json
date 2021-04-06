@@ -16,7 +16,7 @@
           "containerPort": 3087
         }
       ],
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-3.0.6",
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-3.0.9",
       "essential": true,
       "name": "platform-service-production-container",
       "entryPoint": [
