@@ -45,15 +45,12 @@ unit-test:
     - npm install
   script:
     - npm run test:coverage
-<<<<<<< HEAD
   artifacts:
     paths:
     - coverage
-=======
->>>>>>> 18a1ebda8c8942b0b750fb94ba4779d2a0dd250c
   only:
     - master
-    tags:
+  tags:
     - runner-smartfran
 
 static-test:
