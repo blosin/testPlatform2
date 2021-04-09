@@ -56,15 +56,17 @@ unit-test:
 static-test:
   stage: static-test
   allow_failure: true
-  #before_script:
-   # - cd api
-   # - npm install
+  before_script:
+    - cd api
+    - npm install
+    - npm install --global cross-env
+    - npm install --no-bin-links
   script:
     - npm run test:coverage
-    - #cd ..
+    - cd ..
     - pwd
     - ls
-    - export SONAR_SCANNER_OPTS="-Xmx4096m"
+    - export SONAR_SCANNER_OPTS="-Xmxm"
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
   after_script:
     - rm -rf .scannerwork
