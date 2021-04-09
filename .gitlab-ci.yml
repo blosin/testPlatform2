@@ -58,7 +58,7 @@ static-test:
   allow_failure: true
   #before_script:
    # - cd api
-    script:
+  script:
     - npm install
     - npm run test:coverage
     - #cd ..
