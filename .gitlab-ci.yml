@@ -59,8 +59,6 @@ static-test:
   before_script:
     - cd api
     - npm install
-    - npm install --global cross-env
-    - npm install --no-bin-links
   script:
     - npm run test:coverage
     - cd ..

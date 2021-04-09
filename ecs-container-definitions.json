@@ -1,39 +1,18 @@
 {
   "containerDefinitions": [
     {
-<<<<<<< HEAD
       "portMappings": [
         {
           "hostPort": 0,
-=======
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/platform-service-production-task",
-          "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "portMappings": [
-        {
-          "hostPort": 3087,
->>>>>>> 4f637bb3cb874281a48575fb727895a71066de41
           "protocol": "tcp",
           "containerPort": 3087
         }
       ],
-<<<<<<< HEAD
       "cpu": 0,
       "memory": 256,
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:0.0.2",
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:2.0.1",
       "essential": true,
       "name": "platform-service-testing-container",
-      "links": ["mock-container"], 
-=======
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-3.0.6",
-      "essential": true,
-      "name": "platform-service-production-container",
->>>>>>> 4f637bb3cb874281a48575fb727895a71066de41
       "entryPoint": [
         "npm",
         "run"
@@ -44,23 +23,9 @@
       "environment": [
         {
           "name": "NODE_ENV",
-<<<<<<< HEAD
           "value": "testing"
         }
       ]
-    }, 
-    {
-      "cpu": 0,
-      "memory": 256,
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/mock/testing:latest",
-      "essential": true,
-      "name": "mock-container",
-      "portMappings":[
-          {
-            "hostPort": 0,
-            "protocol": "tcp",
-            "containerPort": 8080
-          }]
     }
   ],
   "tags": [
@@ -77,35 +42,6 @@
       "value": "Concentrador"
     }
   ],
-  "networkMode": "bridge",
   "family": "platform-service-testing-task",
-  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
-
-}
-=======
-          "value": "production"
-        }
-      ]
-    }
-  ],
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "256",
-  "memory": "512",
-  "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
-  "tags": [
-    {
-      "key": "Environment",
-      "value": "Production"
-    },
-    {
-      "key": "Project",
-      "value": "platform-service"
-    }
-  ],
-  "family": "platform-service-production-task",
   "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
 }
->>>>>>> 4f637bb3cb874281a48575fb727895a71066de41
