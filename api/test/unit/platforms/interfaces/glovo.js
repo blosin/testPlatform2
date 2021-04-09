@@ -276,6 +276,4 @@ describe('GLOVO - Platform parser', function () {
           displayId: 'BA7DWBUL',
         }); */
       });
-    });
-  }); */
-});
+
