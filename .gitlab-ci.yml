@@ -44,7 +44,7 @@ unit-test:
     - cd api
     - npm install
   script:
-    - npm run test:coverage
+    - npm run test
   artifacts:
     paths:
       - coverage
@@ -64,7 +64,7 @@ static-test:
     - cd ..
     - pwd
     - ls
-    - export SONAR_SCANNER_OPTS="-2048Xmxm"
+    - export SONAR_SCANNER_OPTS="-Xmx512m"
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
   after_script:
     - rm -rf .scannerwork
