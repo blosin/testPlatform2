@@ -64,7 +64,7 @@ static-test:
     - cd ..
     - pwd
     - ls
-    - export SONAR_SCANNER_OPTS="-512Xmxm"
+    - export SONAR_SCANNER_OPTS="-2048Xmxm"
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
   after_script:
     - rm -rf .scannerwork
