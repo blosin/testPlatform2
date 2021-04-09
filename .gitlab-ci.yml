@@ -44,7 +44,7 @@ unit-test:
     - cd api
     - npm install
   script:
-    - npm run test
+    - npm run test:coverage
   artifacts:
     paths:
       - coverage
