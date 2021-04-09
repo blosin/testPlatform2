@@ -15,7 +15,7 @@
     "start:tst": "cross-env AWS_PROFILE=smartfran NODE_ENV=testing npm run start",
     "start:stg": "cross-env AWS_PROFILE=smartfran NODE_ENV=staging npm run start",
     "test": "cross-env ./node_modules/mocha/bin/mocha test/unit --require @babel/register --recursive --exit",
-    "test:coverage": "cross-env nyc --reporter=lcov ./node_modules/mocha/bin/mocha  test/unit --require @babel/register -x **/sdk/pedidosYa/**,**/config/**,**/assets/**,**/routes/** --recursive --exit",
+    "test:coverage": "cross-env nyc --reporter=lcov ./node_modules/mocha/bin/mocha  test/unit --require @babel/register -x ,**/assets/**,**/routes/** --recursive --exit",
     "test:integration": "./node_modules/newman/bin/newman.js run --bail --verbose --environment 'test/integration/environment.json' 'test/integration/collection.json' --delay-request 2000 --export-environment 'test/integration/environment.json'",
     "seed": "cross-env  NODE_ENV=development node ./seeders/helpers/data_generator.js && cross-env DEBUG=mongo-seeding node seeders/index.js",
     "seed-start": "npm-run-all seed serve",
