@@ -101,7 +101,7 @@ const glovo_new = {
         description: 'Helado 1k',
         note: '',
         sku: '1',
-        optionalText: ' Chocolate cantidad 1 Limon cantidad 1'
+        optionalText: ' Chocolate x 1 Limon cantidad 1'
       }
     ],
     payment: {

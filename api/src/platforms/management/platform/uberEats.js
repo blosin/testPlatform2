@@ -5,6 +5,7 @@ import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_PLATFORM } from '../../../utils/errors/codeError';
 import UUID from '../../../utils/errors/utils';
+import NewsStateSingleton from '../../../utils/newsState';
 
 class UberEats extends Platform {
   constructor(platform) {
@@ -116,12 +117,17 @@ class UberEats extends Platform {
           return axios.get(urlDetails, options);
         });
         let ordersDetails = await Promise.all(ordersDetail);
+        console.log(ordersDetails);
         ordersDetails.forEach((singleOrder) =>
-          this.saveNewOrders(singleOrder.data).then(() =>
+          this.saveNewOrders(singleOrder.data).then((newsOrder) => {
             this.loginToUberEats('eats.order').then((confirmToken) => {
-              this.sendPosConfirmation(singleOrder.data, confirmToken);
-            })
-          )
+              if (
+                newsOrder.state == NewsStateSingleton.stateByCod('rej_closed')
+              )
+                this.sendPosDeny(singleOrder.data, confirmToken);
+              else this.sendPosConfirmation(singleOrder.data, confirmToken);
+            });
+          })
         );
         resolve();
       } catch (error) {
@@ -148,6 +154,36 @@ class UberEats extends Platform {
         'https://api.uber.com/v1/eats/orders/' + order.id + '/accept_pos_order';
       let ordersConfirmation = await axios.post(urlToConfirm, payload, options);
       return ordersConfirmation;
+    } catch (error) {
+      if (!error) error = '';
+      const msg = 'Failed to confirm orders.';
+      const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
+        error: error.toString()
+      });
+      return err;
+    }
+  }
+
+  async sendPosDeny(order, token) {
+    try {
+      const options = {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      const payload = {
+        reason: {
+          explanation: 'Restaurant Close',
+          code: 'STORE_CLOSED',
+          out_of_stock_items: [],
+          invalid_items: []
+        }
+      };
+      const urlToDeny =
+        'https://api.uber.com/v1/eats/orders/' + order.id + '/deny_pos_order';
+      let ordersDeny = await axios.post(urlToDeny, payload, options);
+      return ordersDeny;
     } catch (error) {
       if (!error) error = '';
       const msg = 'Failed to confirm orders.';

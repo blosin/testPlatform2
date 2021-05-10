@@ -197,7 +197,7 @@ module.exports = {
                   for (let option of optionsGroups.options) {
                     if (option.integrationCode === '99999') {
                       optionsString +=
-                        ' ' + option.name + ' cantidad ' + option.quantity;
+                        ' ' + option.name + ' X ' + option.quantity;
                     } else {
                       skuComparator = validationSKU(option.integrationCode)
                         ? option.integrationCode
@@ -272,7 +272,7 @@ module.exports = {
                         optionsString += ' ' + options.name;
                       } else {
                         optionsString +=
-                          ' ' + options.name + ' cantidad ' + options.quantity;
+                          ' ' + options.name + ' X ' + options.quantity;
                       }
                     }
                   }

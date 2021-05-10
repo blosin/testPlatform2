@@ -30,11 +30,11 @@ const croni_order = {
       lastName: 'Paley',
       id: 10455712,
       dni: 36095544,
-      email: 'integration@rappi.com',
+      email: 'integration@rappi.com'
     },
     address: {
       description: 'Obispo trejo 1420 esquina rew qwre',
-      phone: '4324232',
+      phone: '4324232'
     },
     details: [
       {
@@ -47,8 +47,8 @@ const croni_order = {
         discount: 0,
         name: 'Crocantino (10 porciones)',
         sku: '4568487',
-        notes: 'nota',
-      },
+        notes: 'nota'
+      }
     ],
     payment: [
       {
@@ -57,11 +57,11 @@ const croni_order = {
         paymentAmount: 55,
         subtotal: 245,
         paymentAmount: 5,
-        partial: 250,
-      },
+        partial: 250
+      }
     ],
-    branchId: '211',
-  },
+    branchId: '211'
+  }
 };
 const croni_new = {
   extraData: {
@@ -69,7 +69,7 @@ const croni_new = {
     chain: 'Grido',
     client: 'Perez Juan',
     platform: 'Croni',
-    region: 'Noreste',
+    region: 'Noreste'
   },
   order: {
     customer: {
@@ -78,7 +78,7 @@ const croni_new = {
       phone: '4324232',
       id: 10455712,
       dni: 36095544,
-      email: 'integration@rappi.com',
+      email: 'integration@rappi.com'
     },
     details: [
       {
@@ -91,8 +91,8 @@ const croni_new = {
         optionalText: 'nota',
         promo: 0,
         promotion: false,
-        groupId: 0,
-      },
+        groupId: 0
+      }
     ],
     payment: {
       typeId: 3,
@@ -104,7 +104,7 @@ const croni_new = {
       currency: '$',
       remaining: 5,
       partial: 250,
-      note: '',
+      note: ''
     },
     totalAmount: 245,
     driver: null,
@@ -119,11 +119,11 @@ const croni_new = {
     preOrder: false,
     observations: 'observacion',
     ownDelivery: false,
-    displayId: 50194,
+    displayId: 50194
   },
   typeId: 1,
   branchId: '15',
-  viewed: null,
+  viewed: null
 };
 const platform = {
   name: 'Croni',
@@ -132,7 +132,7 @@ const platform = {
   internalCode: 6,
   createdAt: '2019-09-22T19:45:40.111Z',
   updatedAt: '2019-09-22T19:45:40.111Z',
-  id: '5d87cf649b0634004fd83c6e',
+  id: '5d87cf649b0634004fd83c6e'
 };
 const branch = {
   address: { region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' } },
@@ -146,36 +146,36 @@ const branch = {
       platform: { _id: 'a24d12527267ecfd0b946390', name: 'PedidosYa' },
       branchReference: 19,
       branchIdReference: 49757,
-      lastGetNews: ' 2019-12-18T23:29:13.483Z',
+      lastGetNews: ' 2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc1',
       platform: { _id: 'f3fc2fb96e42d11cc7c65b4b', name: 'Rappi' },
       branchReference: 115001,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc0',
       platform: { _id: '2fa749ada05d3303fb00322b', name: 'PaD' },
       branchReference: 3593,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bbf',
       platform: { _id: 'c602426305e1e834cb7fcedc', name: 'Croni' },
       branchReference: 210,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
-    },
+      lastGetNews: '2019-12-18T23:29:13.483Z'
+    }
   ],
   chain: { _id: '3b0ed8fa297fb07209439589', chain: 'Grido' },
   client: {
     _id: '0275758a0bc8e6dc0b269c5c',
     contact: 'Juan Perez',
-    businessName: 'Perez Juan',
-  },
+    businessName: 'Perez Juan'
+  }
 };
 describe('THIRDPARTY - Platform parser', function () {
   beforeEach(() => {
@@ -196,7 +196,7 @@ describe('THIRDPARTY - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       expect(return_new).to.eql(croni_new);
     });
@@ -227,11 +227,11 @@ describe('THIRDPARTY - Platform parser', function () {
             lastName: 'Paley',
             id: 10455712,
             dni: 36095544,
-            email: 'integration@rappi.com',
+            email: 'integration@rappi.com'
           },
           address: {
             description: 'Obispo trejo 1420 esquina rew qwre',
-            phone: '4324232',
+            phone: '4324232'
           },
           details: [
             {
@@ -250,16 +250,16 @@ describe('THIRDPARTY - Platform parser', function () {
                   sku: '64',
                   unitPrice: '110',
                   notes:
-                    'Granizado. Cantidad: 1 - Dulce de leche.     Cantidad: 1 - Banana. Cantidad: 1 - Limon. Cantidad: 1',
+                    'Granizado. X: 1 - Dulce de leche.     X: 1 - Banana. X: 1 - Limon. X: 1'
                 },
                 {
                   id: 50,
                   name: 'Segundo kilo',
                   unitPrice: '110',
                   sku: '64',
-                  notes: 'Chocolate. Cantidad: 3 - Vainilla. Cantidad: 1',
-                },
-              ],
+                  notes: 'Chocolate. X: 3 - Vainilla. X: 1'
+                }
+              ]
             },
             {
               id: 51,
@@ -268,8 +268,8 @@ describe('THIRDPARTY - Platform parser', function () {
               discount: 0,
               name: '  1 Kilo',
               sku: '64',
-              notes: 'Granizado. Cantidad: 4',
-            },
+              notes: 'Granizado. X: 4'
+            }
           ],
           payment: [
             {
@@ -277,11 +277,11 @@ describe('THIRDPARTY - Platform parser', function () {
               online: false,
               paymentAmount: 5,
               partial: 250,
-              subtotal: 245,
-            },
+              subtotal: 245
+            }
           ],
-          branchId: '211',
-        },
+          branchId: '211'
+        }
       };
 
       const croni_new = {
@@ -290,7 +290,7 @@ describe('THIRDPARTY - Platform parser', function () {
           chain: 'Grido',
           client: 'Perez Juan',
           platform: 'Croni',
-          region: 'Noreste',
+          region: 'Noreste'
         },
         order: {
           customer: {
@@ -299,7 +299,7 @@ describe('THIRDPARTY - Platform parser', function () {
             phone: '4324232',
             id: 10455712,
             dni: 36095544,
-            email: 'integration@rappi.com',
+            email: 'integration@rappi.com'
           },
           details: [
             {
@@ -312,39 +312,39 @@ describe('THIRDPARTY - Platform parser', function () {
               productId: '4568487',
               promo: 2,
               promotion: false,
-              sku: '4568487',
+              sku: '4568487'
             },
             {
               description: 'Primer kilo',
               groupId: 1,
               optionalText:
-                'Granizado. Cantidad: 1 - Dulce de leche.     Cantidad: 1 - Banana. Cantidad: 1 - Limon. Cantidad: 1',
+                'Granizado. X: 1 - Dulce de leche.     X: 1 - Banana. X: 1 - Limon. X: 1',
               productId: 49,
               promo: 1,
               count: 1,
-              sku: '64',
+              sku: '64'
             },
             {
               description: 'Segundo kilo',
               groupId: 1,
-              optionalText: 'Chocolate. Cantidad: 3 - Vainilla. Cantidad: 1',
+              optionalText: 'Chocolate. X: 3 - Vainilla. X: 1',
               productId: 50,
               count: 1,
               promo: 1,
-              sku: '64',
+              sku: '64'
             },
             {
               count: 1,
               description: '  1 Kilo',
               discount: 0,
               groupId: 0,
-              optionalText: 'Granizado. Cantidad: 4',
+              optionalText: 'Granizado. X: 4',
               price: 240,
               productId: 51,
               promo: 0,
               promotion: false,
-              sku: '64',
-            },
+              sku: '64'
+            }
           ],
           payment: {
             typeId: 3,
@@ -356,7 +356,7 @@ describe('THIRDPARTY - Platform parser', function () {
             currency: '$',
             remaining: 5,
             partial: 250,
-            note: '',
+            note: ''
           },
 
           totalAmount: 245,
@@ -372,11 +372,11 @@ describe('THIRDPARTY - Platform parser', function () {
           preOrder: false,
           observations: 'observacion',
           ownDelivery: false,
-          displayId: 50194,
+          displayId: 50194
         },
         viewed: null,
         typeId: 1,
-        branchId: '15',
+        branchId: '15'
       };
       const stateCod = 'pend';
       const newsCod = 'new_ord';
@@ -388,7 +388,7 @@ describe('THIRDPARTY - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       expect(return_new).to.eql(croni_new);
     });
@@ -411,11 +411,11 @@ describe('THIRDPARTY - Platform parser', function () {
             platform: 'thirdParty',
             name: 'Daley',
             lastName: 'Paley',
-            id: 10455712,
+            id: 10455712
           },
           address: {
             description: 'Obispo trejo 1420 esquina rew qwre',
-            phone: '4324232',
+            phone: '4324232'
           },
           details: [
             {
@@ -428,24 +428,24 @@ describe('THIRDPARTY - Platform parser', function () {
               discount: 0,
               name: 'Crocantino (10 porciones)',
               sku: '4568487',
-              notes: 'nota',
-            },
+              notes: 'nota'
+            }
           ],
           payment: [
             {
               method: 'Efectivo',
               online: false,
               paymentAmount: 55,
-              subtotal: 245,
-            },
+              subtotal: 245
+            }
           ],
-          branchId: '211',
+          branchId: '211'
         };
         expect(thirdParty.retriveMinimunData(croni_order)).to.eql({
           branchReference: '211',
           displayId: '50194',
           originalId: '50194',
-          posId: 50194,
+          posId: 50194
         });
       });
     });

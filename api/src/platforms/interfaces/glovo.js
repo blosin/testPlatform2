@@ -138,7 +138,7 @@ module.exports = {
             if (detail.attributes.length > 0)
               for (let attribute of detail.attributes) {
                 optionsString +=
-                  ' ' + attribute.name + ' cantidad ' + attribute.quantity;
+                  ' ' + attribute.name + ' X ' + attribute.quantity;
                 /* If the product has an item with sku 99999. It's sku is inside toppings */
                 if (tmpSku == '99999') {
                   tmpSku = attribute.id;

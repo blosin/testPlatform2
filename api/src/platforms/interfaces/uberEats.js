@@ -131,7 +131,7 @@ module.exports = {
               for (let attribute of detail.selected_modifier_groups) {
                 attribute.selected_items.forEach((element) => {
                   optionsString +=
-                    ' ' + element.title + ' cantidad ' + element.quantity;
+                    ' ' + element.title + ' X ' + element.quantity;
                 });
 
                 /* If the product has an item with sku 99999. It's sku is inside toppings */
