@@ -31,7 +31,7 @@ const orders = [
             type: 'topping',
             subtype: 'queso',
             comments: null,
-            units: 1,
+            units: 1
           },
           {
             sku: '2712',
@@ -40,7 +40,7 @@ const orders = [
             type: 'topping',
             subtype: 'queso',
             comments: null,
-            units: 1,
+            units: 1
           },
           {
             sku: '2703',
@@ -49,10 +49,10 @@ const orders = [
             type: 'topping',
             subtype: 'borde',
             comments: null,
-            units: 1,
-          },
-        ],
-      },
+            units: 1
+          }
+        ]
+      }
     ],
     client: {
       id: '460901786',
@@ -60,13 +60,13 @@ const orders = [
       lastName: 'TEST',
       email: 'test@rappi.com',
       phone: '1233456',
-      address: 'cra 93 # 19',
+      address: 'cra 93 # 19'
     },
     store: {
       id: '115005',
-      name: 'STORE TEST',
-    },
-  },
+      name: 'STORE TEST'
+    }
+  }
 ];
 const branches = [
   {
@@ -77,7 +77,7 @@ const branches = [
           'https://smartfran.s3-us-west-2.amazonaws.com/SmartFranPedidos_1.0.17.zip',
         releaseDate: '2019-10-23T19:00:00.000Z',
         installedVersion: '1.0.1019',
-        installedDate: '2019-09-23T19:44:20.562Z',
+        installedDate: '2019-09-23T19:44:20.562Z'
       },
       notificator: {
         actualVersion: '1.0.1016',
@@ -85,8 +85,8 @@ const branches = [
           'https://smartfran.s3-us-west-2.amazonaws.com/SmartFranAlertas_1.0.1016.zip',
         releaseDate: '2019-10-28T19:00:00.000Z',
         installedVersion: '1.10.22',
-        installedDate: '2019-09-23T19:44:20.562Z',
-      },
+        installedDate: '2019-09-23T19:44:20.562Z'
+      }
     },
     _id: '5d8d597141996d0081a70997',
     name: 'Surcusal 15',
@@ -101,34 +101,34 @@ const branches = [
         platform: '5d87cea59b0634004fd83c6b',
         branchReference: 15,
         branchIdReference: 62702,
-        lastGetNews: '2019-11-01T18:19:55.436Z',
+        lastGetNews: '2019-11-01T18:19:55.436Z'
       },
       {
         progClosed: [],
         _id: '5d87d35ec50f1f0068e92bc1',
         platform: '5d87ced89b0634004fd83c6c',
         branchReference: 115005,
-        lastGetNews: '2019-11-01T18:19:55.436Z',
+        lastGetNews: '2019-11-01T18:19:55.436Z'
       },
       {
         progClosed: [],
         _id: '5d87d35ec50f1f0068e92bc0',
         platform: '5d87cf149b0634004fd83c6d',
         branchReference: 15,
-        lastGetNews: '2019-11-01T18:19:55.436Z',
+        lastGetNews: '2019-11-01T18:19:55.436Z'
       },
       {
         progClosed: [],
         _id: '5d87d35ec50f1f0068e92bbf',
         platform: '5d87cf649b0634004fd83c6e',
         branchReference: 211,
-        lastGetNews: '2019-11-01T18:19:55.436Z',
-      },
+        lastGetNews: '2019-11-01T18:19:55.436Z'
+      }
     ],
     createdAt: '2019-09-27T00:36:01.270Z',
     updatedAt: '2019-11-01T18:19:55.437Z',
-    tzo: -3,
-  },
+    tzo: -3
+  }
 ];
 const platform = {
   name: 'Rappi',
@@ -140,12 +140,12 @@ const platform = {
     data: {
       token: 'credentials.rappi.token',
       baseUrl: 'credentials.rappi.baseUrl',
-      schedule: 'credentials.rappi.schedule',
-    },
+      schedule: 'credentials.rappi.schedule'
+    }
   },
   createdAt: '2019-09-22T19:43:20.975Z',
   updatedAt: '2019-09-22T19:43:20.975Z',
-  id: '5d87ced89b0634004fd83c6c',
+  id: '5d87ced89b0634004fd83c6c'
 };
 const newOrders = [
   {
@@ -154,8 +154,8 @@ const newOrders = [
     state: 'PENDING',
     orderId: orders[0].id,
     branchId: branches[0].branchId,
-    order: orders[0],
-  },
+    order: orders[0]
+  }
 ];
 
 describe('RAPPI management.', function () {
@@ -239,7 +239,7 @@ describe('RAPPI management.', function () {
     });
   });
 
-  describe('fn(): getOrders()', function () {
+  describe.only('fn(): getOrders()', function () {
     it('should create an order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
@@ -247,8 +247,8 @@ describe('RAPPI management.', function () {
       const saveNewOrdersStub = sandbox
         .stub(rappi, 'saveNewOrders')
         .resolves(newOrders[0]);
-
       let saved = await rappi.getOrders('token');
+      console.log(3434);
 
       expect(saved).to.eql(newOrders);
 
@@ -274,7 +274,7 @@ describe('RAPPI management.', function () {
     });
   });
 
-/*   describe('fn(): confirmOrder()', function () {
+  /*   describe('fn(): confirmOrder()', function () {
     const stateCod = 'confirm';
     const stateId = 5;
 
@@ -387,7 +387,7 @@ describe('RAPPI management.', function () {
       const res = await rappi.branchRejectOrder(
         orders[0],
         rejectMessageId,
-        rejectMessageNote,
+        rejectMessageNote
       );
 
       expect(res).to.eql(newOrders);
@@ -424,7 +424,7 @@ describe('RAPPI management.', function () {
         await rappi.branchRejectOrder(
           orders[0],
           rejectMessageId,
-          rejectMessageNote,
+          rejectMessageNote
         );
       } catch (error) {
         expect(error.error).to.eql('Error');
@@ -456,7 +456,7 @@ describe('RAPPI management.', function () {
         await rappi.branchRejectOrder(
           orders[0],
           rejectMessageId,
-          rejectMessageNote,
+          rejectMessageNote
         );
       } catch (error) {
         expect(error.error).to.eql('Error');

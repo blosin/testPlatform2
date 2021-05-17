@@ -34,7 +34,10 @@ module.exports = {
           order.pickupOnShop = data.order.pickup;
           order.pickupDateOnShop = data.order.pickupDate;
           order.preOrder = data.order.preOrder;
-          order.observations = data.order.notes;
+          order.observations =
+            data.order.user.company.name && data.order.user.company.document
+              ? `SOLICITA FACTURA LEGAL: ${data.order.user.company.name} - CIC/CI/RUC: ${data.order.user.company.document}`
+              : data.order.notes;
           order.ownDelivery = !data.order.logistics;
           if (data.order.pickup) order.ownDelivery = false;
           return order;

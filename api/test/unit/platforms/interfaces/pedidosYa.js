@@ -29,7 +29,7 @@ const order = {
   preparationBuffer: null,
   portal: {
     id: 1,
-    name: 'Pedidos Ya',
+    name: 'Pedidos Ya'
   },
   user: {
     id: 15233746,
@@ -43,8 +43,8 @@ const order = {
     platform: 'PEDIDOS_YA',
     company: {
       name: '',
-      document: '',
-    },
+      document: ''
+    }
   },
   address: {
     description: 'Colon 5500 esquina 1 y 1',
@@ -58,7 +58,7 @@ const order = {
     doorNumber: '5500',
     street: 'Colon',
     corner: '1 y 1',
-    complement: '',
+    complement: ''
   },
   payment: {
     id: 87,
@@ -77,11 +77,11 @@ const order = {
     card: {
       brand: 'CABAL',
       operationType: 'CREDIT',
-      issuer: null,
+      issuer: null
     },
     method: 'Pago online',
     tax: 0,
-    subtotal: 270,
+    subtotal: 270
   },
   discounts: [],
   restaurant: {
@@ -96,14 +96,14 @@ const order = {
       url: 'https://www.pedidosya.com.ar',
       timeOffset: -180,
       currencySymbol: '$',
-      culture: 'es_AR',
+      culture: 'es_AR'
     },
     deliveryTime: {
       id: 2,
       description: null,
       minMinutes: 30,
-      maxMinutes: 45,
-    },
+      maxMinutes: 45
+    }
   },
   details: [
     {
@@ -127,8 +127,8 @@ const order = {
           name: 'Línea de sabores',
           index: 4,
           integrationCode: '',
-          integrationName: '',
-        },
+          integrationName: ''
+        }
       },
       optionGroups: [
         {
@@ -146,20 +146,20 @@ const order = {
               integrationName: '',
               amount: 0,
               modifiesPrice: false,
-              quantity: 4,
-            },
-          ],
-        },
-      ],
-    },
+              quantity: 4
+            }
+          ]
+        }
+      ]
+    }
   ],
   receptionSystems: [
     {
       id: 138,
-      code: 'integration_smartfran',
-    },
+      code: 'integration_smartfran'
+    }
   ],
-  attachments: [],
+  attachments: []
 };
 const encapsulated_order = {
   thirdParty: 'PedidosYa',
@@ -167,7 +167,7 @@ const encapsulated_order = {
   state: 'PENDING',
   orderId: '133290240',
   branchId: '19',
-  order: order,
+  order: order
 };
 const parsed_new = {
   extraData: {
@@ -175,7 +175,7 @@ const parsed_new = {
     chain: 'Grido',
     client: 'Perez Juan',
     platform: 'PedidosYa',
-    region: 'Noreste',
+    region: 'Noreste'
   },
   order: {
     id: 133290240,
@@ -196,7 +196,7 @@ const parsed_new = {
       address: 'Colon 5500 esquina 1 y 1',
       phone: '1130765437',
       email: 'alain.kraupl@ross.com.ar',
-      dni: '36095544',
+      dni: '36095544'
     },
     details: [
       {
@@ -209,8 +209,8 @@ const parsed_new = {
         description: 'Helado pote 1 kg',
         note: '',
         sku: '64',
-        optionalText: ' Sabores Anana a la crema cantidad 4',
-      },
+        optionalText: ' Sabores Anana a la crema X 4'
+      }
     ],
     payment: {
       typeId: 2,
@@ -222,14 +222,14 @@ const parsed_new = {
       currency: '$',
       remaining: 0,
       partial: 0,
-      note: '',
+      note: ''
     },
     driver: null,
-    totalAmount: 270,
+    totalAmount: 270
   },
   typeId: 1,
   branchId: '19',
-  viewed: null,
+  viewed: null
 };
 const platform = {
   name: 'PedidosYa',
@@ -238,11 +238,11 @@ const platform = {
   internalCode: 1,
   credentials: {
     clientId: 'integration_smartfran',
-    clientSecret: 'a223e0a5b2',
+    clientSecret: 'a223e0a5b2'
   },
   createdAt: '2019-09-22T19:42:29.628Z',
   updatedAt: '2019-09-22T19:42:29.628Z',
-  id: '5d87cea59b0634004fd83c6b',
+  id: '5d87cea59b0634004fd83c6b'
 };
 const branch = {
   address: { region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' } },
@@ -256,36 +256,36 @@ const branch = {
       platform: { _id: 'a24d12527267ecfd0b946390', name: 'PedidosYa' },
       branchReference: 19,
       branchIdReference: 49757,
-      lastGetNews: ' 2019-12-18T23:29:13.483Z',
+      lastGetNews: ' 2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc1',
       platform: { _id: 'f3fc2fb96e42d11cc7c65b4b', name: 'Rappi' },
       branchReference: 115001,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bc0',
       platform: { _id: '2fa749ada05d3303fb00322b', name: 'PaD' },
       branchReference: 3593,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
+      lastGetNews: '2019-12-18T23:29:13.483Z'
     },
     {
       progClosed: [],
       _id: '5d87d35ec50f1f0068e92bbf',
       platform: { _id: 'c602426305e1e834cb7fcedc', name: 'Croni' },
       branchReference: 210,
-      lastGetNews: '2019-12-18T23:29:13.483Z',
-    },
+      lastGetNews: '2019-12-18T23:29:13.483Z'
+    }
   ],
   chain: { _id: '3b0ed8fa297fb07209439589', chain: 'Grido' },
   client: {
     _id: '0275758a0bc8e6dc0b269c5c',
     contact: 'Juan Perez',
-    businessName: 'Perez Juan',
-  },
+    businessName: 'Perez Juan'
+  }
 };
 
 describe('PEDIDOSYA - Platform parser', function () {
@@ -309,7 +309,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       expect(return_new).to.eql(parsed_new);
     });
@@ -326,7 +326,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       parsed_new.order.payment.typeId = 2;
       expect(return_new).to.eql(parsed_new);
@@ -361,7 +361,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         preparationBuffer: null,
         portal: {
           id: 1,
-          name: 'Pedidos Ya',
+          name: 'Pedidos Ya'
         },
         user: {
           id: 15233746,
@@ -375,8 +375,8 @@ describe('PEDIDOSYA - Platform parser', function () {
           platform: 'PEDIDOS_YA',
           company: {
             name: '',
-            document: '',
-          },
+            document: ''
+          }
         },
         address: {
           description: 'Obispo trejo 1000 esquina arasda',
@@ -390,7 +390,7 @@ describe('PEDIDOSYA - Platform parser', function () {
           doorNumber: '1000',
           street: 'Obispo trejo',
           corner: 'arasda',
-          complement: '',
+          complement: ''
         },
         payment: {
           id: 1,
@@ -409,11 +409,11 @@ describe('PEDIDOSYA - Platform parser', function () {
           card: {
             brand: null,
             operationType: null,
-            issuer: null,
+            issuer: null
           },
           method: 'Efectivo',
           tax: 0,
-          subtotal: 650,
+          subtotal: 650
         },
         discounts: [],
         restaurant: {
@@ -428,14 +428,14 @@ describe('PEDIDOSYA - Platform parser', function () {
             url: 'https://www.pedidosya.com.ar',
             timeOffset: -180,
             currencySymbol: '$',
-            culture: 'es_AR',
+            culture: 'es_AR'
           },
           deliveryTime: {
             id: 2,
             description: null,
             minMinutes: 30,
-            maxMinutes: 45,
-          },
+            maxMinutes: 45
+          }
         },
         details: [
           {
@@ -459,8 +459,8 @@ describe('PEDIDOSYA - Platform parser', function () {
                 name: 'Promoción',
                 index: 0,
                 integrationCode: '',
-                integrationName: 'PROMO',
-              },
+                integrationName: 'PROMO'
+              }
             },
             optionGroups: [
               {
@@ -478,9 +478,9 @@ describe('PEDIDOSYA - Platform parser', function () {
                     integrationName: '',
                     amount: 0,
                     modifiesPrice: false,
-                    quantity: 4,
-                  },
-                ],
+                    quantity: 4
+                  }
+                ]
               },
               {
                 id: 4529514,
@@ -497,9 +497,9 @@ describe('PEDIDOSYA - Platform parser', function () {
                     integrationName: '',
                     amount: 0,
                     modifiesPrice: false,
-                    quantity: 1,
-                  },
-                ],
+                    quantity: 1
+                  }
+                ]
               },
               {
                 id: 4529515,
@@ -516,20 +516,20 @@ describe('PEDIDOSYA - Platform parser', function () {
                     integrationName: '',
                     amount: 0,
                     modifiesPrice: false,
-                    quantity: 1,
-                  },
-                ],
-              },
-            ],
-          },
+                    quantity: 1
+                  }
+                ]
+              }
+            ]
+          }
         ],
         receptionSystems: [
           {
             id: 138,
-            code: 'integration_smartfran',
-          },
+            code: 'integration_smartfran'
+          }
         ],
-        attachments: [],
+        attachments: []
       };
       const encapsulated_order = {
         thirdParty: 'PedidosYa',
@@ -537,7 +537,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         state: 'PENDING',
         orderId: '133290240',
         branchId: 1,
-        order: promotionOrder,
+        order: promotionOrder
       };
       const promotion_news = {
         order: {
@@ -559,7 +559,7 @@ describe('PEDIDOSYA - Platform parser', function () {
             address: 'Obispo trejo 1000 esquina arasda',
             phone: '1130765437',
             email: 'alain.kraupl@ross.com.ar',
-            dni: '36095544',
+            dni: '36095544'
           },
           details: [
             {
@@ -571,7 +571,7 @@ describe('PEDIDOSYA - Platform parser', function () {
               discount: 0,
               description: 'Promo - Helado 1 kg + Familiar + Tentación',
               sku: '10001',
-              note: '',
+              note: ''
             },
             {
               productId: 4529523,
@@ -579,7 +579,7 @@ describe('PEDIDOSYA - Platform parser', function () {
               groupId: 1,
               description: 'Helado pote 1 kg',
               sku: '64',
-              optionalText: ' Capuccino granizado cantidad 4',
+              optionalText: ' Capuccino granizado X 4'
             },
             {
               count: 1,
@@ -588,7 +588,7 @@ describe('PEDIDOSYA - Platform parser', function () {
               groupId: 1,
               description: 'Familiar',
               sku: '13',
-              optionalText: ' Chocolate, Vainilla y Dulce de Leche Granizado',
+              optionalText: ' Chocolate, Vainilla y Dulce de Leche Granizado'
             },
             {
               count: 1,
@@ -597,8 +597,8 @@ describe('PEDIDOSYA - Platform parser', function () {
               groupId: 1,
               description: 'Tentacion',
               sku: '14',
-              optionalText: ' Chocolate',
-            },
+              optionalText: ' Chocolate'
+            }
           ],
           payment: {
             typeId: 3,
@@ -610,21 +610,21 @@ describe('PEDIDOSYA - Platform parser', function () {
             currency: '$',
             remaining: 0,
             partial: 650,
-            note: '',
+            note: ''
           },
           driver: null,
-          totalAmount: 650,
+          totalAmount: 650
         },
         extraData: {
           branch: 'Surcusal 19',
           chain: 'Grido',
           client: 'Perez Juan',
           platform: 'PedidosYa',
-          region: 'Noreste',
+          region: 'Noreste'
         },
         viewed: null,
         typeId: 1,
-        branchId: 1,
+        branchId: 1
       };
 
       let return_new = await pedidosYa.newsFromOrders(
@@ -632,7 +632,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         platform,
         newsCod,
         stateCod,
-        branch,
+        branch
       );
       expect(return_new).to.eql(promotion_news);
     });
@@ -644,7 +644,7 @@ describe('PEDIDOSYA - Platform parser', function () {
         branchReference: '19',
         posId: 133290240,
         originalId: '133290240',
-        displayId: '133290240',
+        displayId: '133290240'
       });
     });
   });
