@@ -7,6 +7,7 @@ import RapiboySingleton from './platform/instance/rapiboySingleton';
 import CroniSingleton from './platform/instance/croniSingleton';
 import PerformanceSingleton from './platform/instance/performanceSingleton';
 import UberEatsSingleton from './platform/instance/uberEatsSingleton';
+import ThirdPartySingleton from './platform/instance/thirdPartySingleton';
 
 class PlatformFactory {
   createPlatform(platform, uuid) {
@@ -53,7 +54,9 @@ class PlatformFactory {
         return platformSingleton;
 
       default:
-        break;
+        platformSingleton = ThirdPartySingleton.getInstance(platform);
+        platformSingleton.uuid = uuid;
+        return platformSingleton;
     }
   }
 }

@@ -11,9 +11,11 @@ class PlatformSingleton {
             $project: {
               internalCode: '$internalCode',
               name: '$name',
-              credentials: '$credentials'
+              credentials: '$credentials',
+              deletedAt: '$deletedAt'
             }
-          }
+          },
+          { $match: { deletedAt: null } }
         ]);
       }
       resolve(PlatformSingleton.instance);
