@@ -29,6 +29,7 @@ class Pad extends Platform {
       this.authData = {
         auth: { username: this.clientId, password: this.clientSecret }
       };
+      this.statusResponse = this._platform.statusResponse;
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate PaD.';
@@ -48,11 +49,12 @@ class Pad extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-
-        const idPreparando = 2;
-        const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idPreparando}`;
-        const res = await axios.post(url, {}, this.authData);
-        resolve(res.data);
+        if (this.statusResponse.confirm) {
+          const idPreparando = 2;
+          const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idPreparando}`;
+          const res = await axios.post(url, {}, this.authData);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -74,12 +76,13 @@ class Pad extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
+        if (this.statusResponse.dispatch) {
+          const idLlevando = 3;
+          const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idLlevando}`;
+          const res = await axios.post(url, {}, this.authData);
 
-        const idLlevando = 3;
-        const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idLlevando}`;
-        const res = await axios.post(url, {}, this.authData);
-
-        resolve(res.data);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -101,11 +104,12 @@ class Pad extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('delivery');
         await this.updateOrderState(order, state);
-
-        const idEntregando = 4;
-        const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idEntregando}`;
-        const res = await axios.post(url, {}, this.authData);
-        resolve(res.data);
+        if (this.statusResponse.delivery) {
+          const idEntregando = 4;
+          const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idEntregando}`;
+          const res = await axios.post(url, {}, this.authData);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -124,15 +128,17 @@ class Pad extends Platform {
    */
   async branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
     return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('rej');
-      await this.updateOrderState(order, state);
-
-      const idProblema = 5;
-      if (!rejectMessageNote) rejectMessageNote = '-';
       try {
-        const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idProblema}&metadata={"tipo_problema": ${rejectMessageId},"observacion": "${rejectMessageNote}"}`;
-        const res = await axios.post(url, {}, this.authData);
-        resolve(res.data);
+        const state = NewsStateSingleton.stateByCod('rej');
+        await this.updateOrderState(order, state);
+        if (this.statusResponse.reject) {
+          const idProblema = 5;
+          if (!rejectMessageNote) rejectMessageNote = '-';
+
+          const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idProblema}&metadata={"tipo_problema": ${rejectMessageId},"observacion": "${rejectMessageNote}"}`;
+          const res = await axios.post(url, {}, this.authData);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';

@@ -11,6 +11,10 @@ class PerformanceSingleton {
     }
     return PerformanceSingleton.instance;
   }
+
+  static setInstance() {
+    PerformanceSingleton.instance = null;
+  }
 }
 
 export default PerformanceSingleton;

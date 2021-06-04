@@ -11,6 +11,9 @@ class RappiSingleton {
     }
     return RappiSingleton.instance;
   }
+  static setInstance() {
+    RappiSingleton.instance = null;
+  }
 }
 
 export default RappiSingleton;

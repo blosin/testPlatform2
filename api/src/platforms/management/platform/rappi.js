@@ -30,6 +30,7 @@ class Rappi extends Platform {
       this.token = this._platform.credentials.data.token;
       this.baseUrl = this._platform.credentials.data.baseUrl;
       const schedule = this._platform.credentials.data.schedule;
+      this.statusResponse = this._platform.statusResponse;
 
       cron.schedule(schedule, () => {
         this.uuid = UUID();
@@ -129,23 +130,22 @@ class Rappi extends Platform {
   receiveOrder(order) {
     return new Promise(async (resolve) => {
       try {
-        /* LOGIN  */
-        const xAuth = await this.loginToRappi();
+        if (this.statusResponse.receive) {
+          /* LOGIN  */
+          const xAuth = await this.loginToRappi();
 
-        /* UPDATE ORDER */
-        // const state = NewsStateSingleton.stateByCod('confirm');
-        //await this.updateOrderState(order, state);
-        /* SEND CONFIRMED */
-        const options = {
-          method: 'GET',
-          headers: {
-            'content-type': 'application/x-www-form-urlencoded',
-            'x-auth-int': xAuth
-          }
-        };
-        const url = this.baseUrl + this.urlConfirmOrders + order.id;
-        const res = await axios.get(url, options);
-        resolve(res.data);
+          /* SEND CONFIRMED */
+          const options = {
+            method: 'GET',
+            headers: {
+              'content-type': 'application/x-www-form-urlencoded',
+              'x-auth-int': xAuth
+            }
+          };
+          const url = this.baseUrl + this.urlConfirmOrders + order.id;
+          const res = await axios.get(url, options);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
@@ -167,28 +167,30 @@ class Rappi extends Platform {
   branchRejectOrder(order, rejectId, rejectDesc) {
     return new Promise(async (resolve) => {
       try {
-        /* LOGIN  */
-        const xAuth = await this.loginToRappi();
-
         /* UPDATE ORDER */
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
 
-        /* SEND CONFIRMED */
-        const options = {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'x-auth-int': xAuth
-          }
-        };
-        const data = {
-          order_id: order.id,
-          reason: rejectDesc
-        };
-        const url = this.baseUrl + this.urlRejectOrders;
-        const res = await axios.post(url, data, options);
-        resolve(res.data);
+        if (this.statusResponse.reject) {
+          /* LOGIN  */
+          const xAuth = await this.loginToRappi();
+
+          /* SEND CONFIRMED */
+          const options = {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-auth-int': xAuth
+            }
+          };
+          const data = {
+            order_id: order.id,
+            reason: rejectDesc
+          };
+          const url = this.baseUrl + this.urlRejectOrders;
+          const res = await axios.post(url, data, options);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);

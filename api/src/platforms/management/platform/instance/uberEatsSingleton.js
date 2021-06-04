@@ -11,6 +11,9 @@ class UberEatsSingleton {
     }
     return UberEatsSingleton.instance;
   }
+  static setInstance() {
+    UberEatsSingleton.instance = null;
+  }
 }
 
 export default UberEatsSingleton;

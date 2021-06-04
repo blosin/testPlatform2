@@ -10,6 +10,9 @@ class GlovoSingleton {
     }
     return GlovoSingleton.instance;
   }
+  static setInstance() {
+    GlovoSingleton.instance = null;
+  }
 }
 
 export default GlovoSingleton;

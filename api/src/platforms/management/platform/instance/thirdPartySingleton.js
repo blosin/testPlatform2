@@ -2,6 +2,7 @@ import ThirdParty from '../thirdParty';
 
 class ThirdPartySingleton {
   static instance = [];
+
   constructor() {}
 
   static getInstance(platform) {
@@ -14,6 +15,10 @@ class ThirdPartySingleton {
       ThirdPartySingleton.instance.push(newThirdParty);
       return newThirdParty;
     } else return result;
+  }
+
+  static setInstance() {
+    ThirdPartySingleton.instance = [];
   }
 }
 

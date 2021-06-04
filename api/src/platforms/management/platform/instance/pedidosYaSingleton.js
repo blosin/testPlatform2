@@ -10,6 +10,9 @@ class PedidosYaSingleton {
     }
     return PedidosYaSingleton.instance;
   }
+  static setInstance() {
+    PedidosYaSingleton.instance = null;
+  }
 }
 
 export default PedidosYaSingleton;

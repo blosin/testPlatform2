@@ -10,6 +10,9 @@ class PadSingleton {
     }
     return PadSingleton.instance;
   }
+  static setInstance() {
+    PadSingleton.instance = null;
+  }
 }
 
 export default PadSingleton;

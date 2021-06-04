@@ -55,7 +55,7 @@ class UberEats extends Platform {
       })
       .catch((error) => {
         if (!error) error = '';
-        const msg = 'Failed to login.';
+        const msg = 'Failed to login UberEats.';
         new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
           error: error.toString()
         });
@@ -84,7 +84,7 @@ class UberEats extends Platform {
         resolve(response.data.access_token);
       } catch (error) {
         if (!error) error = '';
-        const msg = 'Failed to login.';
+        const msg = 'Failed to login. UberEats';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
           error: error.toString()
         });
@@ -108,7 +108,7 @@ class UberEats extends Platform {
             Authorization: 'Bearer ' + token
           }
         };
-
+        console.log(3434, options);
         const url = this.urlGetOrders;
         const urlDetails = this.urlGetDetailsOrder;
         const response = await axios.get(url, options);

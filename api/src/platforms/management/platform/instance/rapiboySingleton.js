@@ -10,6 +10,9 @@ class RapiboySingleton {
     }
     return RapiboySingleton.instance;
   }
+  static setInstance() {
+    RapiboySingleton.instance = null;
+  }
 }
 
 export default RapiboySingleton;

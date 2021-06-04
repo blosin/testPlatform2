@@ -8,6 +8,8 @@ import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
 class ThirdParty extends Platform {
   constructor(platform) {
     super(platform);
+    this.urlReceive = 'RecibirPedido';
+    this.urlView = 'VistarPedido';
     this.urlRejected = 'CancelarPedido';
     this.urlConfirmed = 'ConfirmarPedido';
     this.urlDispatched = 'EnviarPedido';
@@ -38,7 +40,12 @@ class ThirdParty extends Platform {
       this.clientSecret = this._platform.credentials.data.clientSecret
         ? this._platform.credentials.data.clientSecret
         : null;
-      this.responseData = this._platform.response;
+      this.authData = null;
+      if (this.clientId && this.clientSecret)
+        this.authData = {
+          auth: { username: this.clientId, password: this.clientSecret }
+        };
+      this.statusResponse = this._platform.statusResponse;
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate ThirParty.';
@@ -49,29 +56,122 @@ class ThirdParty extends Platform {
   }
 
   /**
+   * @param {*} order
+   * @override
+   */
+  receiveOrder(order) {
+    return new Promise(async (resolve) => {
+      try {
+        if (this.statusResponse.receive) {
+          if (this.token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id,
+              Demora: deliveryTimeId
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+
+            const url = `${this.baseUrl}${this.urlReceive}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlReceive}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
+      } catch (error) {
+        if (!error) error = '';
+        const msg = 'Failed to send the received status.';
+        const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
+          error: error.toString()
+        });
+        resolve(err);
+      }
+    });
+  }
+
+  /**
+   * @param {*} order
+   * @override
+   */
+  viewOrder(order) {
+    return new Promise(async (resolve) => {
+      try {
+        const state = NewsStateSingleton.stateByCod('view');
+        await this.updateOrderState(order, state);
+        if (this.statusResponse.view) {
+          if (this.token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id,
+              Demora: deliveryTimeId
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlView}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlView}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
+      } catch (error) {
+        if (!error) error = '';
+        const msg = 'Failed to send the viewed status.';
+        const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
+          error: error.toString()
+        });
+        resolve(err);
+      }
+    });
+  }
+
+  /**
    *
    * @param {*} order
    * @override
    */
-  confirmOrder(order, deliveryTimeId) {
+  confirmOrder(order) {
     return new Promise(async (resolve) => {
       try {
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-
-        const body = {
-          Token: this.token,
-          IdPedido: order.id,
-          Demora: deliveryTimeId
-        };
-
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-
-        const url = `${this.baseUrl}${this.urlConfirmed}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+        if (this.statusResponse.confirm) {
+          if (this.token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlConfirmed}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlConfirmed}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -93,16 +193,28 @@ class ThirdParty extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id
-        };
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-        const url = `${this.baseUrl}${this.urlDispatched}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+        if (this.statusResponse.dispatch) {
+          if (this.Token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlDispatched}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlDispatched}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -124,17 +236,28 @@ class ThirdParty extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('delivery');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id
-        };
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-
-        const url = `${this.baseUrl}${this.urlDelivered}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+        if (this.statusResponse.delivery) {
+          if (this.token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlDelivered}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlDispatched}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -156,22 +279,29 @@ class ThirdParty extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
-
-        const body = {
-          Token: this.token,
-          IdPedido: order.id,
-          Motivo: rejectMessageId
-        };
-
-        console.log('BODY', body);
-
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-
-        const url = `${this.baseUrl}${this.urlRejected}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+        if (this.statusResponse.reject) {
+          if (this.token) {
+            const body = {
+              Token: this.token,
+              IdPedido: order.id,
+              Motivo: rejectMessageId
+            };
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlRejected}`;
+            const res = await axios.put(url, body, headers);
+            resolve(res.data);
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlRejected}`;
+            const res = await axios.post(
+              url,
+              { IdPedido: order.id },
+              this.authData
+            );
+            resolve(res.data);
+          }
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -190,25 +320,28 @@ class ThirdParty extends Platform {
   getDeliveryTimes() {
     return new Promise(async (resolve) => {
       try {
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-        const url = `${this.baseUrl}${this.urlDeliveryTime}`;
-        const deliveryTimesRes = await axios.get(url, {}, headers);
-        const deliveryTimes = deliveryTimesRes.data.map((obj, index) => {
-          const minutes =
-            parseInt(obj.m_Item2.split(':')[0], 10) * 60 +
-            parseInt(obj.m_Item2.split(':')[1], 10);
-          return {
-            name: obj.m_Item2,
-            description: obj.m_Item2,
-            minMinutes: minutes,
-            maxMinutes: minutes,
-            order: index + 1,
-            id: parseInt(obj.m_Item1, 10),
-            platformId: this._platform.internalCode
+        let deliveryTimes = [];
+        if (this.statusResponse.deliveryTimes) {
+          const headers = {
+            'Content-Type': 'application/json'
           };
-        });
+          const url = `${this.baseUrl}${this.urlDeliveryTime}`;
+          const deliveryTimesRes = await axios.get(url, {}, headers);
+          deliveryTimes = deliveryTimesRes.data.map((obj, index) => {
+            const minutes =
+              parseInt(obj.m_Item2.split(':')[0], 10) * 60 +
+              parseInt(obj.m_Item2.split(':')[1], 10);
+            return {
+              name: obj.m_Item2,
+              description: obj.m_Item2,
+              minMinutes: minutes,
+              maxMinutes: minutes,
+              order: index + 1,
+              id: parseInt(obj.m_Item1, 10),
+              platformId: this._platform.internalCode
+            };
+          });
+        }
         resolve(deliveryTimes);
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
@@ -227,25 +360,27 @@ class ThirdParty extends Platform {
   getRejectedMessages() {
     return new Promise(async (resolve) => {
       try {
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-        console.log(11111);
-        const url = `${this.baseUrl}${this.urlRejectedType}`;
-        const rejectedMessagesRes = await axios.get(url, {}, headers);
-
-        let data = rejectedMessagesRes.data.map((obj) => {
-          return {
-            name: obj.m_Item2,
-            descriptionES: obj.m_Item2,
-            descriptionPT: obj.m_Item2,
-            forRestaurant: true,
-            forLogistics: true,
-            forPickup: true,
-            id: parseInt(obj.m_Item1, 10),
-            platformId: this._platform.internalCode
+        let data = [];
+        if (this.statusResponse.rejectedMessages) {
+          const headers = {
+            'Content-Type': 'application/json'
           };
-        });
+          const url = `${this.baseUrl}${this.urlRejectedType}`;
+          const rejectedMessagesRes = await axios.get(url, {}, headers);
+
+          data = rejectedMessagesRes.data.map((obj) => {
+            return {
+              name: obj.m_Item2,
+              descriptionES: obj.m_Item2,
+              descriptionPT: obj.m_Item2,
+              forRestaurant: true,
+              forLogistics: true,
+              forPickup: true,
+              id: parseInt(obj.m_Item1, 10),
+              platformId: this._platform.internalCode
+            };
+          });
+        }
         let negatives = require('../../../assets/rejectedMessages').negatives;
         data = data.concat(negatives);
         resolve(data);

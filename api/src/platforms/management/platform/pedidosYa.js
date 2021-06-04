@@ -38,7 +38,8 @@ class PedidosYa extends Platform {
         try {
           this.credentials = new Credentials();
           this.credentials.clientId = this._platform.credentials.data.clientId;
-          this.credentials.clientSecret = this._platform.credentials.data.clientSecret;
+          this.credentials.clientSecret =
+            this._platform.credentials.data.clientSecret;
           this.credentials.environment =
             Environments[this._platform.credentials.data.environment];
           this._api = new ApiClient(this.credentials);
@@ -194,15 +195,19 @@ class PedidosYa extends Platform {
   receiveOrder(order) {
     return new Promise(async (resolve) => {
       try {
-        const branch = await branchModel.findOne({ branchId: order.branchId });
-        const platformBranch = this.getBranchPlatform(
-          branch.platforms,
-          this._platform._id
-        );
-        const idRef = platformBranch.branchReference.toString();
-        let res = await this._api.event.reception(order.id, idRef);
-        if (!res) res = true;
-        return resolve(res);
+        if (this.statusResponse.receive) {
+          const branch = await branchModel.findOne({
+            branchId: order.branchId
+          });
+          const platformBranch = this.getBranchPlatform(
+            branch.platforms,
+            this._platform._id
+          );
+          const idRef = platformBranch.branchReference.toString();
+          let res = await this._api.event.reception(order.id, idRef);
+          if (!res) res = true;
+          return resolve(res);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
@@ -221,19 +226,24 @@ class PedidosYa extends Platform {
   viewOrder(order) {
     return new Promise(async (resolve) => {
       try {
-        const branch = await branchModel.findOne({ branchId: order.branchId });
-        const platformBranch = this.getBranchPlatform(
-          branch.platforms,
-          this._platform._id
-        );
-        const idRef = platformBranch.branchReference.toString();
         const state = NewsStateSingleton.stateByCod('view');
         await this.updateOrderState(order, state);
-        this.updateLastContact();
+        if (this.statusResponse.view) {
+          const branch = await branchModel.findOne({
+            branchId: order.branchId
+          });
+          const platformBranch = this.getBranchPlatform(
+            branch.platforms,
+            this._platform._id
+          );
+          const idRef = platformBranch.branchReference.toString();
 
-        let res = await this._api.event.acknowledgement(order.id, idRef);
-        if (!res) res = true;
-        return resolve(res);
+          this.updateLastContact();
+
+          let res = await this._api.event.acknowledgement(order.id, idRef);
+          if (!res) res = true;
+          return resolve(res);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
@@ -256,13 +266,15 @@ class PedidosYa extends Platform {
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-        let res;
-        if (order.preOrder || !order.ownDelivery) {
-          res = await this._api.order.confirm(order.id);
-        } else {
-          res = await this._api.order.confirm(order.id, deliveryTimeId);
-        }
-        return resolve(res);
+        if (this.statusResponse.confirm) {
+          let res;
+          if (order.preOrder || !order.ownDelivery) {
+            res = await this._api.order.confirm(order.id);
+          } else {
+            res = await this._api.order.confirm(order.id, deliveryTimeId);
+          }
+          return resolve(res);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -286,13 +298,14 @@ class PedidosYa extends Platform {
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
-
-        const res = await this._api.order.reject(
-          order.id,
-          rejectMessageId,
-          rejectMessageNote
-        );
-        resolve(res);
+        if (this.statusResponse.reject) {
+          const res = await this._api.order.reject(
+            order.id,
+            rejectMessageId,
+            rejectMessageNote
+          );
+          resolve(res);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -314,11 +327,13 @@ class PedidosYa extends Platform {
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
-        let res = {};
-        if (order.ownDelivery) {
-          res = await this._api.order.dispatch(order);
-        }
-        return resolve(res);
+        if (this.statusResponse.dispatch) {
+          let res = {};
+          if (order.ownDelivery) {
+            res = await this._api.order.dispatch(order);
+          }
+          return resolve(res);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';

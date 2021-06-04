@@ -10,53 +10,73 @@ import UberEatsSingleton from './platform/instance/uberEatsSingleton';
 import ThirdPartySingleton from './platform/instance/thirdPartySingleton';
 
 class PlatformFactory {
-  createPlatform(platform, uuid) {
+  createPlatform(platform, uuid, setInstance = false) {
     let platformSingleton;
     switch (platform.internalCode) {
       case 1: //'PEDIDOSYA'
-        platformSingleton = PedidosYaSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) PedidosYaSingleton.getInstance(platform);
+        else {
+          platformSingleton = PedidosYaSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 2: //'RAPPI'
-        platformSingleton = RappiSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) RappiSingleton.setInstance();
+        else {
+          platformSingleton = RappiSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 4: //'UBEREATS'
-        platformSingleton = UberEatsSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) UberEatsSingleton.setInstance();
+        else {
+          platformSingleton = UberEatsSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 5: //'PAD'
-        platformSingleton = PadSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
-
-      case 6: //'CRONI'
-        platformSingleton = CroniSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) PadSingleton.setInstance();
+        else {
+          platformSingleton = PadSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 7: //'RAPIBOY'
-        platformSingleton = RapiboySingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) RapiboySingleton.setInstance();
+        else {
+          platformSingleton = RapiboySingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 9: //'GLOVO'
-        platformSingleton = GlovoSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) GlovoSingleton.setInstance();
+        else {
+          platformSingleton = GlovoSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       case 10: //'PERFORMANCE'
-        platformSingleton = PerformanceSingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) PerformanceSingleton.setInstance();
+        else {
+          platformSingleton = PerformanceSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
 
       default:
-        platformSingleton = ThirdPartySingleton.getInstance(platform);
-        platformSingleton.uuid = uuid;
-        return platformSingleton;
+        if (setInstance) {
+          ThirdPartySingleton.setInstance();
+        } else {
+          platformSingleton = ThirdPartySingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
     }
   }
 }

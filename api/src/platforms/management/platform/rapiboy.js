@@ -28,6 +28,7 @@ class Rapiboy extends Platform {
     ) {
       this.baseUrl = this._platform.credentials.data.baseUrl;
       this.token = this._platform.credentials.data.token;
+      this.statusResponse = this._platform.statusResponse;
       console.log(`${this._platform.name}.\t Inicializated.`);
     } else {
       const msg = 'Can not initializate PediGrido.';
@@ -47,19 +48,21 @@ class Rapiboy extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id,
-          Demora: deliveryTimeId
-        };
+        if (this.statusResponse.confirm) {
+          const body = {
+            Token: this.token,
+            IdPedido: order.id,
+            Demora: deliveryTimeId
+          };
 
-        const headers = {
-          'Content-Type': 'application/json'
-        };
+          const headers = {
+            'Content-Type': 'application/json'
+          };
 
-        const url = `${this.baseUrl}${this.urlConfirmed}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+          const url = `${this.baseUrl}${this.urlConfirmed}`;
+          const res = await axios.put(url, body, headers);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -81,17 +84,19 @@ class Rapiboy extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id
-        };
-        const headers = {
-          'Content-Type': 'application/json'
-        };
+        if (this.statusResponse.dispatch) {
+          const body = {
+            Token: this.token,
+            IdPedido: order.id
+          };
+          const headers = {
+            'Content-Type': 'application/json'
+          };
 
-        const url = `${this.baseUrl}${this.urlDispatched}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+          const url = `${this.baseUrl}${this.urlDispatched}`;
+          const res = await axios.put(url, body, headers);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -113,17 +118,19 @@ class Rapiboy extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('delivery');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id
-        };
-        const headers = {
-          'Content-Type': 'application/json'
-        };
+        if (this.statusResponse.delivery) {
+          const body = {
+            Token: this.token,
+            IdPedido: order.id
+          };
+          const headers = {
+            'Content-Type': 'application/json'
+          };
 
-        const url = `${this.baseUrl}${this.urlDelivered}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+          const url = `${this.baseUrl}${this.urlDelivered}`;
+          const res = await axios.put(url, body, headers);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -145,20 +152,22 @@ class Rapiboy extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
-        const body = {
-          Token: this.token,
-          IdPedido: order.id,
-          Motivo: rejectMessageId
-        };
-        console.log('BODY', body);
+        if (this.statusResponse.reject) {
+          const body = {
+            Token: this.token,
+            IdPedido: order.id,
+            Motivo: rejectMessageId
+          };
+          console.log('BODY', body);
 
-        const headers = {
-          'Content-Type': 'application/json'
-        };
+          const headers = {
+            'Content-Type': 'application/json'
+          };
 
-        const url = `${this.baseUrl}${this.urlRejected}`;
-        const res = await axios.put(url, body, headers);
-        resolve(res.data);
+          const url = `${this.baseUrl}${this.urlRejected}`;
+          const res = await axios.put(url, body, headers);
+          resolve(res.data);
+        } else resolve(this.doesNotApply);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
