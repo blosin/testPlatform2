@@ -67,6 +67,7 @@ static-test:
     - ls
     - export SONAR_SCANNER_OPTS="-Xmx512m"
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+    #test
   after_script:
     - rm -rf .scannerwork
   only:
