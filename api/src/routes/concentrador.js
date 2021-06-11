@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-import controller from '../controllers/user';
+import controller from '../controllers/concentrador';
 
 router.route('/').post(controller.setInstance);
 

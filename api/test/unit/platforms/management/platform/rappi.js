@@ -248,7 +248,6 @@ describe('RAPPI management.', function () {
         .stub(rappi, 'saveNewOrders')
         .resolves(newOrders[0]);
       let saved = await rappi.getOrders('token');
-      console.log(3434);
 
       expect(saved).to.eql(newOrders);
 

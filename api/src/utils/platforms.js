@@ -2,9 +2,9 @@
 import PlatformModel from '../models/platform';
 
 class PlatformSingleton {
-  static getInstance() {
+  static getInstance(loadAll = false) {
     return new Promise(async (resolve, reject) => {
-      if (!PlatformSingleton.instance) {
+      if (!PlatformSingleton.instance || loadAll) {
         PlatformSingleton.instance = new PlatformSingleton();
         PlatformSingleton.platforms = await PlatformModel.aggregate([
           {

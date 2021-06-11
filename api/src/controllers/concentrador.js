@@ -4,6 +4,7 @@ import PlatformSingleton from '../utils/platforms';
 import UUID from '../utils/errors/utils';
 
 const setInstance = (req, res) => {
+  console.log(4444);
   initPlatform(req.body.platform);
 };
 
@@ -13,8 +14,9 @@ const initPlatform = (platform) => {
   loadPlatforms();
 };
 
-const loadPlatforms = () => {
+const loadPlatforms = async () => {
   const platformFactory = new PlatformFactory();
+  await PlatformSingleton.getInstance(true);
   const platforms = PlatformSingleton.platforms;
 
   platforms.forEach((platform) => {

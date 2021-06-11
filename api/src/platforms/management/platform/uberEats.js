@@ -108,7 +108,6 @@ class UberEats extends Platform {
             Authorization: 'Bearer ' + token
           }
         };
-        console.log(3434, options);
         const url = this.urlGetOrders;
         const urlDetails = this.urlGetDetailsOrder;
         const response = await axios.get(url, options);

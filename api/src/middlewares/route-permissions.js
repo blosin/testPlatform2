@@ -5,6 +5,7 @@ import { CORE } from '../utils/errors/codeError';
 
 const required = (req, res, next) => {
   try {
+    console.log(444, req);
     if (
       req.headers &&
       req.headers.authorization &&

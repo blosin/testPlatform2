@@ -4,7 +4,7 @@ import UberEats from '../uberEats';
 
 class UberEatsSingleton {
   constructor() {}
-
+  static instance = null;
   static getInstance(platform) {
     if (!UberEatsSingleton.instance) {
       UberEatsSingleton.instance = new UberEats(platform);

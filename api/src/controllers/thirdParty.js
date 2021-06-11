@@ -87,7 +87,6 @@ const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
 
   const platform = initPlatform(req.token.internalCode, req.uuid);
-
   if (isArray(req.body)) {
     req.body.forEach(async (data) => {
       let result = await req.body.filter((filtro) => filtro.id === data.id);
