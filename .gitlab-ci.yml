@@ -26,14 +26,14 @@ clean:
   stage: clean
   script:
     - echo "Removing all containers"
-    #- test $(docker ps -aq) && docker rm -f $(docker ps -aq)
-    - docker rm -f $(docker ps -aq)
+    - sudo test $(docker ps -aq) && docker rm -f $(docker ps -aq)
+    #- docker rm -f $(docker ps -aq)
     - echo "Pruning all docker stuff without use"
-    - docker system prune --force --all --volumes
+    - sudo docker system prune --force --all --volumes
     - echo "Cleaning npm garbage"
-    - rm -rf node_modules package-lock.json yarn-lock.json
+    - sudo rm -rf node_modules package-lock.json yarn-lock.json
     - echo "Cleaning gitlab-runner cache"
-    - rm -rf /home/gitlab-runner/cache/
+    - sudo rm -rf /home/gitlab-runner/cache/
   only:
     - master
   tags:
