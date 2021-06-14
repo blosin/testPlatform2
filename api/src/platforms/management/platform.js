@@ -619,12 +619,8 @@ class Platform {
         promiseNew,
         branch,
         isOpened;
-      const {
-        posId,
-        originalId,
-        displayId,
-        branchReference
-      } = this.parser.retriveMinimunData(order);
+      const { posId, originalId, displayId, branchReference } =
+        this.parser.retriveMinimunData(order);
       try {
         let branches = await this.getOrderBranches(branchReference);
         if (branches.length == 0)
@@ -634,6 +630,7 @@ class Platform {
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
         try {
+          console.log(333, branch);
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
             branch.platform,

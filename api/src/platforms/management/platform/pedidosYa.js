@@ -38,7 +38,8 @@ class PedidosYa extends Platform {
         try {
           this.credentials = new Credentials();
           this.credentials.clientId = this._platform.credentials.data.clientId;
-          this.credentials.clientSecret = this._platform.credentials.data.clientSecret;
+          this.credentials.clientSecret =
+            this._platform.credentials.data.clientSecret;
           this.credentials.environment =
             Environments[this._platform.credentials.data.environment];
           this._api = new ApiClient(this.credentials);
@@ -129,7 +130,7 @@ class PedidosYa extends Platform {
     this.updateLastContact();
     try {
       const savedOrder = await orderModel.findOne({
-        orderId: data.id,
+        'order.id': data.id,
         internalCode: this._platform.internalCode
       });
       if (data.state == NewsStateSingleton.stateByCod('pend')) {
