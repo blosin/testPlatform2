@@ -34,6 +34,7 @@ clean:
     - rm -rf node_modules package-lock.json yarn-lock.json
     - echo "Cleaning gitlab-runner cache"
     - rm -rf /home/gitlab-runner/cache/
+    #test
   only:
     - master
   tags:
