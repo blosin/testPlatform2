@@ -25,6 +25,7 @@ stages:
 clean:
   stage: clean
   script:
+    - chown gitlab-runner /api
     - echo "Removing all containers"
     - test $(docker ps -aq) && docker rm -f $(docker ps -aq)
     #- docker rm -f $(docker ps -aq)
@@ -34,7 +35,7 @@ clean:
     - rm -rf node_modules package-lock.json yarn-lock.json
     - echo "Cleaning gitlab-runner cache"
     - rm -rf /home/gitlab-runner/cache/
-    
+  
   only:
     - master
   tags:
