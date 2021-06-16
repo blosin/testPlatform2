@@ -8,5 +8,5 @@
     - echo "Tagging image ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG} "
     - docker tag ${PROJ_IMG} ${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}
   tags:
-    - inviertis-backend
+    - smartfran-platform
   environment: $CI_COMMIT_REF_SLUG
