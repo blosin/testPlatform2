@@ -44,8 +44,7 @@ unit-test:
   stage: unit-test
   before_script:
     #- cd api
-    #- npm install
-    - npm install --unsafe-perm
+    - npm install
   script:
     - npm run test
   artifacts:
