@@ -55,23 +55,23 @@ unit-test:
   tags:
     - runner-smartfran
 
-static-test:
-  stage: static-test
-  allow_failure: true
-  before_script:
-    - cd api
-    - npm install
-  script:
-    - npm run test:coverage
-    - export SONAR_SCANNER_OPTS="-Xmx512m"
-    - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
+# static-test:
+#   stage: static-test
+#   allow_failure: true
+#   before_script:
+#     - cd api
+#     - npm install
+#   script:
+#     - npm run test:coverage
+#     - export SONAR_SCANNER_OPTS="-Xmx512m"
+#     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
     
-  after_script:
-    - rm -rf .scannerwork
-  only:
-    - master
-  tags:
-    - runner-smartfran
+#   after_script:
+#     - rm -rf .scannerwork
+#   only:
+#     - master
+#   tags:
+#     - runner-smartfran
 
 build:
   stage: build
