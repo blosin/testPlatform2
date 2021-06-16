@@ -43,7 +43,7 @@ clean:
 unit-test:
   stage: unit-test
   before_script:
-    - cd api
+    #- cd api
     #- npm install
     - npm install --unsafe-perm
   script:
