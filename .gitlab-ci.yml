@@ -81,8 +81,6 @@ build:
   variables:
     DOCKER_DRIVER: overlay2
   script:
-    - pwd
-    - cd api
     - echo "Building image..."
     - docker build -t $PROJ_IMG .
     - echo "Tagging image..."
