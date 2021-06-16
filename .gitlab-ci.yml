@@ -12,7 +12,7 @@ services:
 before_script:
   - echo $BUILD_TAG
   - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
-
+######
 stages:
   - clean
   - unit-test
