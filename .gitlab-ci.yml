@@ -78,6 +78,7 @@ build:
   variables:
     DOCKER_DRIVER: overlay2
   script:
+    - cd api
     - echo "Building image..."
     - echo $PROJ_IMG
     - docker build -t $PROJ_IMG .
