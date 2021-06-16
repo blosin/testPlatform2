@@ -44,7 +44,8 @@ unit-test:
   stage: unit-test
   before_script:
     - cd api
-    - npm install
+    #- npm install
+    - npm install --unsafe-perm
   script:
     - npm run test
   artifacts:
@@ -52,6 +53,7 @@ unit-test:
       - coverage
   only:
     - master
+    - tags
   tags:
     - runner-smartfran
 
@@ -70,6 +72,7 @@ unit-test:
 #     - rm -rf .scannerwork
 #   only:
 #     - master
+#     - tags
 #   tags:
 #     - runner-smartfran
 
