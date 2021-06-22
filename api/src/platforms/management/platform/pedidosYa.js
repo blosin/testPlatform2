@@ -42,6 +42,7 @@ class PedidosYa extends Platform {
             this._platform.credentials.data.clientSecret;
           this.credentials.environment =
             Environments[this._platform.credentials.data.environment];
+          this.statusResponse = this._platform.statusResponse;
           this._api = new ApiClient(this.credentials);
           this.getOrders();
           console.log(`${this._platform.name}.\t Inicializated.`);
@@ -130,7 +131,7 @@ class PedidosYa extends Platform {
     this.updateLastContact();
     try {
       const savedOrder = await orderModel.findOne({
-        orderId: data.id,
+        'order.id': data.id,
         internalCode: this._platform.internalCode
       });
       if (data.state == NewsStateSingleton.stateByCod('pend')) {
@@ -195,6 +196,7 @@ class PedidosYa extends Platform {
   receiveOrder(order) {
     return new Promise(async (resolve) => {
       try {
+        console.log(111, this.statusResponse);
         if (this.statusResponse.receive) {
           const branch = await branchModel.findOne({
             branchId: order.branchId
