@@ -47,9 +47,9 @@ unit-test:
     - npm install
   script:
     - npm run test
-  artifacts:
-    paths:
-      - coverage
+  # artifacts:
+  #   paths:
+  #     - coverage
   only:
     - master
     - tags
