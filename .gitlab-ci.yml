@@ -1,5 +1,5 @@
 image: docker:latest
-
+#
 variables:
   AWS_ACCOUNT: 382381053403
   ECR_REGION: 'us-east-2'
