@@ -67,8 +67,8 @@ static-test:
     - export SONAR_SCANNER_OPTS="-Xmx512m"
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=sonar-project.properties
         
-  # after_script:
-  #   - rm -rf .scannerwork
+  after_script:
+     - rm -rf .scannerwork
   only:
     - master
     - tags
