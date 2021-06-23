@@ -12,6 +12,7 @@ class PlatformSingleton {
               internalCode: '$internalCode',
               name: '$name',
               credentials: '$credentials',
+              statusResponse: '$statusResponse',
               deletedAt: '$deletedAt'
             }
           },

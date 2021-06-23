@@ -25,7 +25,7 @@ class Platform {
    * Can be overriden.
    */
   cronGetPlatformParameters() {
-    const schedule = '6 * * * *';
+    const schedule = '55 * * * *';
     cron.schedule(schedule, () => this.getPlatformParameters());
   }
 
@@ -619,12 +619,8 @@ class Platform {
         promiseNew,
         branch,
         isOpened;
-      const {
-        posId,
-        originalId,
-        displayId,
-        branchReference
-      } = this.parser.retriveMinimunData(order);
+      const { posId, originalId, displayId, branchReference } =
+        this.parser.retriveMinimunData(order);
       try {
         let branches = await this.getOrderBranches(branchReference);
         if (branches.length == 0)

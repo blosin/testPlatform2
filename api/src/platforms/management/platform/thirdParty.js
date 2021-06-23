@@ -45,7 +45,9 @@ class ThirdParty extends Platform {
         this.authData = {
           auth: { username: this.clientId, password: this.clientSecret }
         };
-      this.statusResponse = this._platform.statusResponse;
+      this.statusResponse = this._platform.statusResponse
+        ? this._platform.statusResponse
+        : {};
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate ThirParty.';
@@ -341,8 +343,14 @@ class ThirdParty extends Platform {
               platformId: this._platform.internalCode
             };
           });
+          resolve(deliveryTimes);
+        } else {
+          deliveryTimes = require('../../../assets/deliveryTimes').generic;
+          deliveryTimes.forEach(
+            (obj) => (obj.platformId = this._platform.internalCode)
+          );
+          resolve(deliveryTimes);
         }
-        resolve(deliveryTimes);
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
@@ -360,6 +368,16 @@ class ThirdParty extends Platform {
   getRejectedMessages() {
     return new Promise(async (resolve) => {
       try {
+        console.log(
+          1111,
+
+          this._platform.name
+        );
+        console.log(
+          1111,
+
+          this.statusResponse.rejectedMessages
+        );
         let data = [];
         if (this.statusResponse.rejectedMessages) {
           const headers = {
@@ -380,10 +398,17 @@ class ThirdParty extends Platform {
               platformId: this._platform.internalCode
             };
           });
+          resolve(data);
+          return;
+        } else {
+          data = require('../../../assets/rejectedMessages').generic;
+          const negatives =
+            require('../../../assets/rejectedMessages').negatives;
+          data = data.concat(negatives);
+          data.forEach((obj) => (obj.platformId = this._platform.internalCode));
+          console.log(7777777, data);
+          resolve(data);
         }
-        let negatives = require('../../../assets/rejectedMessages').negatives;
-        data = data.concat(negatives);
-        resolve(data);
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
