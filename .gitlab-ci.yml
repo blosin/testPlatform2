@@ -46,10 +46,10 @@ unit-test:
     - cd api
     - npm install
   script:
-    - npm run test:coverage
-  artifacts:
-     paths:
-       - coverage
+    - npm run test
+  # artifacts:
+  #    paths:
+  #      - coverage
   only:
     - master
     - tags
@@ -68,7 +68,7 @@ static-test:
     - /opt/sonar-scanner/bin/sonar-scanner -Dproject.settings=sonar-project.properties
         
   after_script:
-     - rm -rf .scannerwork
+    - rm -rf .scannerwork
   only:
     - master
     - tags
