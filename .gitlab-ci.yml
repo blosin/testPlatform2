@@ -46,10 +46,11 @@ unit-test:
     - cd api
     - npm install
   script:
-    - npm run test:coverage
-  artifacts:
-      paths:
-        - coverage
+    #- npm run test:coverage
+     - npm run test
+  # artifacts:
+  #     paths:
+  #       - coverage
   only:
     - master
     - tags
