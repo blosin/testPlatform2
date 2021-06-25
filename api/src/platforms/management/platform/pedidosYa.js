@@ -208,7 +208,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          orderId: order.id
         });
         resolve(err);
       }
@@ -239,7 +240,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
         const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          orderId: order.id
         });
         resolve(err);
       }
@@ -268,7 +270,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          orderId: order.id
         });
         resolve(err);
       }
@@ -298,7 +301,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          orderId: order.id
         });
         resolve(err);
       }
@@ -324,7 +328,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          orderId: order.id
         });
         return resolve(err);
       }
@@ -359,7 +364,8 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to call the heartbeat.';
         const err = new CustomError(APP_PLATFORM.HEARTBEAT, msg, this.uuid, {
-          error: error.toString()
+          error: error.toString(),
+          branchId: branch.branchId
         });
         resolve(err);
       }
