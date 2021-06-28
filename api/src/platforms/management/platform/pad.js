@@ -59,6 +59,9 @@ class Pad extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -87,6 +90,9 @@ class Pad extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -114,6 +120,9 @@ class Pad extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
         const err = new CustomError(APP_PLATFORM.DELIVERY, msg, this.uuid, {
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -143,6 +152,9 @@ class Pad extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);

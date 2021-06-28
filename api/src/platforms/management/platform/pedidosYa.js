@@ -214,7 +214,9 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -252,7 +254,9 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
         const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -285,7 +289,9 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -318,7 +324,9 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         resolve(err);
@@ -348,7 +356,9 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
         return resolve(err);
@@ -542,7 +552,9 @@ class PedidosYa extends Platform {
       } catch (error) {
         const msg = 'No se pudo obtener el driver de la orden.';
         new CustomError(APP_PLATFORM.DRIVER, msg, this.uuid, {
-          orderId: order.id,
+          orderId: order.id ? order.id.toString() : '-',
+          branchId: order.branchId ? order.branchId.toString() : '-',
+          platformId: order.platformId ? order.platformId.toString() : '-',
           platformError: error.toString()
         });
       }
