@@ -196,7 +196,7 @@ class PedidosYa extends Platform {
   receiveOrder(order) {
     return new Promise(async (resolve) => {
       try {
-        console.log(111, this.statusResponse);
+        console.log('receive', this.statusResponse.receive);
         if (this.statusResponse.receive) {
           const branch = await branchModel.findOne({
             branchId: order.branchId
@@ -214,6 +214,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
+          orderId: order.id,
           error: error.toString()
         });
         resolve(err);
@@ -228,6 +229,7 @@ class PedidosYa extends Platform {
   viewOrder(order) {
     return new Promise(async (resolve) => {
       try {
+        console.log('view:', this.statusResponse.view);
         const state = NewsStateSingleton.stateByCod('view');
         await this.updateOrderState(order, state);
         if (this.statusResponse.view) {
@@ -250,6 +252,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
         const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
+          orderId: order.id,
           error: error.toString()
         });
         resolve(err);
@@ -265,6 +268,7 @@ class PedidosYa extends Platform {
   confirmOrder(order, deliveryTimeId) {
     return new Promise(async (resolve) => {
       try {
+        console.log('confirm', this.statusResponse.confirm);
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
@@ -281,6 +285,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
+          orderId: order.id,
           error: error.toString()
         });
         resolve(err);
@@ -297,6 +302,7 @@ class PedidosYa extends Platform {
   branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
     return new Promise(async (resolve) => {
       try {
+        console.log('reject', this.statusResponse.reject);
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
@@ -312,6 +318,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
+          orderId: order.id,
           error: error.toString()
         });
         resolve(err);
@@ -326,6 +333,7 @@ class PedidosYa extends Platform {
   dispatchOrder(order) {
     return new Promise(async (resolve) => {
       try {
+        console.log('dispatch', this.statusResponse.dispatch);
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
@@ -340,6 +348,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
+          orderId: order.id,
           error: error.toString()
         });
         return resolve(err);
@@ -375,6 +384,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to call the heartbeat.';
         const err = new CustomError(APP_PLATFORM.HEARTBEAT, msg, this.uuid, {
+          branchId: branch.branchId,
           error: error.toString()
         });
         resolve(err);

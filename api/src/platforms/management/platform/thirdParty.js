@@ -68,8 +68,7 @@ class ThirdParty extends Platform {
           if (this.token) {
             const body = {
               Token: this.token,
-              IdPedido: order.id,
-              Demora: deliveryTimeId
+              IdPedido: order.id
             };
             const headers = {
               'Content-Type': 'application/json'
@@ -147,16 +146,18 @@ class ThirdParty extends Platform {
    * @param {*} order
    * @override
    */
-  confirmOrder(order) {
+  confirmOrder(order, deliveryTimeId) {
     return new Promise(async (resolve) => {
       try {
+        console.log('deliveryTimeId', deliveryTimeId);
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
         if (this.statusResponse.confirm) {
           if (this.token) {
             const body = {
               Token: this.token,
-              IdPedido: order.id
+              IdPedido: order.id,
+              Demora: deliveryTimeId
             };
             const headers = {
               'Content-Type': 'application/json'
@@ -168,7 +169,7 @@ class ThirdParty extends Platform {
             const url = `${this.baseUrl}${this.urlConfirmed}`;
             const res = await axios.post(
               url,
-              { IdPedido: order.id },
+              { IdPedido: order.id, Demora: deliveryTimeId },
               this.authData
             );
             resolve(res.data);
@@ -279,6 +280,8 @@ class ThirdParty extends Platform {
   branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
     return new Promise(async (resolve) => {
       try {
+        console.log('rejectMessageId', rejectMessageId);
+        console.log('rejectMessageNote', rejectMessageNote);
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
         if (this.statusResponse.reject) {
@@ -286,7 +289,7 @@ class ThirdParty extends Platform {
             const body = {
               Token: this.token,
               IdPedido: order.id,
-              Motivo: rejectMessageId
+              IdMotivo: rejectMessageId
             };
             const headers = {
               'Content-Type': 'application/json'
@@ -298,7 +301,10 @@ class ThirdParty extends Platform {
             const url = `${this.baseUrl}${this.urlRejected}`;
             const res = await axios.post(
               url,
-              { IdPedido: order.id },
+              {
+                IdPedido: order.id,
+                IdMotivo: rejectMessageId
+              },
               this.authData
             );
             resolve(res.data);
