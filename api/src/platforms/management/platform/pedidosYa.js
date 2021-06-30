@@ -230,6 +230,7 @@ class PedidosYa extends Platform {
    */
   viewOrder(order) {
     return new Promise(async (resolve) => {
+      let idRef = '';
       try {
         console.log('view:', this.statusResponse.view);
         const state = NewsStateSingleton.stateByCod('view');
@@ -242,7 +243,7 @@ class PedidosYa extends Platform {
             branch.platforms,
             this._platform._id
           );
-          const idRef = platformBranch.branchReference.toString();
+          idRef = platformBranch.branchReference.toString();
 
           this.updateLastContact();
 
@@ -259,6 +260,10 @@ class PedidosYa extends Platform {
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
+
+        //Se envia de nuevo
+        await this._api.event.acknowledgement(order.id, idRef);
+
         resolve(err);
       }
     });
@@ -294,6 +299,12 @@ class PedidosYa extends Platform {
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
+        //Se envia de nuevo
+        if (order.preOrder || !order.ownDelivery) {
+          await this._api.order.confirm(order.id);
+        } else {
+          await this._api.order.confirm(order.id, deliveryTimeId);
+        }
         resolve(err);
       }
     });
@@ -329,6 +340,12 @@ class PedidosYa extends Platform {
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
+        //Se envia de nuevo
+        await this._api.order.reject(
+          order.id,
+          rejectMessageId,
+          rejectMessageNote
+        );
         resolve(err);
       }
     });
@@ -361,6 +378,9 @@ class PedidosYa extends Platform {
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
+        if (order.ownDelivery) {
+          await this._api.order.dispatch(order);
+        }
         return resolve(err);
       }
     });
