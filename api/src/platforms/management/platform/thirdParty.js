@@ -75,7 +75,7 @@ class ThirdParty extends Platform {
             };
 
             const url = `${this.baseUrl}${this.urlReceive}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlReceive}`;
@@ -114,14 +114,13 @@ class ThirdParty extends Platform {
           if (this.token) {
             const body = {
               Token: this.token,
-              IdPedido: order.id,
-              Demora: deliveryTimeId
+              IdPedido: order.id
             };
             const headers = {
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlView}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlView}`;
@@ -169,7 +168,7 @@ class ThirdParty extends Platform {
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlConfirmed}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlConfirmed}`;
@@ -215,7 +214,7 @@ class ThirdParty extends Platform {
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlDispatched}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlDispatched}`;
@@ -261,7 +260,7 @@ class ThirdParty extends Platform {
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlDelivered}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlDispatched}`;
@@ -310,7 +309,7 @@ class ThirdParty extends Platform {
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlRejected}`;
-            const res = await axios.put(url, body, headers);
+            const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlRejected}`;
@@ -347,12 +346,22 @@ class ThirdParty extends Platform {
     return new Promise(async (resolve) => {
       try {
         let deliveryTimes = [];
+        let deliveryTimesRes;
         if (this.statusResponse.deliveryTimes) {
-          const headers = {
-            'Content-Type': 'application/json'
-          };
-          const url = `${this.baseUrl}${this.urlDeliveryTime}`;
-          const deliveryTimesRes = await axios.get(url, {}, headers);
+          if (this.token) {
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlDeliveryTime}`;
+            deliveryTimesRes = await axios.get(
+              url,
+              { Token: this.token },
+              headers
+            );
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlDeliveryTime}`;
+            deliveryTimesRes = await axios.get(url, {}, this.authData);
+          }
           deliveryTimes = deliveryTimesRes.data.map((obj, index) => {
             const minutes =
               parseInt(obj.m_Item2.split(':')[0], 10) * 60 +
@@ -392,23 +401,23 @@ class ThirdParty extends Platform {
   getRejectedMessages() {
     return new Promise(async (resolve) => {
       try {
-        console.log(
-          1111,
-
-          this._platform.name
-        );
-        console.log(
-          1111,
-
-          this.statusResponse.rejectedMessages
-        );
         let data = [];
+        let rejectedMessagesRes;
         if (this.statusResponse.rejectedMessages) {
-          const headers = {
-            'Content-Type': 'application/json'
-          };
-          const url = `${this.baseUrl}${this.urlRejectedType}`;
-          const rejectedMessagesRes = await axios.get(url, {}, headers);
+          if (this.token) {
+            const headers = {
+              'Content-Type': 'application/json'
+            };
+            const url = `${this.baseUrl}${this.urlRejectedType}`;
+            deliveryTimesRes = await axios.get(
+              url,
+              { Token: this.token },
+              headers
+            );
+          } else if (this.authData) {
+            const url = `${this.baseUrl}${this.urlRejectedType}`;
+            rejectedMessagesRes = await axios.get(url, {}, this.authData);
+          }
 
           data = rejectedMessagesRes.data.map((obj) => {
             return {
@@ -430,7 +439,6 @@ class ThirdParty extends Platform {
             require('../../../assets/rejectedMessages').negatives;
           data = data.concat(negatives);
           data.forEach((obj) => (obj.platformId = this._platform.internalCode));
-          console.log(7777777, data);
           resolve(data);
         }
       } catch (error) {
