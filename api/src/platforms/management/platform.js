@@ -592,6 +592,7 @@ class Platform {
           'chain.chain': '$joinChains.chain',
           'platform.name': '$joinPlatforms.name',
           'platform.platform': '$joinPlatforms._id',
+          'platform.autoReply': '$joinPlatforms.autoReply',
           lastGetNews: '$lastGetNews',
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
@@ -619,6 +620,7 @@ class Platform {
         promiseNew,
         branch,
         isOpened;
+      let autoReply = false;
       const { posId, originalId, displayId, branchReference } =
         this.parser.retriveMinimunData(order);
       try {
@@ -629,13 +631,22 @@ class Platform {
           });
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
+
+        if (
+          //process.env.NODE_ENV === 'staging' &&
+          //process.env.NODE_ENV === 'testing' &&
+          process.env.NODE_ENV === 'development' &&
+          branch.platform.autoReply &&
+          (branch.branchId == 800000 || branch.branchId == 1)
+        )
+          autoReply = true;
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
             branch.platform,
             branch.lastGetNews
           );
-          if (isOpened && branch.platform.isActive) {
+          if ((isOpened && branch.platform.isActive) || autoReply) {
             stateCod = 'pend';
             newsCode = 'new_ord';
           } else {
@@ -667,26 +678,27 @@ class Platform {
             branch,
             this.uuid
           );
-
-          /* If restaurant is closed, mark the new as viewed. */
-          if (!isOpened) {
-            newCreator.viewed = new Date();
-            const rej = RejectedMessagesSingleton.closedResRejectedMessages;
-            newCreator.extraData.rejected = {
-              rejectMessageId: rej.id,
-              rejectMessageDescription: rej.name,
-              rejectMessageNote: null,
-              entity: 'CONCENTRADOR'
-            };
-          } else if (!branch.platform.isActive) {
-            newCreator.viewed = new Date();
-            const rej = RejectedMessagesSingleton.inactiveResRejectedMessages;
-            newCreator.extraData.rejected = {
-              rejectMessageId: rej.id,
-              rejectMessageDescription: rej.name,
-              rejectMessageNote: null,
-              entity: 'CONCENTRADOR'
-            };
+          if (!autoReply) {
+            /* If restaurant is closed, mark the new as viewed. */
+            if (!isOpened) {
+              newCreator.viewed = new Date();
+              const rej = RejectedMessagesSingleton.closedResRejectedMessages;
+              newCreator.extraData.rejected = {
+                rejectMessageId: rej.id,
+                rejectMessageDescription: rej.name,
+                rejectMessageNote: null,
+                entity: 'CONCENTRADOR'
+              };
+            } else if (!branch.platform.isActive) {
+              newCreator.viewed = new Date();
+              const rej = RejectedMessagesSingleton.inactiveResRejectedMessages;
+              newCreator.extraData.rejected = {
+                rejectMessageId: rej.id,
+                rejectMessageDescription: rej.name,
+                rejectMessageNote: null,
+                entity: 'CONCENTRADOR'
+              };
+            }
           }
           trace = newsModel.createTrace({
             typeId: newCreator.typeId,
@@ -743,10 +755,17 @@ class Platform {
           if (
             isOpened &&
             branch.platform.isActive &&
-            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24
+            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24 &&
+            !autoReply
           ) {
             //Push all savedNews to the queue
             await this.aws.pushNewToQueue(savedNews);
+          }
+          if (autoReply) {
+            this.aws.pushAutoReplyToQueue(
+              savedNews._id.toString(),
+              branch.branchId.toString()
+            );
           }
         }
         return resolve(orderProccessed);

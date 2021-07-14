@@ -156,6 +156,7 @@ class Aws {
       attributeNames: ['All'],
       batchSize: 10,
       handleMessageBatch: async (messages) => {
+        console.log(messages);
         const newsForFilter = messages;
         const newsNoIds = newsForFilter.filter((n) => !JSON.parse(n.Body).id);
         const totalIds = newsForFilter
@@ -208,6 +209,46 @@ class Aws {
       .on('processing_error', (err) => {
         console.error('PROC_ERR', err.message);
       });
+  }
+
+  async pushAutoReplyToQueue(id, branchId) {
+    const sqs = new AWS.SQS({
+      region: config.AWS.SQS.REGION,
+      credentials: null
+    });
+    let data = [
+      {
+        MessageBody: { id, typeId: 10, typeIdPrev: 1 },
+        MessageGroupId: id + branchId
+      },
+      {
+        MessageBody: { id, typeId: 11 },
+        MessageGroupId: id + branchId
+      },
+      {
+        MessageBody: { id, typeId: 5 },
+        MessageGroupId: id + branchId
+      },
+      {
+        MessageBody: { id, typeId: 3 },
+        MessageGroupId: id + branchId
+      },
+      {
+        MessageBody: { id, typeId: 14 },
+        MessageGroupId: id + branchId
+      }
+    ];
+
+    for (let index = 0; index < data.length; index++) {
+      const element = data[index];
+      const params = {
+        MessageBody: JSON.stringify(element.MessageBody),
+        MessageGroupId: element.MessageGroupId,
+        QueueUrl: config.AWS.SQS.ORDER_CONSUMER.NAME
+      };
+      await sqs.sendMessage(params).promise();
+      console.log(params);
+    }
   }
 }
 

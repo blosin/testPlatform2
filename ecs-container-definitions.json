@@ -1,24 +1,18 @@
 {
   "containerDefinitions": [
     {
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/platform-service-production-task",
-          "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
       "portMappings": [
         {
-          "hostPort": 3087,
+          "hostPort": 0,
           "protocol": "tcp",
           "containerPort": 3087
         }
       ],
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-3.1.4",
+      "cpu": 0,
+      "memory": 256,
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:2.0.9",
       "essential": true,
-      "name": "platform-service-production-container",
+      "name": "platform-service-testing-container",
       "entryPoint": [
         "npm",
         "run"
@@ -29,28 +23,26 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "production"
+          "value": "testing"
         }
       ]
     }
   ],
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "256",
-  "memory": "512",
-  "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
   "tags": [
     {
+      "key": "Customer",
+      "value": "Smartfran"
+    },
+    {
       "key": "Environment",
-      "value": "Production"
+      "value": "testing"
     },
     {
       "key": "Project",
-      "value": "platform-service"
+      "value": "Concentrador"
     }
   ],
-  "family": "platform-service-production-task",
-  "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
+  "family": "platform-service-testing-task",
+  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+
 }

@@ -1,6 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
+const enviroment = process.env.NODE_ENV === 'testing' ? 'testing' : 'api';
+
 const platformSchema = new Schema(
   {
     name: {
@@ -27,7 +29,10 @@ const platformSchema = new Schema(
     },
     permissions: {
       type: Array,
-      default: ['api/thirdParties/orders', 'api/thirdParties/orders/cancel'],
+      default: [
+        `${enviroment}/thirdParties/orders`,
+        `${enviroment}/thirdParties/orders/cancel`
+      ],
       required: true
     },
     avatar: {
@@ -79,6 +84,10 @@ const platformSchema = new Schema(
         type: Boolean,
         required: false
       }
+    },
+    autoReply: {
+      type: Boolean,
+      required: false
     }
   },
   {

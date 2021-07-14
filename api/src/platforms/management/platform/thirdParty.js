@@ -205,7 +205,7 @@ class ThirdParty extends Platform {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
         if (this.statusResponse.dispatch) {
-          if (this.Token) {
+          if (this.token) {
             const body = {
               Token: this.token,
               IdPedido: order.id
@@ -263,7 +263,7 @@ class ThirdParty extends Platform {
             const res = await axios.post(url, body, headers);
             resolve(res.data);
           } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlDispatched}`;
+            const url = `${this.baseUrl}${this.urlDelivered}`;
             const res = await axios.post(
               url,
               { IdPedido: order.id },
