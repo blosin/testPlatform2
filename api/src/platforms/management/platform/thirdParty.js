@@ -76,7 +76,7 @@ class ThirdParty extends Platform {
 
             const url = `${this.baseUrl}${this.urlReceive}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlReceive}`;
             const res = await axios.post(
@@ -84,9 +84,9 @@ class ThirdParty extends Platform {
               { IdPedido: order.id },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
@@ -121,7 +121,7 @@ class ThirdParty extends Platform {
             };
             const url = `${this.baseUrl}${this.urlView}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlView}`;
             const res = await axios.post(
@@ -129,9 +129,9 @@ class ThirdParty extends Platform {
               { IdPedido: order.id },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
@@ -169,7 +169,7 @@ class ThirdParty extends Platform {
             };
             const url = `${this.baseUrl}${this.urlConfirmed}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlConfirmed}`;
             const res = await axios.post(
@@ -177,9 +177,9 @@ class ThirdParty extends Platform {
               { IdPedido: order.id, Demora: deliveryTimeId },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -215,7 +215,7 @@ class ThirdParty extends Platform {
             };
             const url = `${this.baseUrl}${this.urlDispatched}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlDispatched}`;
             const res = await axios.post(
@@ -223,9 +223,9 @@ class ThirdParty extends Platform {
               { IdPedido: order.id },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -261,7 +261,7 @@ class ThirdParty extends Platform {
             };
             const url = `${this.baseUrl}${this.urlDelivered}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlDelivered}`;
             const res = await axios.post(
@@ -269,9 +269,9 @@ class ThirdParty extends Platform {
               { IdPedido: order.id },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -310,7 +310,7 @@ class ThirdParty extends Platform {
             };
             const url = `${this.baseUrl}${this.urlRejected}`;
             const res = await axios.post(url, body, headers);
-            resolve(res.data);
+            resolve(true);
           } else if (this.authData) {
             const url = `${this.baseUrl}${this.urlRejected}`;
             const res = await axios.post(
@@ -321,9 +321,9 @@ class ThirdParty extends Platform {
               },
               this.authData
             );
-            resolve(res.data);
+            resolve(true);
           }
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';

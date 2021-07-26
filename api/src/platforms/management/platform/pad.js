@@ -54,7 +54,7 @@ class Pad extends Platform {
           const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idPreparando}`;
           const res = await axios.post(url, {}, this.authData);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -85,7 +85,7 @@ class Pad extends Platform {
           const res = await axios.post(url, {}, this.authData);
 
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -115,7 +115,7 @@ class Pad extends Platform {
           const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idEntregando}`;
           const res = await axios.post(url, {}, this.authData);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -147,7 +147,7 @@ class Pad extends Platform {
           const url = `${this.baseUrl}${this.urlSetState}?pedido=${order.id}&estado=${idProblema}&metadata={"tipo_problema": ${rejectMessageId},"observacion": "${rejectMessageNote}"}`;
           const res = await axios.post(url, {}, this.authData);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';

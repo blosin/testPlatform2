@@ -633,11 +633,11 @@ class Platform {
         let trace, stateCod, newsCode, orderCreator;
 
         if (
-          //process.env.NODE_ENV === 'staging' &&
-          //process.env.NODE_ENV === 'testing' &&
-          process.env.NODE_ENV === 'development' &&
           branch.platform.autoReply &&
-          (branch.branchId == 800000 || branch.branchId == 1)
+          (branch.branchId == 800000 || branch.branchId == 1) &&
+          (process.env.NODE_ENV === 'staging' ||
+            process.env.NODE_ENV === 'testing' ||
+            process.env.NODE_ENV === 'development')
         )
           autoReply = true;
         try {

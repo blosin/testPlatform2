@@ -209,7 +209,7 @@ class PedidosYa extends Platform {
           let res = await this._api.event.reception(order.id, idRef);
           if (!res) res = true;
           return resolve(res);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
@@ -250,7 +250,7 @@ class PedidosYa extends Platform {
           let res = await this._api.event.acknowledgement(order.id, idRef);
           if (!res) res = true;
           return resolve(res);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
@@ -289,7 +289,7 @@ class PedidosYa extends Platform {
             res = await this._api.order.confirm(order.id, deliveryTimeId);
           }
           return resolve(res);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -330,7 +330,7 @@ class PedidosYa extends Platform {
             rejectMessageNote
           );
           resolve(res);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -368,7 +368,7 @@ class PedidosYa extends Platform {
             res = await this._api.order.dispatch(order);
           }
           return resolve(res);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';

@@ -12,7 +12,7 @@ module.exports = {
           paymentNews.typeId = 2; //Credito
           paymentNews.online = true;
           paymentNews.shipping = 0;
-          paymentNews.discount = 0;
+          paymentNews.discount = order.order.totalDiscounts;
           paymentNews.voucher = '';
           paymentNews.subtotal = order.order.totalValue;
           paymentNews.currency = '$';
@@ -240,7 +240,7 @@ module.exports = {
         news.order.details = detailsMapper(dataOrder.order);
         news.extraData = extraDataMapper(branch, platform);
 
-        news.order.totalAmount = parseInt(dataOrder.order.totalValue, 10);
+        news.order.totalAmount = parseInt(dataOrder.order.totalOrderValue, 10);
         resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de Rappi.';

@@ -90,6 +90,8 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
           searchBranch.platforms[0].isActive &&
           parseFloat(searchBranch.smartfran_sw.agent.installedVersion) > 1.24
         ) {
+          result['viewed'] = null;
+          console.log(result);
           //Push all savedNews to the queue
           await aws.pushNewToQueue(result);
         }

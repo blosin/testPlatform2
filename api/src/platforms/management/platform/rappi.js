@@ -97,7 +97,8 @@ class Rappi extends Platform {
         };
         const url = this.baseUrl + this.urlGetOrders;
         const response = await axios.get(url, options);
-        var result, saved;
+        let result, saved;
+        console.log('rappi', response.data);
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
             this.saveNewOrders(data, this._platform)
@@ -144,8 +145,9 @@ class Rappi extends Platform {
           };
           const url = this.baseUrl + this.urlConfirmOrders + order.id;
           const res = await axios.get(url, options);
-          resolve(res.data);
-        } else resolve(this.doesNotApply);
+          console.log(res.data);
+          resolve(true);
+        } else resolve(false);
       } catch (error) {
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
@@ -171,14 +173,14 @@ class Rappi extends Platform {
     return new Promise(async (resolve) => {
       try {
         /* UPDATE ORDER */
-        const state = NewsStateSingleton.stateByCod('confirm');
+        const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
 
         if (this.statusResponse.reject) {
           /* LOGIN  */
           const xAuth = await this.loginToRappi();
 
-          /* SEND CONFIRMED */
+          /* SEND REJECT */
           const options = {
             method: 'POST',
             headers: {
@@ -193,7 +195,7 @@ class Rappi extends Platform {
           const url = this.baseUrl + this.urlRejectOrders;
           const res = await axios.post(url, data, options);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);

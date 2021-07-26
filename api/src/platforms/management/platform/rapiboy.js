@@ -62,7 +62,7 @@ class Rapiboy extends Platform {
           const url = `${this.baseUrl}${this.urlConfirmed}`;
           const res = await axios.put(url, body, headers);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -99,7 +99,7 @@ class Rapiboy extends Platform {
           const url = `${this.baseUrl}${this.urlDispatched}`;
           const res = await axios.put(url, body, headers);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -136,7 +136,7 @@ class Rapiboy extends Platform {
           const url = `${this.baseUrl}${this.urlDelivered}`;
           const res = await axios.put(url, body, headers);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -176,7 +176,7 @@ class Rapiboy extends Platform {
           const url = `${this.baseUrl}${this.urlRejected}`;
           const res = await axios.put(url, body, headers);
           resolve(res.data);
-        } else resolve(this.doesNotApply);
+        } else resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
