@@ -17,6 +17,8 @@ describe('RAPPI - Test interface platform', function () {
     order: {
       id: '259777',
       totalValue: 210,
+      totalDiscounts: 0,
+      totalOrderValue: 210,
       createdAt: '2020-02-08 10:32:46',
       items: [
         {
@@ -93,6 +95,8 @@ describe('RAPPI - Test interface platform', function () {
     order: {
       id: '259777',
       totalValue: 210,
+      totalDiscounts: 0,
+      totalOrderValue: 210,
       createdAt: '2020-02-08 10:32:46',
       items: [
         {

@@ -68,6 +68,16 @@ const orders = [
     }
   }
 ];
+
+const statusResponse = {
+  receive: true,
+  view: true,
+  confirm: true,
+  dispatch: true,
+  delivery: true,
+  reject: true
+};
+
 const branches = [
   {
     smartfran_sw: {
@@ -239,7 +249,7 @@ describe('RAPPI management.', function () {
     });
   });
 
-  describe.only('fn(): getOrders()', function () {
+  describe('fn(): getOrders()', function () {
     it('should create an order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
@@ -369,6 +379,7 @@ describe('RAPPI management.', function () {
     it('should reject order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
+      rappi.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -402,6 +413,7 @@ describe('RAPPI management.', function () {
     it('should not reject order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
+      rappi.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -442,6 +454,7 @@ describe('RAPPI management.', function () {
     it('should reject when confirm order because can not login', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
+      rappi.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)

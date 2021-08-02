@@ -253,18 +253,25 @@ class PedidosYa extends Platform {
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
-        const msg = 'Failed to send the viewed status.';
-        const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
+        let msg = 'Failed to send the viewed status.';
+        new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
           orderId: order.id ? order.id.toString() : '-',
           branchId: order.branchId ? order.branchId.toString() : '-',
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
-
-        //Se envia de nuevo
-        await this._api.event.acknowledgement(order.id, idRef);
-
-        resolve(err);
+        try {
+          let res = await this._api.event.acknowledgement(order.id, idRef);
+          if (!res) res = true;
+          return resolve(res);
+        } catch (error) {
+          if (!error) error = '';
+          msg = 'Failed to send the viewed status. 2 intento';
+          const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
+            error: error.toString()
+          });
+          resolve(err);
+        }
       }
     });
   }
@@ -292,20 +299,30 @@ class PedidosYa extends Platform {
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
-        const msg = 'Failed to send the rejected status.';
-        const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
+        let msg = 'Failed to send the rejected status.';
+        new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
           orderId: order.id ? order.id.toString() : '-',
           branchId: order.branchId ? order.branchId.toString() : '-',
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
-        //Se envia de nuevo
-        if (order.preOrder || !order.ownDelivery) {
-          await this._api.order.confirm(order.id);
-        } else {
-          await this._api.order.confirm(order.id, deliveryTimeId);
+        try {
+          let res;
+          //Se envia de nuevo
+          if (order.preOrder || !order.ownDelivery) {
+            res = await this._api.order.confirm(order.id);
+          } else {
+            res = await this._api.order.confirm(order.id, deliveryTimeId);
+          }
+          resolve(res);
+        } catch (error) {
+          if (!error) error = '';
+          msg = 'Failed to send the rejected status. 2 intento';
+          const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
+            error: error.toString()
+          });
+          resolve(err);
         }
-        resolve(err);
       }
     });
   }
@@ -333,20 +350,30 @@ class PedidosYa extends Platform {
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
-        const msg = 'Failed to send the rejected status.';
-        const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
+        let msg = 'Failed to send the rejected status.';
+        new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
           orderId: order.id ? order.id.toString() : '-',
           branchId: order.branchId ? order.branchId.toString() : '-',
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
-        //Se envia de nuevo
-        await this._api.order.reject(
-          order.id,
-          rejectMessageId,
-          rejectMessageNote
-        );
-        resolve(err);
+
+        try {
+          //Se envia de nuevo
+          const res = await this._api.order.reject(
+            order.id,
+            rejectMessageId,
+            rejectMessageNote
+          );
+          resolve(res);
+        } catch (error) {
+          if (!error) error = '';
+          msg = 'Failed to send the rejected status. 2 intento';
+          const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
+            error: error.toString()
+          });
+          resolve(err);
+        }
       }
     });
   }
@@ -371,17 +398,31 @@ class PedidosYa extends Platform {
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
-        const msg = 'Failed to send the dispatched status.';
-        const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
+        let msg = 'Failed to send the dispatched status.';
+        new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
           orderId: order.id ? order.id.toString() : '-',
           branchId: order.branchId ? order.branchId.toString() : '-',
           platformId: order.platformId ? order.platformId.toString() : '-',
           error: error.toString()
         });
-        if (order.ownDelivery) {
-          await this._api.order.dispatch(order);
+
+        try {
+          if (order.ownDelivery) {
+            await this._api.order.dispatch(order);
+          }
+          let res = {};
+          if (order.ownDelivery) {
+            res = await this._api.order.dispatch(order);
+          }
+          return resolve(res);
+        } catch (error) {
+          if (!error) error = '';
+          msg = 'Failed to send the dispatched status. 2 intento';
+          const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
+            error: error.toString()
+          });
+          resolve(err);
         }
-        return resolve(err);
       }
     });
   }
@@ -414,7 +455,7 @@ class PedidosYa extends Platform {
         if (!error) error = '';
         const msg = 'Failed to call the heartbeat.';
         const err = new CustomError(APP_PLATFORM.HEARTBEAT, msg, this.uuid, {
-          branchId: branch.branchId,
+          branchId: branch ? branch.branchId : 'Sin branch',
           error: error.toString()
         });
         resolve(err);

@@ -154,7 +154,6 @@ class ThirdParty extends Platform {
   confirmOrder(order, deliveryTimeId) {
     return new Promise(async (resolve) => {
       try {
-        console.log('deliveryTimeId', deliveryTimeId);
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
         if (this.statusResponse.confirm) {

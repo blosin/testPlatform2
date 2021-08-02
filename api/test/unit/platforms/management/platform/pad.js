@@ -133,7 +133,14 @@ const platformThirdParty = {
   updatedAt: '2019-09-22T19:44:20.562Z',
   _id: '5d87cf149b0634004fd83c6d'
 };
-
+const statusResponse = {
+  receive: true,
+  view: true,
+  confirm: true,
+  dispatch: true,
+  delivery: true,
+  reject: true
+};
 const newOrders = [
   {
     thirdParty: platformThirdParty.name,
@@ -254,6 +261,7 @@ describe('PAD management.', function () {
     it('should confirm order correctly', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -281,6 +289,7 @@ describe('PAD management.', function () {
     it('should not confirm order correctly, but resolves', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -309,6 +318,7 @@ describe('PAD management.', function () {
       };
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -334,6 +344,7 @@ describe('PAD management.', function () {
     it('should dispatch order correctly', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -361,6 +372,7 @@ describe('PAD management.', function () {
     it('should not dispatchOrder order correctly, but resolves', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -386,6 +398,7 @@ describe('PAD management.', function () {
       const pad = new Pad();
       const codeError = { code: 1109, name: 'Sending dispatched status' };
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -411,6 +424,7 @@ describe('PAD management.', function () {
     it('should delivery order correctly', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -438,6 +452,7 @@ describe('PAD management.', function () {
     it('should not deliveryOrder order correctly, but resolves', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -468,6 +483,7 @@ describe('PAD management.', function () {
     it('should reject order correctly', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -495,6 +511,7 @@ describe('PAD management.', function () {
     it('should not reject order correctly, but resolves', async function () {
       const pad = new Pad();
       pad._platform = platformThirdParty;
+      pad.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)

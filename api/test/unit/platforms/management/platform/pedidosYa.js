@@ -27,7 +27,7 @@ const order = {
   pushed: false,
   express: false,
   preOrder: false,
-  ownDelivery:true,
+  ownDelivery: true,
   logistics: false,
   integrationCode: null,
   preparationTime: null,
@@ -166,7 +166,14 @@ const order = {
   ],
   attachments: []
 };
-
+const statusResponse = {
+  receive: true,
+  view: true,
+  confirm: true,
+  dispatch: true,
+  delivery: true,
+  reject: true
+};
 const branches = [
   {
     smartfran_sw: {
@@ -279,6 +286,7 @@ describe('PEDIDOSYA management.', function () {
     it('should init correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       const getOrdersStub = sandbox
         .stub(PedidosYa.prototype, 'getOrders')
         .returns();
@@ -291,6 +299,7 @@ describe('PEDIDOSYA management.', function () {
     it('should failed init by no credentials', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       delete py._platform.credentials;
       const getOrdersStub = sandbox
         .stub(PedidosYa.prototype, 'getOrders')
@@ -306,6 +315,7 @@ describe('PEDIDOSYA management.', function () {
     it('should init restaurant correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           initialization: () => Promise.resolve()
@@ -319,6 +329,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail init restaurant correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           initialization: () => Promise.reject('Can not init')
@@ -360,6 +371,7 @@ describe('PEDIDOSYA management.', function () {
       savedOrderStub.resolves(order);
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
 
       const saveNewOrdersStub = sandbox
         .stub(PedidosYa.prototype, 'saveNewOrders')
@@ -380,6 +392,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       stateByCodStub.withArgs(stateCod).returns(state);
       stateByCodStub.withArgs(confirmStateCod).returns(confirmState);
       stateByCodStub.withArgs(rejStateCod).returns(rejState);
@@ -450,6 +463,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           confirm: () => Promise.resolve('Ok')
@@ -480,6 +494,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           confirm: () => Promise.resolve('Ok')
@@ -508,12 +523,16 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
-          confirm: () => Promise.reject('Error+')
+          confirm: () => {
+            return Promise.reject('Error+');
+          }
         }
       };
-      const res = await py.confirmOrder(order, deliveryTimeId);
+      let res;
+      res = await py.confirmOrder(order, deliveryTimeId);
       expect(res.metadata.error).to.eql('Error+');
 
       expect(stateIdByCodStub.callCount).to.equal(1);
@@ -542,6 +561,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           reject: () => Promise.resolve(newOrders[0])
@@ -573,6 +593,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           reject: () => Promise.reject('Error+')
@@ -609,6 +630,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           dispatch: () => Promise.resolve(newOrders[0])
@@ -636,6 +658,7 @@ describe('PEDIDOSYA management.', function () {
 
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           dispatch: () => Promise.reject('Error+')
@@ -656,6 +679,7 @@ describe('PEDIDOSYA management.', function () {
     it('should receive order correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           reception: () => Promise.resolve('Receive')
@@ -673,6 +697,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail receiving an order', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           reception: () => Promise.reject('Receive')
@@ -695,6 +720,7 @@ describe('PEDIDOSYA management.', function () {
     it('should view order correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           acknowledgement: () => Promise.resolve('Viewed')
@@ -726,6 +752,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail viewing an order', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           acknowledgement: () => Promise.reject('Error+')
@@ -759,6 +786,7 @@ describe('PEDIDOSYA management.', function () {
     it('should call the heartbeat when the branch has pedidosYa', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         event: {
           heartBeat: () => Promise.reject('Error+')
@@ -773,7 +801,7 @@ describe('PEDIDOSYA management.', function () {
       expect(res.metadata.error).to.eql('Error+');
     });
 
-    it('should call the heartbeat when the branch has no pedidosYa', async function () {
+    it.only('should call the heartbeat when the branch has no pedidosYa', async function () {
       const py = new PedidosYa();
       py._platform = platform;
       py._api = {
@@ -817,6 +845,7 @@ describe('PEDIDOSYA management.', function () {
     it('should close the restaurant correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         restaurant: {
           close: () => Promise.resolve('Closed')
@@ -838,6 +867,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail closing the restaurant', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         restaurant: {
           close: () => Promise.reject('Closed')
@@ -871,6 +901,7 @@ describe('PEDIDOSYA management.', function () {
     it('should open the restaurant correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         restaurant: {
           open: () => Promise.resolve('Open')
@@ -887,6 +918,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail opening the restaurant', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         restaurant: {
           open: () => Promise.reject()
@@ -923,6 +955,7 @@ describe('PEDIDOSYA management.', function () {
     it('should retrive the order driver correctly', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           tracking: () => Promise.resolve(trackingPY)
@@ -936,6 +969,7 @@ describe('PEDIDOSYA management.', function () {
       trackingPY.name = undefined;
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           tracking: () => Promise.resolve(trackingPY)
@@ -949,6 +983,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail retriving an empty driver', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           tracking: () => Promise.resolve()
@@ -965,6 +1000,7 @@ describe('PEDIDOSYA management.', function () {
     it('should fail retriving the order driver', async function () {
       const py = new PedidosYa();
       py._platform = platform;
+      py.statusResponse = statusResponse;
       py._api = {
         order: {
           tracking: () => Promise.reject('')

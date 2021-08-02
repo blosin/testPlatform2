@@ -143,7 +143,14 @@ const newOrders = [
     order: orders[0]
   }
 ];
-
+const statusResponse = {
+  receive: true,
+  view: true,
+  confirm: true,
+  dispatch: true,
+  delivery: true,
+  reject: true
+};
 describe('Performance management.', function () {
   let stubLoggerFn;
   beforeEach(() => {
@@ -171,6 +178,7 @@ describe('Performance management.', function () {
     it('should confirm order correctly', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -193,6 +201,7 @@ describe('Performance management.', function () {
     it('should not confirm order correctly, but resolves', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -218,6 +227,7 @@ describe('Performance management.', function () {
     it('should dispatch order correctly', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -239,6 +249,7 @@ describe('Performance management.', function () {
     it('should not dispatchOrder order correctly, but resolves', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -263,6 +274,7 @@ describe('Performance management.', function () {
     it('should delivery order correctly', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)
@@ -285,6 +297,7 @@ describe('Performance management.', function () {
     it('should not deliveryOrder order correctly, but resolves', async function () {
       const performance = new Performance();
       performance._platform = platformThirdParty;
+      performance.statusResponse = statusResponse;
       const stateIdByCodStub = sandbox
         .stub(NewsStateSingleton, 'stateByCod')
         .withArgs(stateCod)

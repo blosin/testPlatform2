@@ -39,10 +39,9 @@
     },
     {
       "key": "Project",
-      "value": "Concentrador"
+      "value": "platform-service"
     }
   ],
   "family": "${SERVICE_NAME}-${BRANCH_NAME}-task",
-  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
-
+  "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
 }

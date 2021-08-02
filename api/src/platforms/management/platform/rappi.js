@@ -145,7 +145,6 @@ class Rappi extends Platform {
           };
           const url = this.baseUrl + this.urlConfirmOrders + order.id;
           const res = await axios.get(url, options);
-          console.log(res.data);
           resolve(true);
         } else resolve(false);
       } catch (error) {
