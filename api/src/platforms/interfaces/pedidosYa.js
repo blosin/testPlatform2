@@ -310,7 +310,8 @@ module.exports = {
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : ''
+            region: branch.address.region ? branch.address.region.region : '',
+            country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de PY.';

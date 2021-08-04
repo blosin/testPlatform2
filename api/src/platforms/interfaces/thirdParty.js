@@ -87,12 +87,14 @@ module.exports = {
 
       const extraDataMapper = (branch, platform) => {
         try {
+          console.log(branch);
           return {
             branch: branch.name,
             chain: branch.chain.chain,
             platform: platform.name,
             client: branch.client.businessName,
-            region: branch.address.region ? branch.address.region.region : ''
+            region: branch.address.region ? branch.address.region.region : '',
+            country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';

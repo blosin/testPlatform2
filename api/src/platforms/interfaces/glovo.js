@@ -55,9 +55,10 @@ module.exports = {
           const estimated_total_price = payment.estimated_total_price
             ? parseFloat(payment.estimated_total_price / 100)
             : 0;
-          const customer_cash_payment_amount = payment.customer_cash_payment_amount
-            ? parseFloat(payment.customer_cash_payment_amount / 100)
-            : 0;
+          const customer_cash_payment_amount =
+            payment.customer_cash_payment_amount
+              ? parseFloat(payment.customer_cash_payment_amount / 100)
+              : 0;
           const delivery_fee = payment.delivery_fee
             ? parseFloat(payment.delivery_fee / 100)
             : 0;
@@ -170,7 +171,8 @@ module.exports = {
           chain: branch.chain.chain,
           platform: platform.name,
           client: branch.client.businessName,
-          region: branch.address.region ? branch.address.region.region : ''
+          region: branch.address.region ? branch.address.region.region : '',
+          country: branch.address.country ? branch.address.country : ''
         };
         news.order = orderMapper(data, platform);
         news.order.details = detailsMapper(data.order);

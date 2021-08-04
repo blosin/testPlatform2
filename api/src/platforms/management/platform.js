@@ -598,7 +598,8 @@ class Platform {
           'platform.isActive': '$platforms.isActive',
           'client.businessName': '$joinClients.businessName',
           'address.region': '$joinRegions.region',
-          smartfran_sw: '$smartfran_sw'
+          smartfran_sw: '$smartfran_sw',
+          'address.country': '$address.country'
         }
       },
       {
