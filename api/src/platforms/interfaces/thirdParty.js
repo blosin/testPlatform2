@@ -87,7 +87,6 @@ module.exports = {
 
       const extraDataMapper = (branch, platform) => {
         try {
-          console.log(branch);
           return {
             branch: branch.name,
             chain: branch.chain.chain,

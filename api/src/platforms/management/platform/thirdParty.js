@@ -48,6 +48,7 @@ class ThirdParty extends Platform {
       this.statusResponse = this._platform.statusResponse
         ? this._platform.statusResponse
         : {};
+      this.autoReply = this._platform.autoReply;
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate ThirParty.';

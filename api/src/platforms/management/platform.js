@@ -516,11 +516,20 @@ class Platform {
           'platforms.platform': this._platform._id
         })
         .lean();
-
       if (!foundBranch) {
         const error = `The branch not exists. ${minOrders.branchReference}`;
         logger.error({ message: error, meta: { newOrder } });
         return reject({ error });
+      }
+      if (foundBranch.autoReply && this._platform.autoReply) {
+        this.saveNewOrdersAutomally(newOrder, foundBranch).then((res) => {
+          orderSaved = {
+            id: res.posId,
+            state: res.state,
+            branchId: res.order.branchId.toString()
+          };
+          return resolve(orderSaved);
+        });
       }
       this.saveNewOrders(newOrder)
         .then((res) => {
@@ -592,7 +601,6 @@ class Platform {
           'chain.chain': '$joinChains.chain',
           'platform.name': '$joinPlatforms.name',
           'platform.platform': '$joinPlatforms._id',
-          'platform.autoReply': '$joinPlatforms.autoReply',
           lastGetNews: '$lastGetNews',
           'platform.progClosed': '$platforms.progClosed',
           'platform.isActive': '$platforms.isActive',
@@ -621,7 +629,7 @@ class Platform {
         promiseNew,
         branch,
         isOpened;
-      let autoReply = false;
+
       const { posId, originalId, displayId, branchReference } =
         this.parser.retriveMinimunData(order);
       try {
@@ -633,21 +641,13 @@ class Platform {
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
 
-        if (
-          branch.platform.autoReply &&
-          (branch.branchId == 800000 || branch.branchId == 1) &&
-          (process.env.NODE_ENV === 'staging' ||
-            process.env.NODE_ENV === 'testing' ||
-            process.env.NODE_ENV === 'development')
-        )
-          autoReply = true;
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
             branch.platform,
             branch.lastGetNews
           );
-          if ((isOpened && branch.platform.isActive) || autoReply) {
+          if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
           } else {
@@ -679,27 +679,25 @@ class Platform {
             branch,
             this.uuid
           );
-          if (!autoReply) {
-            /* If restaurant is closed, mark the new as viewed. */
-            if (!isOpened) {
-              newCreator.viewed = new Date();
-              const rej = RejectedMessagesSingleton.closedResRejectedMessages;
-              newCreator.extraData.rejected = {
-                rejectMessageId: rej.id,
-                rejectMessageDescription: rej.name,
-                rejectMessageNote: null,
-                entity: 'CONCENTRADOR'
-              };
-            } else if (!branch.platform.isActive) {
-              newCreator.viewed = new Date();
-              const rej = RejectedMessagesSingleton.inactiveResRejectedMessages;
-              newCreator.extraData.rejected = {
-                rejectMessageId: rej.id,
-                rejectMessageDescription: rej.name,
-                rejectMessageNote: null,
-                entity: 'CONCENTRADOR'
-              };
-            }
+          /* If restaurant is closed, mark the new as viewed. */
+          if (!isOpened) {
+            newCreator.viewed = new Date();
+            const rej = RejectedMessagesSingleton.closedResRejectedMessages;
+            newCreator.extraData.rejected = {
+              rejectMessageId: rej.id,
+              rejectMessageDescription: rej.name,
+              rejectMessageNote: null,
+              entity: 'CONCENTRADOR'
+            };
+          } else if (!branch.platform.isActive) {
+            newCreator.viewed = new Date();
+            const rej = RejectedMessagesSingleton.inactiveResRejectedMessages;
+            newCreator.extraData.rejected = {
+              rejectMessageId: rej.id,
+              rejectMessageDescription: rej.name,
+              rejectMessageNote: null,
+              entity: 'CONCENTRADOR'
+            };
           }
           trace = newsModel.createTrace({
             typeId: newCreator.typeId,
@@ -756,17 +754,10 @@ class Platform {
           if (
             isOpened &&
             branch.platform.isActive &&
-            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24 &&
-            !autoReply
+            parseFloat(branch.smartfran_sw.agent.installedVersion) > 1.24
           ) {
             //Push all savedNews to the queue
             await this.aws.pushNewToQueue(savedNews);
-          }
-          if (autoReply) {
-            this.aws.pushAutoReplyToQueue(
-              savedNews._id.toString(),
-              branch.branchId.toString()
-            );
           }
         }
         return resolve(orderProccessed);
@@ -778,6 +769,107 @@ class Platform {
     });
   }
 
+  /**
+   *  Generate custom order and response automally.
+   *  Save them to database.
+   *  @param order  order received from the platform.
+   *   */
+  saveNewOrdersAutomally(order, branch) {
+    return new Promise(async (resolve, reject) => {
+      let orderProccessed, promiseOrder, promiseNew;
+
+      const { posId, originalId, displayId, branchReference } =
+        this.parser.retriveMinimunData(order);
+      try {
+        console.log(order);
+        let trace, stateCod, newsCode, orderCreator;
+
+        stateCod = 'pend';
+        newsCode = 'new_ord';
+
+        try {
+          orderCreator = {
+            thirdParty: this._platform.name,
+            internalCode: this._platform.internalCode,
+            state: order.state,
+            posId,
+            displayId,
+            originalId,
+            branchId: branch.branchId,
+            order
+          };
+          const newCreator = await this.parser.newsFromOrders(
+            orderCreator,
+            this._platform,
+            newsCode,
+            stateCod,
+            branch,
+            this.uuid
+          );
+          trace = newsModel.createTrace({
+            typeId: newCreator.typeId,
+            orderStatusId: newCreator.order.statusId
+          });
+          trace.entity = 'PLATFORM';
+          newCreator['traces'] = trace;
+          const orderQuery = {
+            internalCode: this._platform.internalCode,
+            originalId
+          };
+          const newsQuery = {
+            order: {
+              id: displayId,
+              platformId: this._platform.internalCode
+            }
+          };
+          const options = { new: true, upsert: true };
+          promiseOrder = orderModel.findOneAndUpdate(
+            orderQuery,
+            orderCreator,
+            options
+          );
+          promiseNew = newsModel.findOneAndUpdate(
+            newsQuery,
+            newCreator,
+            options
+          );
+          orderProccessed = orderCreator;
+        } catch (error) {
+          const msg = `News: ${originalId} can not be parsed correctly.`;
+          const err = logger.error({
+            message: msg,
+            meta: { error: error.toString() }
+          });
+          throw err;
+        }
+      } catch (error) {
+        reject({
+          orderId: originalId,
+          error: `Order: ${originalId} can not be proccessed correctly.`
+        });
+      }
+      /* Save all orders and news generated. */
+      try {
+        if (promiseNew) {
+          //Save all news
+          const [saveOrders, savedNews] = await Promise.all([
+            promiseOrder,
+            promiseNew
+          ]);
+
+          this.aws.pushAutoReplyToQueue(
+            savedNews._id.toString(),
+            branch.branchId.toString()
+          );
+        }
+        return resolve(orderProccessed);
+      } catch (error) {
+        const msg = `Failed to create orders.`;
+        logger.error({ message: msg, meta: error.toString() });
+        reject(msg);
+      }
+    });
+  }
   async updateRejectedMessage(rejectedMessages) {
     //Update all platform rejectedMessages to false
     await rejectedMessageModel.updateMany(

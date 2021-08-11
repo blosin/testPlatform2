@@ -4,7 +4,6 @@ import PlatformSingleton from '../utils/platforms';
 import UUID from '../utils/errors/utils';
 
 const setInstance = (req, res) => {
-  console.log(4444);
   initPlatform(req.body.platform);
 };
 
