@@ -1,7 +1,7 @@
 'use strict';
 import moment from 'moment';
 import cron from 'node-cron';
-import logger from '../../config/logger';
+import logger, { log } from '../../config/logger';
 import branchModel from '../../models/branch';
 import deliveryTimeModel from '../../models/deliveryTime';
 import newsModel from '../../models/news';
@@ -530,22 +530,23 @@ class Platform {
           };
           return resolve(orderSaved);
         });
-      }
-      this.saveNewOrders(newOrder)
-        .then((res) => {
-          if (!res) throw 'Orders could not been processed.';
+      } else {
+        this.saveNewOrders(newOrder)
+          .then((res) => {
+            if (!res) throw 'Orders could not been processed.';
 
-          if (foundBranch.branchId == res.order.branchId)
-            orderSaved = {
-              id: res.posId,
-              state: res.state,
-              branchId: res.order.branchId.toString()
-            };
-          return resolve(orderSaved);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+            if (foundBranch.branchId == res.order.branchId)
+              orderSaved = {
+                id: res.posId,
+                state: res.state,
+                branchId: res.order.branchId.toString()
+              };
+            return resolve(orderSaved);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      }
     });
   }
 

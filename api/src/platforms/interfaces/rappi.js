@@ -3,18 +3,55 @@ import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
 
+const paymentType = {
+  debit: {
+    paymentId: 1,
+    paymentName: 'Debit'
+  },
+  cc: {
+    paymentId: 2,
+    paymentName: 'Credit'
+  },
+  cash: {
+    paymentId: 3,
+    paymentName: 'Efectivo'
+  }
+};
+
 module.exports = {
   newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
+          const {
+            totalProducts,
+            tip,
+            whims,
+            totalRappiCredits,
+            totalDiscounts,
+            paymentMethod,
+            totalOrderValue,
+            totalValue
+          } = order.order;
           let paymentNews = {};
-          paymentNews.typeId = 2; //Credito
-          paymentNews.online = true;
-          paymentNews.shipping = 0;
-          paymentNews.discount = order.order.totalDiscounts;
+          paymentNews.typeId = paymentType[paymentMethod]
+            ? paymentType[paymentMethod].paymentId
+            : 2;
+          paymentNews.online = paymentNews.typeId !== 3;
+          //totalProducts + charges + tip + whims - totalRappiPay - totalDiscounts
+          paymentNews.shipping =
+            Math.round(
+              (totalOrderValue +
+                totalRappiCredits +
+                totalDiscounts -
+                totalProducts -
+                tip -
+                whims) *
+                10
+            ) / 10;
+          paymentNews.discount = totalDiscounts + totalRappiCredits;
           paymentNews.voucher = '';
-          paymentNews.subtotal = order.order.totalValue;
+          paymentNews.subtotal = totalValue + paymentNews.shipping;
           paymentNews.currency = '$';
           paymentNews.remaining = 0;
           paymentNews.partial = 0;
