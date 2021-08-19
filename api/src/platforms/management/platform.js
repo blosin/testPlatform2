@@ -12,6 +12,7 @@ import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import RejectedMessagesSingleton from '../../utils/rejectedMessages';
 import Aws from '../provider/aws';
+import orderFailedModel from '../../models/orderFailed';
 
 class Platform {
   constructor(platform) {
@@ -641,7 +642,6 @@ class Platform {
           });
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
-
         try {
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
@@ -738,6 +738,29 @@ class Platform {
           throw err;
         }
       } catch (error) {
+        const orderFailedCreator = {
+          thirdParty: this._platform.name,
+          internalCode: this._platform.internalCode,
+          state: order.state,
+          posId,
+          displayId,
+          originalId,
+          branchId: branch ? branch.branchId : null,
+          order
+        };
+        try {
+          const findOrder = await orderFailedModel.findOne({
+            internalCode: this._platform.internalCode,
+            originalId
+          });
+          if (!findOrder) await orderFailedModel.create(orderFailedCreator);
+        } catch (error) {
+          const msg = `OrderFailed: ${originalId} can not be parsed correctly.`;
+          logger.error({
+            message: msg,
+            meta: { error: error.toString() }
+          });
+        }
         reject({
           orderId: originalId,
           error: `Order: ${originalId} can not be proccessed correctly.`
