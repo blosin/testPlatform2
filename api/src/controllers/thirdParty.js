@@ -134,7 +134,7 @@ const cancelOrder = async (req, res) => {
 const findOrder = (req, res) => {
   const platform = initPlatform(req.token.internalCode, req.uuid);
   platform
-    .findOrder(parseInt(req.params.id, 10))
+    .findOrder(req.params.id, 10)
     .then((foundOrder) => res.status(200).send(foundOrder).end())
     .catch((error) => res.status(400).json(error).end());
 };
