@@ -277,8 +277,11 @@ module.exports = {
         news.order.driver = driverMapper(dataOrder);
         news.order.details = detailsMapper(dataOrder.order);
         news.extraData = extraDataMapper(branch, platform);
-
-        news.order.totalAmount = parseInt(dataOrder.order.totalOrderValue, 10);
+        //se resta tip para evitar errores de facturacion en sucirsales
+        news.order.totalAmount = parseInt(
+          dataOrder.order.totalOrderValue - dataOrder.order.tip,
+          10
+        );
         resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de Rappi.';
