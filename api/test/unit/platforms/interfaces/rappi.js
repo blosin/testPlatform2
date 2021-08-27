@@ -19,6 +19,10 @@ describe('RAPPI - Test interface platform', function () {
       totalValue: 210,
       totalDiscounts: 0,
       totalOrderValue: 210,
+      totalRappiCredits: 0,
+      totalProducts: 210,
+      tip: 0,
+      whims: 0,
       createdAt: '2020-02-08 10:32:46',
       items: [
         {
@@ -97,6 +101,10 @@ describe('RAPPI - Test interface platform', function () {
       totalValue: 210,
       totalDiscounts: 0,
       totalOrderValue: 210,
+      totalRappiCredits: 0,
+      totalProducts: 210,
+      tip: 0,
+      whims: 0,
       createdAt: '2020-02-08 10:32:46',
       items: [
         {
@@ -167,7 +175,8 @@ describe('RAPPI - Test interface platform', function () {
       chain: 'Grido',
       client: 'Perez Juan',
       platform: 'Rappi',
-      region: 'Noreste'
+      region: 'Noreste',
+      country: 'Argentina'
     },
     order: {
       id: 259777,
@@ -239,7 +248,8 @@ describe('RAPPI - Test interface platform', function () {
       chain: 'Grido',
       client: 'Perez Juan',
       platform: 'Rappi',
-      region: 'Noreste'
+      region: 'Noreste',
+      country: 'Argentina'
     }
   };
 
@@ -317,12 +327,16 @@ describe('RAPPI - Test interface platform', function () {
       chain: 'Grido',
       platform: 'Rappi',
       client: 'Perez Juan',
-      region: 'Noreste'
+      region: 'Noreste',
+      country: 'Argentina'
     }
   };
 
   const branch = {
-    address: { region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' } },
+    address: {
+      region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' },
+      country: 'Argentina'
+    },
     _id: '8c5e2eb8bc28c20a41e09282',
     name: 'Surcusal 19',
     branchId: 2,
@@ -447,7 +461,8 @@ describe('RAPPI - Test interface platform', function () {
           },
           branch: {
             address: {
-              region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' }
+              region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' },
+              country: 'Argentina'
             },
             _id: '8c5e2eb8bc28c20a41e09282',
             name: 'Surcusal 19',

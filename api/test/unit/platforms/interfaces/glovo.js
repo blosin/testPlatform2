@@ -79,7 +79,8 @@ const glovo_new = {
     chain: 'Grido',
     client: 'Perez Juan',
     platform: 'Glovo',
-    region: 'Noreste'
+    region: 'Noreste',
+    country: 'Argentina'
   },
   order: {
     customer: {
@@ -147,7 +148,13 @@ const platform = {
   id: '5d87cf649b0634004fd83c6e'
 };
 const branch = {
-  address: { region: { _id: 'de6916525f469e90351abf60', region: 'Noreste' } },
+  address: {
+    region: {
+      _id: 'de6916525f469e90351abf60',
+      region: 'Noreste'
+    },
+    country: 'Argentina'
+  },
   _id: '8c5e2eb8bc28c20a41e09282',
   name: 'Surcusal 15',
   branchId: 2,

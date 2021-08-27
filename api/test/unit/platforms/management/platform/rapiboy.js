@@ -598,6 +598,15 @@ describe('Rapiboy management.', function () {
         forRestaurant: true,
         forLogistics: true,
         forPickup: true
+      },
+      {
+        id: -4,
+        descriptionES: 'Orden rechazada por local inactivo',
+        descriptionPT: 'Orden rechazada por local inactivo',
+        forLogistics: true,
+        forPickup: true,
+        forRestaurant: true,
+        name: 'Orden rechazada por local inactivo'
       }
     ];
 

@@ -5,6 +5,7 @@ import logger from '../../../../src/config/logger';
 import newsModel from '../../../../src/models/news';
 import branchModel from '../../../../src/models/branch';
 import orderModel from '../../../../src/models/order';
+import orderFailed from '../../../../src/models/orderFailed';
 import Platform from '../../../../src/platforms/management/platform';
 import NewsStateSingleton from '../../../../src/utils/newsState';
 import NewsTypeSingleton from '../../../../src/utils/newsType';
@@ -1116,6 +1117,7 @@ describe('Platform', function () {
         displayId: 800000,
         branchReference: 800000
       });
+      sandbox.stub(orderFailed, 'findOne').rejects();
       try {
         await platformObj.saveNewOrders(thirdParty_orders);
       } catch (error) {
@@ -1228,6 +1230,8 @@ describe('Platform', function () {
         .withArgs(stateCod)
         .returns(state);
       sandbox.stub(thirdParty, 'newsFromOrders').rejects(newCreator);
+      sandbox.stub(orderFailed, 'findOne').resolves(true);
+      sandbox.stub(orderFailed, 'create').rejects();
 
       try {
         await platformObj.saveNewOrders(thirdParty_orders);
@@ -1381,6 +1385,16 @@ describe('Platform', function () {
         forLogistics: true,
         forPickup: true,
         platformId: 10
+      },
+      {
+        id: -4,
+        platformId: 10,
+        descriptionES: 'Orden rechazada por local inactivo',
+        descriptionPT: 'Orden rechazada por local inactivo',
+        forLogistics: true,
+        forPickup: true,
+        forRestaurant: true,
+        name: 'Orden rechazada por local inactivo'
       }
     ];
     it('should get Refect Messages', async function () {

@@ -801,7 +801,7 @@ describe('PEDIDOSYA management.', function () {
       expect(res.metadata.error).to.eql('Error+');
     });
 
-    it.only('should call the heartbeat when the branch has no pedidosYa', async function () {
+    it('should call the heartbeat when the branch has no pedidosYa', async function () {
       const py = new PedidosYa();
       py._platform = platform;
       py._api = {
