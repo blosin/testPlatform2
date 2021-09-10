@@ -34,10 +34,9 @@ module.exports = {
             totalValue
           } = order.order;
           let paymentNews = {};
-          paymentNews.typeId = paymentType[paymentMethod]
-            ? paymentType[paymentMethod].paymentId
-            : 2;
-          paymentNews.online = paymentNews.typeId !== 3;
+          //Se deja online ya que los pagos de rappi son siempre online
+          paymentNews.typeId = 2;
+          paymentNews.online = true;
           //totalProducts + charges + tip + whims - totalRappiPay - totalDiscounts
           paymentNews.shipping =
             Math.round(
