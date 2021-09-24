@@ -23,34 +23,17 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
-          const {
-            totalProducts,
-            tip,
-            whims,
-            totalRappiCredits,
-            totalDiscounts,
-            paymentMethod,
-            totalOrderValue,
-            totalValue
-          } = order.order;
+          const { totalProducts, totalRappiCredits, totalDiscounts } =
+            order.order;
           let paymentNews = {};
           //Se deja online ya que los pagos de rappi son siempre online
           paymentNews.typeId = 2;
           paymentNews.online = true;
           //totalProducts + charges + tip + whims - totalRappiPay - totalDiscounts
-          paymentNews.shipping =
-            Math.round(
-              (totalOrderValue +
-                totalRappiCredits +
-                totalDiscounts -
-                totalProducts -
-                tip -
-                whims) *
-                10
-            ) / 10;
+          paymentNews.shipping = 0;
           paymentNews.discount = totalDiscounts + totalRappiCredits;
           paymentNews.voucher = '';
-          paymentNews.subtotal = totalValue + paymentNews.shipping;
+          paymentNews.subtotal = totalProducts || 0;
           paymentNews.currency = '$';
           paymentNews.remaining = 0;
           paymentNews.partial = 0;
@@ -264,6 +247,8 @@ module.exports = {
       };
 
       try {
+        const { totalProducts, totalRappiCredits, totalDiscounts } =
+          data.order.order;
         let news = {};
         news.viewed = null;
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
@@ -277,11 +262,11 @@ module.exports = {
         news.order.details = detailsMapper(dataOrder.order);
         news.extraData = extraDataMapper(branch, platform);
         //se resta tip para evitar errores de facturacion en sucirsales
-        news.order.totalAmount = parseInt(
-          dataOrder.order.totalOrderValue - dataOrder.order.tip,
-          10
-        );
-        resolve(news);
+        (news.order.totalAmount =
+          totalProducts - (totalDiscounts + totalRappiCredits) > 0
+            ? totalProducts - (totalDiscounts + totalRappiCredits)
+            : 0),
+          resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de Rappi.';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
