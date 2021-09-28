@@ -72,7 +72,16 @@ module.exports = {
 
       const driverMapper = (order) => {
         try {
-          let driver = null;
+          let driver = {
+            latitud:
+              order.address && order.address.coordinates
+                ? order.address.coordinates.split(';')[0]
+                : '',
+            longitud:
+              order.address && order.address.coordinates
+                ? order.address.coordinates.split(';')[1]
+                : ''
+          };
           return driver;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
@@ -112,6 +121,7 @@ module.exports = {
           customer.name = order.user.name + ' ' + order.user.lastName;
           customer.address = order.address.description;
           customer.phone = order.address.phone;
+
           customer.id =
             !order.user.id ||
             order.user.id == 'null' ||

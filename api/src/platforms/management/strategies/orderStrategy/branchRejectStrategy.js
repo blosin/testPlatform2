@@ -61,6 +61,7 @@ class BranchRejectStrategy extends NewsTypeStrategy {
             this.newToSet.rejectMessageId,
             this.newToSet.rejectMessageNote
           );
+          this.requestLastMile(this.savedNew);
         }
         const { findQuery, updateQuery, options } = this.createObjectsUpdate(
           platformResult,
