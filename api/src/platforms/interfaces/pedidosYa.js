@@ -346,9 +346,6 @@ module.exports = {
           data.order.discounts,
           data.thirdParty
         );
-
-        if (data.order.restaurant.country.name != "Argentina")
-          news.order.payment.online = true
         news.order.driver = driverMapper(data.driver);
         news.extraData = extraDataMapper(branch, platform);
         news.order.totalAmount =

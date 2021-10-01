@@ -303,7 +303,8 @@ class ThirdParty extends Platform {
             const body = {
               Token: this.token,
               IdPedido: order.id,
-              IdMotivo: rejectMessageId
+              IdMotivo: rejectMessageId,
+              nota: rejectMessageNote ? rejectMessageNote : ''
             };
             const headers = {
               'Content-Type': 'application/json'
@@ -317,7 +318,8 @@ class ThirdParty extends Platform {
               url,
               {
                 IdPedido: order.id,
-                IdMotivo: rejectMessageId
+                IdMotivo: rejectMessageId,
+                nota: rejectMessageNote ? rejectMessageNote : ''
               },
               this.authData
             );
