@@ -55,6 +55,7 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
           platformResult = await this.platform.rejectPlatformOrder(
             this.savedNew.order.id
           );
+          this.requestLastMile(this.savedNew);
         }
         const { findQuery, updateQuery, options } = this.createObjectsUpdate(
           platformResult,

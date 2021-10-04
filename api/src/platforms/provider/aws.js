@@ -156,7 +156,6 @@ class Aws {
       attributeNames: ['All'],
       batchSize: 10,
       handleMessageBatch: async (messages) => {
-        console.log(messages);
         const newsForFilter = messages;
         const newsNoIds = newsForFilter.filter((n) => !JSON.parse(n.Body).id);
         const totalIds = newsForFilter

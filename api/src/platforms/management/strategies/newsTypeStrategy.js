@@ -134,7 +134,7 @@ class NewsTypeStrategy {
     });
   }
 
-  requestLastMile(order) {
+  requestLastMile(order, extra = {}) {
     try {
       const headers = {
         token: config.tokenStatic
@@ -145,9 +145,13 @@ class NewsTypeStrategy {
         id: order._id
       };
 
-      axios.post(config.apiUrlLastMile + '/delivery/setNews', data, {
-        headers
-      });
+      axios.post(
+        config.apiUrlLastMile + '/delivery/setNews',
+        { ...data, ...extra },
+        {
+          headers
+        }
+      );
     } catch (error) {
       console.log('No se pudo solicitar delivery.');
     }
