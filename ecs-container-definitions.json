@@ -1,18 +1,24 @@
 {
   "containerDefinitions": [
     {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/platform-service-production-task",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
       "portMappings": [
         {
-          "hostPort": 0,
+          "hostPort": 3087,
           "protocol": "tcp",
           "containerPort": 3087
         }
       ],
-      "cpu": 0,
-      "memory": 256,
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-2.4.0",
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-3.9.0",
       "essential": true,
-      "name": "platform-service-staging-container",
+      "name": "platform-service-production-container",
       "entryPoint": [
         "npm",
         "run"
@@ -23,25 +29,28 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "staging"
+          "value": "production"
         }
       ]
     }
   ],
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
   "tags": [
     {
-      "key": "Customer",
-      "value": "Smartfran"
-    },
-    {
       "key": "Environment",
-      "value": "staging"
+      "value": "Production"
     },
     {
       "key": "Project",
       "value": "platform-service"
     }
   ],
-  "family": "platform-service-staging-task",
+  "family": "platform-service-production-task",
   "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
 }
