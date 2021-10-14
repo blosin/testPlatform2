@@ -4,6 +4,8 @@ import PlatformSingleton from '../../../utils/platforms';
 import { APP_BRANCH, DB } from '../../../utils/errors/codeError';
 import CustomError from '../../../utils/errors/customError';
 const { ObjectId } = require('mongodb');
+import axios from 'axios';
+import config from '../../../config/env';
 
 class NewsTypeStrategy {
   constructor(newToSet) {
@@ -130,6 +132,29 @@ class NewsTypeStrategy {
         return reject(error);
       }
     });
+  }
+
+  requestLastMile(order, extra = {}) {
+    try {
+      const headers = {
+        token: config.tokenStatic
+      };
+      const data = {
+        typeId: this.typeId,
+        branchId: order.branchId,
+        id: order._id
+      };
+
+      axios.post(
+        config.apiUrlLastMile + '/delivery/setNews',
+        { ...data, ...extra },
+        {
+          headers
+        }
+      );
+    } catch (error) {
+      console.log('No se pudo solicitar delivery.');
+    }
   }
 }
 

@@ -49,6 +49,7 @@ class ConfirmStrategy extends NewsTypeStrategy {
             this.savedNew.order,
             this.newToSet.deliveryTimeId
           );
+          this.requestLastMile(this.savedNew);
         }
 
         const { findQuery, updateQuery, options } = this.createObjectsUpdate(
