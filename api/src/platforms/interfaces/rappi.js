@@ -29,9 +29,8 @@ module.exports = {
           //Se deja online ya que los pagos de rappi son siempre online
           paymentNews.typeId = 2;
           paymentNews.online = true;
-          //totalProducts + charges + tip + whims - totalRappiPay - totalDiscounts
           paymentNews.shipping = 0;
-          paymentNews.discount = totalDiscounts + totalRappiCredits;
+          paymentNews.discount = 0;
           paymentNews.voucher = '';
           paymentNews.subtotal = totalProducts || 0;
           paymentNews.currency = '$';
@@ -247,8 +246,7 @@ module.exports = {
       };
 
       try {
-        const { totalProducts, totalRappiCredits, totalDiscounts } =
-          data.order.order;
+        const { totalProducts } = data.order.order;
         let news = {};
         news.viewed = null;
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
@@ -262,11 +260,11 @@ module.exports = {
         news.order.details = detailsMapper(dataOrder.order);
         news.extraData = extraDataMapper(branch, platform);
         //se resta tip para evitar errores de facturacion en sucirsales
-        (news.order.totalAmount =
-          totalProducts - (totalDiscounts + totalRappiCredits) > 0
+        news.order.totalAmount = totalProducts;
+        /*  - (totalDiscounts + totalRappiCredits) > 0
             ? totalProducts - (totalDiscounts + totalRappiCredits)
-            : 0),
-          resolve(news);
+            : 0), */
+        resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de Rappi.';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
