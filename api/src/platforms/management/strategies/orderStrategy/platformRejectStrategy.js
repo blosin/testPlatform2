@@ -5,7 +5,6 @@ import news from '../../../../models/news';
 import NewsTypeSingleton from '../../../../utils/newsType';
 import Aws from '../../../../platforms/provider/aws';
 import branch from '../../../../models/branch';
-import PlatformController from '../../platform';
 
 class PlatformRejectStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -79,20 +78,12 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
         const searchBranch = (
           await branch.find({ branchId: this.savedNew.branchId }).lean()
         ).pop();
-        const platformController = new PlatformController();
-
-        const isOpened = await platformController.isClosedRestaurant(
-          searchBranch.platforms,
-          searchBranch.lastGetNews
-        );
 
         if (
-          isOpened &&
           searchBranch.platforms[0].isActive &&
           parseFloat(searchBranch.smartfran_sw.agent.installedVersion) > 1.24
         ) {
           result['viewed'] = null;
-          console.log(result);
           //Push all savedNews to the queue
           await aws.pushNewToQueue(result);
         }
