@@ -15,6 +15,7 @@ import Credentials from '../../sdk/pedidosYa/lib/http/Credentials';
 import ApiClient from '../../sdk/pedidosYa/lib/ApiClient';
 import PaginationOptions from '../../sdk/pedidosYa/lib/utils/PaginationOptions';
 import Environments from '../../sdk/pedidosYa/lib/http/Environments';
+import Aws from '../../../platforms/provider/aws';
 
 class PedidosYa extends Platform {
   constructor(platform) {
@@ -168,7 +169,7 @@ class PedidosYa extends Platform {
             rejectMessageNote: null,
             entity: 'PLATFORM'
           };
-          await this.updateNewsState(
+          const result = await this.updateNewsState(
             savedOrder.order,
             statusId,
             typeId,
@@ -176,6 +177,20 @@ class PedidosYa extends Platform {
             'PLATFORM',
             rejectedExtraData
           );
+          const aws = new Aws();
+
+          const searchBranch = (
+            await branchModel.find({ branchId: savedOrder.branchId }).lean()
+          ).pop();
+
+          if (
+            searchBranch.platforms[0].isActive &&
+            parseFloat(searchBranch.smartfran_sw.agent.installedVersion) > 1.24
+          ) {
+            result['viewed'] = null;
+            //Push all savedNews to the queue
+            await aws.pushNewToQueue(result);
+          }
         } catch (error) {
           throw error;
         }
