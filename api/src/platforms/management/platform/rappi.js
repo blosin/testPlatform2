@@ -145,7 +145,7 @@ class Rappi extends Platform {
 
         const response = await axios.get(url, options);
         let result, saved;
-        console.log('rappi', response.data);
+        console.log('rappi', JSON.stringify(response.data));
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
             this.saveNewOrders(data, this._platform)
@@ -192,13 +192,13 @@ class Rappi extends Platform {
           let url =
             process.env.NODE_ENV == 'produccion'
               ? this.baseUrl[order.country] +
-                this.urlConfirmOrders +
-                order.id +
-                '/take'
+              this.urlConfirmOrders +
+              order.id +
+              '/take'
               : 'https://microservices.dev.rappi.com' +
-                this.urlConfirmOrders +
-                order.id +
-                '/take';
+              this.urlConfirmOrders +
+              order.id +
+              '/take';
 
           const res = await axios.put(url, options);
           resolve(true);
@@ -245,13 +245,13 @@ class Rappi extends Platform {
           let url =
             process.env.NODE_ENV == 'produccion'
               ? this.baseUrl[order.country] +
-                this.urlRejectOrders +
-                order.id +
-                '/reject'
+              this.urlRejectOrders +
+              order.id +
+              '/reject'
               : 'https://microservices.dev.rappi.com' +
-                this.urlRejectOrders +
-                order.id +
-                '/reject';
+              this.urlRejectOrders +
+              order.id +
+              '/reject';
 
           const data = {
             reason: rejectDesc
