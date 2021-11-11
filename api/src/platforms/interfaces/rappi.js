@@ -23,7 +23,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
-      
+
           const { total_order, other_totals, total_products_with_discount } =
             order.order_detail.totals;
           let paymentNews = {};
@@ -69,7 +69,7 @@ module.exports = {
 
       const customerMapper = (client) => {
         try {
-         
+
           let customer = {};
           customer.id = client.id;
           customer.name = client.name;
@@ -102,7 +102,7 @@ module.exports = {
 
       const detailsMapper = (order) => {
         try {
-         
+
           let details = [];
           let numberOfPromotions = 1;
 
@@ -114,7 +114,7 @@ module.exports = {
               !!detail.products.length &&
               detail.type.trim().toLowerCase() == 'combo'
             ) {
-           
+
               let detHeader = {};
               // creating promo header
               detHeader.productId = parseInt(detail.sku, 10);
@@ -296,6 +296,7 @@ module.exports = {
       }
     });
   },
+
   retriveMinimunData: function (data) {
 
     return {
@@ -313,7 +314,8 @@ module.exports = {
     //   displayId: data.order.id.toString()
     // };
 
-
-
   }
 };
+
+
+
