@@ -40,10 +40,11 @@ class Rappi extends Platform {
       this.statusResponse = this._platform.statusResponse;
       this.clientId = this._platform.credentials.data.clientId;
       this.clientSecret = this._platform.credentials.data.clientSecret;
+      console.log(424,schedule) 
       cron.schedule(schedule, () => {
         this.uuid = UUID();
         this.loginGetOrders();
-      });
+    });
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate Rappi.';
@@ -99,27 +100,6 @@ class Rappi extends Platform {
       }
     });
   }
-  /* 
-  loginToRappi() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const url = this.baseUrl + this.urlLogin;
-        let response = await axios.post(url, {
-          token: this.token
-        });
-        if (!response) throw 'Can not login to rappi.';
-        this.updateLastContact();
-        resolve(response['headers']['x-auth-int']);
-      } catch (error) {
-        if (!error) error = '';
-        const msg = 'Failed to login.';
-        const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString()
-        });
-        reject(err);
-      }
-    });
-  } */
 
   /**
    * Find Rappi orders using the api.
@@ -189,6 +169,7 @@ class Rappi extends Platform {
               'x-authorization': 'bearer ' + xAuth
             }
           };
+          console.log("Countryy ",order);
           let url =
             process.env.NODE_ENV == 'produccion'
               ? this.baseUrl[order.country] +
@@ -199,6 +180,8 @@ class Rappi extends Platform {
               this.urlConfirmOrders +
               order.id +
               '/take';
+          
+          console.log("Url prod ",url);
 
           const res = await axios.put(url, options);
           resolve(true);
