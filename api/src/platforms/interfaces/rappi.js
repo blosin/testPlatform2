@@ -23,7 +23,6 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
-
           const { total_order, other_totals, total_products_with_discount } =
             order.order_detail.totals;
           let paymentNews = {};
@@ -32,7 +31,8 @@ module.exports = {
           paymentNews.online = true;
           //totalProducts + charges + tip + whims - totalRappiPay - total_products_with_discount
           paymentNews.shipping = 0;
-          paymentNews.discount = total_products_with_discount + other_totals.total_rappi_credits;
+          paymentNews.discount =
+            total_products_with_discount + other_totals.total_rappi_credits;
           paymentNews.voucher = '';
           paymentNews.subtotal = total_order || 0;
           paymentNews.currency = '$';
@@ -40,7 +40,6 @@ module.exports = {
           paymentNews.partial = 0;
           paymentNews.note = '';
           return paymentNews;
-
         } catch (error) {
           const msg = 'No se pudo parsear la orden de Rappi.1';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
@@ -57,7 +56,7 @@ module.exports = {
           let driver = null;
           return driver;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 2';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -69,18 +68,18 @@ module.exports = {
 
       const customerMapper = (client) => {
         try {
-
           let customer = {};
-          customer.id = client.id;
-          customer.name = client.name;
-          customer.address = client.address;
-          customer.phone = client.phone;
-          customer.email = client.email;
+
+          customer.id = client ? client.id : '-';
+          customer.name = client ? client.name : '-';
+          customer.address = client ? client.address : '-';
+          customer.phone = client ? client.phone : '-';
+          customer.email = client ? client.email : '-';
           customer.dni = null;
 
           return customer;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 3';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -94,7 +93,8 @@ module.exports = {
         if (
           (sku == null || sku.match(/[A-Za-z]/g) === null) &&
           sku != '9999' &&
-          sku != '999999'  && sku < 2147483647
+          sku != '999999' &&
+          sku < 2147483647
         )
           return true;
         return false;
@@ -102,10 +102,8 @@ module.exports = {
 
       const detailsMapper = (order) => {
         try {
-
           let details = [];
           let numberOfPromotions = 1;
-
 
           for (let detail of order.order_detail.items) {
             let det = {};
@@ -114,7 +112,6 @@ module.exports = {
               !!detail.products.length &&
               detail.type.trim().toLowerCase() == 'combo'
             ) {
-
               let detHeader = {};
               // creating promo header
               detHeader.productId = parseInt(detail.sku, 10);
@@ -196,9 +193,8 @@ module.exports = {
           }
 
           return details;
-
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 4';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -210,7 +206,6 @@ module.exports = {
 
       const orderMapper = (data, platform) => {
         try {
-
           let order = {};
           order.id = data.posId;
           order.originalId = data.originalId;
@@ -225,9 +220,8 @@ module.exports = {
           order.observations = '';
           order.ownDelivery = false;
           return order;
-
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 5';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -239,7 +233,6 @@ module.exports = {
 
       const extraDataMapper = (branch, platform) => {
         try {
-
           return {
             branch: branch.name,
             chain: branch.chain.chain,
@@ -249,7 +242,7 @@ module.exports = {
             country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 6';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -260,11 +253,11 @@ module.exports = {
       };
 
       try {
-
-
         const totalProducts = data.order.order_detail.items.quantity;
-        const totalRappiCredits = data.order.order_detail.totals.other_totals.total_rappi_credits;
-        const totalDiscounts = data.order.order_detail.totals.total_products_with_discount;
+        const totalRappiCredits =
+          data.order.order_detail.totals.other_totals.total_rappi_credits;
+        const totalDiscounts =
+          data.order.order_detail.totals.total_products_with_discount;
 
         let news = {};
         news.viewed = null;
@@ -274,7 +267,9 @@ module.exports = {
 
         news.order = orderMapper(data, platform);
         news.order.payment = paymentenMapper(dataOrder, data.thirdParty);
-        news.order.customer = customerMapper(dataOrder.order_detail.billing_information);
+        news.order.customer = customerMapper(
+          dataOrder.order_detail.billing_information
+        );
         news.order.driver = driverMapper(dataOrder);
         news.order.details = detailsMapper(dataOrder);
         news.extraData = extraDataMapper(branch, platform);
@@ -284,9 +279,8 @@ module.exports = {
             ? totalProducts - (totalDiscounts + totalRappiCredits)
             : 0),
           resolve(news);
-
       } catch (error) {
-        const msg = 'No se pudo parsear la orden de Rappi.';
+        const msg = 'No se pudo parsear la orden de Rappi. 7';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,
           branch,
@@ -298,7 +292,7 @@ module.exports = {
   },
 
   retriveMinimunData: function (data) {
-
+    console.log(343434, data);
     return {
       branchReference: data.store.external_id.toString(),
       posId: data.order_detail.order_id,
@@ -313,9 +307,5 @@ module.exports = {
     //   originalId: data.order.id.toString(),
     //   displayId: data.order.id.toString()
     // };
-
   }
 };
-
-
-

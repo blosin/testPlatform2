@@ -17,7 +17,7 @@ class Rappi extends Platform {
     this.urlRejectOrders =
       '/api/v2/restaurants-integrations-public-api/orders/';
     this.urlAuth =
-      process.env.NODE_ENV == 'produccion'
+      process.env.NODE_ENV == 'production'
         ? 'https://rests-integrations.auth0.com/oauth/token'
         : 'https://rests-integrations-dev.auth0.com/oauth/token';
 
@@ -40,11 +40,11 @@ class Rappi extends Platform {
       this.statusResponse = this._platform.statusResponse;
       this.clientId = this._platform.credentials.data.clientId;
       this.clientSecret = this._platform.credentials.data.clientSecret;
-      console.log(424,schedule) 
+      console.log(424, schedule);
       cron.schedule(schedule, () => {
         this.uuid = UUID();
         this.loginGetOrders();
-    });
+      });
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
       const msg = 'Can not initializate Rappi.';
@@ -79,8 +79,12 @@ class Rappi extends Platform {
           client_id: this.clientId,
           client_secret: this.clientSecret,
           grant_type: 'client_credentials',
-          audience: 'https://int-public-api-v2/api'
+          audience:
+            process.env.NODE_ENV == 'production'
+              ? 'https://services.rappi.com.ar/api/v2/restaurants-integrations-public-api'
+              : 'https://int-public-api-v2/api'
         };
+        console.log('payload rappi', payload);
         const config = {
           headers: {
             'Content-Type': 'application/json'
@@ -91,6 +95,7 @@ class Rappi extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
+        console.log('error token rappi', error);
         if (!error) error = '';
         const msg = 'Failed to login. Auth0 Rappi';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -117,7 +122,7 @@ class Rappi extends Platform {
         };
 
         let url =
-          process.env.NODE_ENV == 'produccion'
+          process.env.NODE_ENV == 'production'
             ? urlBase
             : 'https://microservices.dev.rappi.com';
 
@@ -140,6 +145,7 @@ class Rappi extends Platform {
         }
         resolve(result);
       } catch (error) {
+        console.log(3333, error);
         if (!error) error = '';
         const msg = 'Failed to get orders.';
         const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
@@ -169,19 +175,19 @@ class Rappi extends Platform {
               'x-authorization': 'bearer ' + xAuth
             }
           };
-          console.log("Countryy ",order);
+          console.log('Countryy ', order);
           let url =
-            process.env.NODE_ENV == 'produccion'
+            process.env.NODE_ENV == 'production'
               ? this.baseUrl[order.country] +
-              this.urlConfirmOrders +
-              order.id +
-              '/take'
+                this.urlConfirmOrders +
+                order.id +
+                '/take'
               : 'https://microservices.dev.rappi.com' +
-              this.urlConfirmOrders +
-              order.id +
-              '/take';
-          
-          console.log("Url prod ",url);
+                this.urlConfirmOrders +
+                order.id +
+                '/take';
+
+          console.log('Url prod ', url);
 
           const res = await axios.put(url, options);
           resolve(true);
@@ -226,15 +232,15 @@ class Rappi extends Platform {
           };
           /* SEND REJECT */
           let url =
-            process.env.NODE_ENV == 'produccion'
+            process.env.NODE_ENV == 'production'
               ? this.baseUrl[order.country] +
-              this.urlRejectOrders +
-              order.id +
-              '/reject'
+                this.urlRejectOrders +
+                order.id +
+                '/reject'
               : 'https://microservices.dev.rappi.com' +
-              this.urlRejectOrders +
-              order.id +
-              '/reject';
+                this.urlRejectOrders +
+                order.id +
+                '/reject';
 
           const data = {
             reason: rejectDesc
