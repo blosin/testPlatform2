@@ -166,33 +166,35 @@ class Rappi extends Platform {
       try {
         if (this.statusResponse.receive) {
           /* LOGIN  */
-          const xAuth = await this.loginToAuth0();
+        const xAuth = await this.loginToAuth0();
 
-          /* SEND CONFIRMED */
-          const options = {
-            headers: {
-              accept: 'application/json',
-              'x-authorization': 'bearer ' + xAuth
-            }
-          };
-          console.log('Countryy ', order);
-          let url =
-            process.env.NODE_ENV == 'production'
-              ? this.baseUrl[order.country] +
-                this.urlConfirmOrders +
-                order.id +
-                '/take'
-              : 'https://microservices.dev.rappi.com' +
-                this.urlConfirmOrders +
-                order.id +
-                '/take';
+        /* SEND CONFIRMED */
+        const options = {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-authorization': 'bearer ' + xAuth
+          }
+        };
+        console.log('Countryy ', order);
+        let url =
+          process.env.NODE_ENV == 'production'
+            ? this.baseUrl[order.country] +
+              this.urlConfirmOrders +
+              order.id +
+              '/take'
+            : 'https://microservices.dev.rappi.com' +
+              this.urlConfirmOrders +
+              order.id +
+              '/take';
 
-          console.log('Url prod ', url);
+        console.log('Url prod ', url);
+        console.log('Options prod ', options);
 
-          const res = await axios.put(url, options);
-          resolve(true);
-        } else resolve(false);
-      } catch (error) {
+        const res = await axios.put(url, {}, options);
+        resolve(true);
+      } else resolve(false);
+    } catch (error) {
+        console.log('error send rappi', error.response);
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
         if (!error) error = '';
@@ -226,7 +228,7 @@ class Rappi extends Platform {
 
           const options = {
             headers: {
-              accept: 'application/json',
+              'Content-Type': 'application/json',
               'x-authorization': 'bearer ' + xAuth
             }
           };
@@ -245,10 +247,11 @@ class Rappi extends Platform {
           const data = {
             reason: rejectDesc
           };
-          const res = await axios.post(url, data, options);
+          const res = await axios.put(url, data, options);
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        console.log('error rappi', error.response);
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
         if (!error) error = '';

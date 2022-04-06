@@ -23,8 +23,10 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
-          const { total_order, other_totals, total_products_with_discount } =
-            order.order_detail.totals;
+          const {
+            total_products_with_discount,
+            total_products_without_discount
+          } = order.order_detail.totals;
           let paymentNews = {};
           //Se deja online ya que los pagos de rappi son siempre online
           paymentNews.typeId = 2;
@@ -32,9 +34,10 @@ module.exports = {
           //totalProducts + charges + tip + whims - totalRappiPay - total_products_with_discount
           paymentNews.shipping = 0;
           paymentNews.discount =
-            total_products_with_discount + other_totals.total_rappi_credits;
+            total_products_with_discount -
+            total_products_without_discount
           paymentNews.voucher = '';
-          paymentNews.subtotal = total_order || 0;
+          paymentNews.subtotal = total_products_without_discount || 0;
           paymentNews.currency = '$';
           paymentNews.remaining = 0;
           paymentNews.partial = 0;
@@ -70,11 +73,11 @@ module.exports = {
         try {
           let customer = {};
 
-          customer.id = client ? client.id : '-';
-          customer.name = client ? client.name : '-';
-          customer.address = client ? client.address : '-';
-          customer.phone = client ? client.phone : '-';
-          customer.email = client ? client.email : '-';
+          customer.id = client ? client.id : 1;
+          customer.name = client ? client.name : 'Sin información';
+          customer.address = client ? client.address : 'Sin información';
+          customer.phone = client ? client.phone : 'Sin información';
+          customer.email = client ? client.email : 'Sin información';
           customer.dni = null;
 
           return customer;
@@ -106,42 +109,37 @@ module.exports = {
           let numberOfPromotions = 1;
 
           for (let detail of order.order_detail.items) {
-            let det = {};
-            if (
-              !!detail.products &&
-              !!detail.products.length &&
-              detail.type.trim().toLowerCase() == 'combo'
-            ) {
-              let detHeader = {};
-              // creating promo header
-              detHeader.productId = parseInt(detail.sku, 10);
-              detHeader.count = detail.quantity;
-              detHeader.price = parseFloat(detail.unit_price_with_discount);
-              detHeader.promo = 2;
-              detHeader.groupId = numberOfPromotions;
-              detHeader.discount = 0;
-              detHeader.description = detail.name;
-              detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
-              detHeader.note = detail.comments;
+            let detHeader = {};
+            // creating promo header
+            detHeader.productId = parseInt(detail.sku, 10);
+            detHeader.count = detail.quantity;
+            detHeader.price = parseFloat(detail.unit_price_with_discount);
+            detHeader.promo = 0;
+            detHeader.groupId = numberOfPromotions;
+            detHeader.discount = 0;
+            detHeader.description = detail.name;
+            detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
+            detHeader.note = detail.comments;
+            detHeader.optionalText = '';
 
-              details.push(detHeader);
-
-              //creating each of  of the promo
-              for (let product of detail.subitems) {
+            //creating each of  of the promo
+            for (let product of detail.subitems) {
+              if (product.unit_price_without_discount > 0) {
                 let detDetails = {};
                 detDetails.productId = parseInt(product.sku, 10);
-                detDetails.promo = 1;
+                detDetails.promo = 0;
                 detDetails.groupId = numberOfPromotions;
                 detDetails.description = product.name;
                 detDetails.sku = validationSKU(product.sku)
                   ? product.sku
                   : 99999;
-
+                detDetails.price = product.unit_price_with_discount;
+                detDetails.count = product.quantity;
                 let number = 0;
                 detDetails.optionalText = '';
 
-                if (!!product.toppings)
-                  for (let topping of product.toppings) {
+                if (!!product.subitems)
+                  for (let topping of product.subitems) {
                     /* If the product has an item with sku 99999. It's sku is inside toppings */
                     if (product.sku == '99999') {
                       detDetails.productId = parseInt(topping.sku, 10);
@@ -156,40 +154,13 @@ module.exports = {
                       detDetails.optionalText += ', ' + topping.name;
                     }
                   }
-
                 details.push(detDetails);
+              } else {
+                detHeader.optionalText += ', ' + product.name;
               }
-
-              numberOfPromotions += 1;
-            } else {
-              det.productId = parseInt(detail.sku, 10);
-              det.sku = validationSKU(detail.sku) ? detail.sku : 99999;
-              det.count = detail.quantity;
-              det.price = parseFloat(detail.unit_price_without_discount);
-              det.promo = 0;
-              det.groupId = '0';
-              det.discount = 0;
-              det.description = detail.name;
-              det.note = detail.comments;
-
-              let number = 0;
-              det.optionalText = '';
-              if (!!detail.toppings)
-                for (let topping of detail.toppings) {
-                  /* If the product has an item with sku 99999. It's sku is inside toppings */
-                  if (detail.sku == '99999') {
-                    det.productId = parseInt(topping.sku, 10);
-                    det.sku = validationSKU(topping.sku) ? topping.sku : 99999;
-                  }
-                  if (number == 0) {
-                    det.optionalText += topping.name;
-                    number += 1;
-                  } else {
-                    det.optionalText += ', ' + topping.name;
-                  }
-                }
-              details.push(det);
             }
+            details.push(detHeader);
+            numberOfPromotions += 1;
           }
 
           return details;
@@ -253,12 +224,6 @@ module.exports = {
       };
 
       try {
-        const totalProducts = data.order.order_detail.items.quantity;
-        const totalRappiCredits =
-          data.order.order_detail.totals.other_totals.total_rappi_credits;
-        const totalDiscounts =
-          data.order.order_detail.totals.total_products_with_discount;
-
         let news = {};
         news.viewed = null;
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
@@ -274,11 +239,9 @@ module.exports = {
         news.order.details = detailsMapper(dataOrder);
         news.extraData = extraDataMapper(branch, platform);
         //se resta tip para evitar errores de facturacion en sucirsales
-        (news.order.totalAmount =
-          totalProducts - (totalDiscounts + totalRappiCredits) > 0
-            ? totalProducts - (totalDiscounts + totalRappiCredits)
-            : 0),
-          resolve(news);
+        news.order.totalAmount =
+          data.order.order_detail.totals.total_products_with_discount;
+        resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de Rappi. 7';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
@@ -300,12 +263,5 @@ module.exports = {
       displayId: data.order_detail.order_id.toString()
     };
 
-    //Version raapi v1
-    // return {
-    //   branchReference: data.store.id.toString(),
-    //   posId: data.order.id,
-    //   originalId: data.order.id.toString(),
-    //   displayId: data.order.id.toString()
-    // };
   }
 };

@@ -652,7 +652,7 @@ class Platform {
             branch.platform,
             branch.lastGetNews
           );
-          console.log("opened?", isOpened);
+          console.log("opened?", isOpened,  branch.platform.isActive);
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
