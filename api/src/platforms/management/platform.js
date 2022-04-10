@@ -450,6 +450,7 @@ class Platform {
     @param branchPlatform 
     */
   isClosedRestaurant(branchPlatform, lastGetNew) {
+    console.log("ACA");
     return new Promise(async (resolve) => {
       try {
         const timeToClose = 3;
@@ -552,6 +553,7 @@ class Platform {
   }
 
   getOrderBranches(branchReference) {
+    console.log("branchreferences", branchReference);
     const query = {
       'platforms.platform': this._platform._id,
       'platforms.branchReference': branchReference.toString()
@@ -624,6 +626,7 @@ class Platform {
    *  @param order  order received from the platform.
    *   */
   saveNewOrders(order) {
+    console.log("Orden", order);
     return new Promise(async (resolve, reject) => {
       let orderProccessed,
         newProccessed,
@@ -641,6 +644,7 @@ class Platform {
             error: 'There is no branch for this order'
           });
         branch = branches[0];
+        console.log("branch", branch);
         let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
@@ -648,6 +652,7 @@ class Platform {
             branch.platform,
             branch.lastGetNews
           );
+          console.log("opened?", isOpened,  branch.platform.isActive);
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';

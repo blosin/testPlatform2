@@ -64,7 +64,7 @@ module.exports = {
         if (
           (sku == null || sku.match(/[A-Za-z]/g) === null) &&
           sku != '9999' &&
-          sku != '999999'
+          sku != '999999'  && sku < 2147483647
         )
           return true;
         return false;

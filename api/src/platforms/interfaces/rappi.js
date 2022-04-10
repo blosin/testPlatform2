@@ -23,23 +23,27 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const paymentenMapper = (order, thirdParty) => {
         try {
-          const { totalProducts, totalRappiCredits, totalDiscounts } =
-            order.order;
+          const {
+            total_products_with_discount,
+            total_products_without_discount
+          } = order.order_detail.totals;
           let paymentNews = {};
           //Se deja online ya que los pagos de rappi son siempre online
           paymentNews.typeId = 2;
           paymentNews.online = true;
+          //totalProducts + charges + tip + whims - totalRappiPay - total_products_with_discount
           paymentNews.shipping = 0;
-          paymentNews.discount = 0;
+          paymentNews.discount =
+            total_products_with_discount - total_products_without_discount;
           paymentNews.voucher = '';
-          paymentNews.subtotal = totalProducts || 0;
+          paymentNews.subtotal = total_products_without_discount || 0;
           paymentNews.currency = '$';
           paymentNews.remaining = 0;
           paymentNews.partial = 0;
           paymentNews.note = '';
           return paymentNews;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi.1';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -54,7 +58,7 @@ module.exports = {
           let driver = null;
           return driver;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 2';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -67,16 +71,17 @@ module.exports = {
       const customerMapper = (client) => {
         try {
           let customer = {};
-          customer.id = client.id;
-          customer.name = client.firstName + ' ' + client.lastName;
-          customer.address = client.address;
-          customer.phone = client.phone;
-          customer.email = client.email;
+
+          customer.id = client ? client.id : 1;
+          customer.name = client ? client.name : 'Sin información';
+          customer.address = client ? client.address : 'Sin información';
+          customer.phone = client ? client.phone : 'Sin información';
+          customer.email = client ? client.email : 'Sin información';
           customer.dni = null;
 
           return customer;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 3';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -90,7 +95,8 @@ module.exports = {
         if (
           (sku == null || sku.match(/[A-Za-z]/g) === null) &&
           sku != '9999' &&
-          sku != '999999'
+          sku != '999999' &&
+          sku < 2147483647
         )
           return true;
         return false;
@@ -100,18 +106,14 @@ module.exports = {
         try {
           let details = [];
           let numberOfPromotions = 1;
-          for (let detail of order.items) {
+          for (let detail of order.order_detail.items) {
             let det = {};
-            if (
-              !!detail.products &&
-              !!detail.products.length &&
-              detail.type.trim().toLowerCase() == 'combo'
-            ) {
+            if (detail.type.trim().toLowerCase() == 'combo') {
               let detHeader = {};
               // creating promo header
               detHeader.productId = parseInt(detail.sku, 10);
-              detHeader.count = detail.units;
-              detHeader.price = parseFloat(detail.price);
+              detHeader.count = detail.quantity;
+              detHeader.price = parseFloat(detail.unit_price_with_discount);
               detHeader.promo = 2;
               detHeader.groupId = numberOfPromotions;
               detHeader.discount = 0;
@@ -122,7 +124,7 @@ module.exports = {
               details.push(detHeader);
 
               //creating each of  of the promo
-              for (let product of detail.products) {
+              for (let product of detail.subitems) {
                 let detDetails = {};
                 detDetails.productId = parseInt(product.sku, 10);
                 detDetails.promo = 1;
@@ -158,8 +160,8 @@ module.exports = {
             } else {
               det.productId = parseInt(detail.sku, 10);
               det.sku = validationSKU(detail.sku) ? detail.sku : 99999;
-              det.count = detail.units;
-              det.price = parseFloat(detail.price);
+              det.count = detail.quantity;
+              det.price = parseFloat(detail.unit_price_with_discount);
               det.promo = 0;
               det.groupId = '0';
               det.discount = 0;
@@ -168,18 +170,53 @@ module.exports = {
 
               let number = 0;
               det.optionalText = '';
-              if (!!detail.toppings)
-                for (let topping of detail.toppings) {
+              if (!!detail.subitems)
+                for (let product of detail.subitems) {
                   /* If the product has an item with sku 99999. It's sku is inside toppings */
-                  if (detail.sku == '99999') {
-                    det.productId = parseInt(topping.sku, 10);
-                    det.sku = validationSKU(topping.sku) ? topping.sku : 99999;
-                  }
-                  if (number == 0) {
-                    det.optionalText += topping.name;
-                    number += 1;
+                  if (product.unit_price_without_discount > 0) {
+                    let detDetails = {};
+                    detDetails.productId = parseInt(product.sku, 10);
+                    detDetails.promo = 0;
+                    detDetails.groupId = numberOfPromotions;
+                    detDetails.description = product.name;
+                    detDetails.sku = validationSKU(product.sku)
+                      ? product.sku
+                      : 99999;
+                    detDetails.price = product.unit_price_with_discount;
+                    detDetails.count = product.quantity;
+                    let number = 0;
+                    detDetails.optionalText = '';
+
+                    if (!!product.subitems)
+                      for (let topping of product.subitems) {
+                        /* If the product has an item with sku 99999. It's sku is inside toppings */
+                        if (product.sku == '99999') {
+                          detDetails.productId = parseInt(topping.sku, 10);
+                          detDetails.sku = validationSKU(topping.sku)
+                            ? topping.sku
+                            : 99999;
+                        }
+                        if (number == 0) {
+                          detDetails.optionalText += topping.name;
+                          number += 1;
+                        } else {
+                          detDetails.optionalText += ', ' + topping.name;
+                        }
+                      }
+                    details.push(detDetails);
                   } else {
-                    det.optionalText += ', ' + topping.name;
+                    if (detail.sku == '99999') {
+                      det.productId = parseInt(product.sku, 10);
+                      det.sku = validationSKU(product.sku)
+                        ? product.sku
+                        : 99999;
+                    }
+                    if (number == 0) {
+                      det.optionalText += product.name;
+                      number += 1;
+                    } else {
+                      det.optionalText += ', ' + product.name;
+                    }
                   }
                 }
               details.push(det);
@@ -187,7 +224,7 @@ module.exports = {
           }
           return details;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 4';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -205,7 +242,7 @@ module.exports = {
           order.displayId = data.displayId;
           order.platformId = platform.internalCode;
           order.statusId = NewsStateSingleton.idByCod(stateCod);
-          order.orderTime = data.order.order.createdAt;
+          order.orderTime = data.order.order_detail.createdAt;
           order.deliveryTime = null;
           order.pickupOnShop = false;
           order.pickupDateOnShop = null;
@@ -214,7 +251,7 @@ module.exports = {
           order.ownDelivery = false;
           return order;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 5';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -235,7 +272,7 @@ module.exports = {
             country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de Rappi.';
+          const msg = 'No se pudo parsear la orden de Rappi. 6';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -246,7 +283,6 @@ module.exports = {
       };
 
       try {
-        const { totalProducts } = data.order.order;
         let news = {};
         news.viewed = null;
         news.typeId = NewsTypeSingleton.idByCod(newsCode);
@@ -255,18 +291,18 @@ module.exports = {
 
         news.order = orderMapper(data, platform);
         news.order.payment = paymentenMapper(dataOrder, data.thirdParty);
-        news.order.customer = customerMapper(dataOrder.client);
+        news.order.customer = customerMapper(
+          dataOrder.order_detail.billing_information
+        );
         news.order.driver = driverMapper(dataOrder);
-        news.order.details = detailsMapper(dataOrder.order);
+        news.order.details = detailsMapper(dataOrder);
         news.extraData = extraDataMapper(branch, platform);
         //se resta tip para evitar errores de facturacion en sucirsales
-        news.order.totalAmount = totalProducts;
-        /*  - (totalDiscounts + totalRappiCredits) > 0
-            ? totalProducts - (totalDiscounts + totalRappiCredits)
-            : 0), */
+        news.order.totalAmount =
+          data.order.order_detail.totals.total_products_with_discount;
         resolve(news);
       } catch (error) {
-        const msg = 'No se pudo parsear la orden de Rappi.';
+        const msg = 'No se pudo parsear la orden de Rappi. 7';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,
           branch,
@@ -276,12 +312,14 @@ module.exports = {
       }
     });
   },
+
   retriveMinimunData: function (data) {
+    console.log(343434, data);
     return {
-      branchReference: data.store.id.toString(),
-      posId: data.order.id,
-      originalId: data.order.id.toString(),
-      displayId: data.order.id.toString()
+      branchReference: data.store.external_id.toString(),
+      posId: data.order_detail.order_id,
+      originalId: data.order_detail.order_id.toString(),
+      displayId: data.order_detail.order_id.toString()
     };
   }
 };

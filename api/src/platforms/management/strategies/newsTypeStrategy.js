@@ -96,7 +96,8 @@ class NewsTypeStrategy {
               'order.branchId': '$branchId',
               branchId: '$branchId',
               'extraData.rejected': '$extraData.rejected',
-              traces: '$traces'
+              traces: '$traces',
+              'order.country': '$extraData.country'
             }
           },
           { $limit: 1 }

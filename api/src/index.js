@@ -9,7 +9,7 @@ import CustomError from './utils/errors/customError';
 import { CORE, DB } from './utils/errors/codeError';
 
 async function start() {
-  connectWithRetry();
+  await connectWithRetry();
   console.log(`\nDatabase connected.\t HOST: ${settings.database.host}.`);
 
   /* Do all stuff after connection */
@@ -24,7 +24,7 @@ const connectWithRetry = async function () {
   const connString =
     `mongodb+srv://${settings.database.username}:${settings.database.password}@${settings.database.host}/${settings.database.name}?retryWrites=true&w=majority`;
   try {
-    await mongoose
+   await mongoose
       .connect(connString, {
         useNewUrlParser: true,
         useFindAndModify: false,
