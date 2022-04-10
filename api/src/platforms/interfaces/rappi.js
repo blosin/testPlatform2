@@ -34,8 +34,7 @@ module.exports = {
           //totalProducts + charges + tip + whims - totalRappiPay - total_products_with_discount
           paymentNews.shipping = 0;
           paymentNews.discount =
-            total_products_with_discount -
-            total_products_without_discount
+            total_products_with_discount - total_products_without_discount;
           paymentNews.voucher = '';
           paymentNews.subtotal = total_products_without_discount || 0;
           paymentNews.currency = '$';
@@ -107,39 +106,39 @@ module.exports = {
         try {
           let details = [];
           let numberOfPromotions = 1;
-
           for (let detail of order.order_detail.items) {
-            let detHeader = {};
-            // creating promo header
-            detHeader.productId = parseInt(detail.sku, 10);
-            detHeader.count = detail.quantity;
-            detHeader.price = parseFloat(detail.unit_price_with_discount);
-            detHeader.promo = 0;
-            detHeader.groupId = numberOfPromotions;
-            detHeader.discount = 0;
-            detHeader.description = detail.name;
-            detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
-            detHeader.note = detail.comments;
-            detHeader.optionalText = '';
+            let det = {};
+            if (detail.type.trim().toLowerCase() == 'combo') {
+              let detHeader = {};
+              // creating promo header
+              detHeader.productId = parseInt(detail.sku, 10);
+              detHeader.count = detail.quantity;
+              detHeader.price = parseFloat(detail.unit_price_with_discount);
+              detHeader.promo = 2;
+              detHeader.groupId = numberOfPromotions;
+              detHeader.discount = 0;
+              detHeader.description = detail.name;
+              detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
+              detHeader.note = detail.comments;
 
-            //creating each of  of the promo
-            for (let product of detail.subitems) {
-              if (product.unit_price_without_discount > 0) {
+              details.push(detHeader);
+
+              //creating each of  of the promo
+              for (let product of detail.subitems) {
                 let detDetails = {};
                 detDetails.productId = parseInt(product.sku, 10);
-                detDetails.promo = 0;
+                detDetails.promo = 1;
                 detDetails.groupId = numberOfPromotions;
                 detDetails.description = product.name;
                 detDetails.sku = validationSKU(product.sku)
                   ? product.sku
                   : 99999;
-                detDetails.price = product.unit_price_with_discount;
-                detDetails.count = product.quantity;
+
                 let number = 0;
                 detDetails.optionalText = '';
 
-                if (!!product.subitems)
-                  for (let topping of product.subitems) {
+                if (!!product.toppings)
+                  for (let topping of product.toppings) {
                     /* If the product has an item with sku 99999. It's sku is inside toppings */
                     if (product.sku == '99999') {
                       detDetails.productId = parseInt(topping.sku, 10);
@@ -154,15 +153,75 @@ module.exports = {
                       detDetails.optionalText += ', ' + topping.name;
                     }
                   }
-                details.push(detDetails);
-              } else {
-                detHeader.optionalText += ', ' + product.name;
-              }
-            }
-            details.push(detHeader);
-            numberOfPromotions += 1;
-          }
 
+                details.push(detDetails);
+              }
+              numberOfPromotions += 1;
+            } else {
+              det.productId = parseInt(detail.sku, 10);
+              det.sku = validationSKU(detail.sku) ? detail.sku : 99999;
+              det.count = detail.quantity;
+              det.price = parseFloat(detail.unit_price_with_discount);
+              det.promo = 0;
+              det.groupId = '0';
+              det.discount = 0;
+              det.description = detail.name;
+              det.note = detail.comments;
+
+              let number = 0;
+              det.optionalText = '';
+              if (!!detail.subitems)
+                for (let product of detail.subitems) {
+                  /* If the product has an item with sku 99999. It's sku is inside toppings */
+                  if (product.unit_price_without_discount > 0) {
+                    let detDetails = {};
+                    detDetails.productId = parseInt(product.sku, 10);
+                    detDetails.promo = 0;
+                    detDetails.groupId = numberOfPromotions;
+                    detDetails.description = product.name;
+                    detDetails.sku = validationSKU(product.sku)
+                      ? product.sku
+                      : 99999;
+                    detDetails.price = product.unit_price_with_discount;
+                    detDetails.count = product.quantity;
+                    let number = 0;
+                    detDetails.optionalText = '';
+
+                    if (!!product.subitems)
+                      for (let topping of product.subitems) {
+                        /* If the product has an item with sku 99999. It's sku is inside toppings */
+                        if (product.sku == '99999') {
+                          detDetails.productId = parseInt(topping.sku, 10);
+                          detDetails.sku = validationSKU(topping.sku)
+                            ? topping.sku
+                            : 99999;
+                        }
+                        if (number == 0) {
+                          detDetails.optionalText += topping.name;
+                          number += 1;
+                        } else {
+                          detDetails.optionalText += ', ' + topping.name;
+                        }
+                      }
+                    details.push(detDetails);
+                  } else {
+                    if (detail.sku == '99999') {
+                      det.productId = parseInt(product.sku, 10);
+                      det.sku = validationSKU(product.sku)
+                        ? product.sku
+                        : 99999;
+                    }
+                    if (number == 0) {
+                      det.optionalText += product.name;
+                      number += 1;
+                    } else {
+                      det.optionalText += ', ' + product.name;
+                    }
+                  }
+                }
+              details.push(det);
+            }
+          }
           return details;
         } catch (error) {
           const msg = 'No se pudo parsear la orden de Rappi. 4';
@@ -262,6 +321,5 @@ module.exports = {
       originalId: data.order_detail.order_id.toString(),
       displayId: data.order_detail.order_id.toString()
     };
-
   }
 };

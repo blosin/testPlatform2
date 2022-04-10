@@ -5,7 +5,7 @@ CLUSTER=smartfran-pedidos-common
 SERVICE=${SERVICE_NAME}-${BRANCH_NAME}-service
 TASK=${SERVICE_NAME}-${BRANCH_NAME}-task
 
-export IMG_TAG=ps-2.9.0
+export IMG_TAG=ps-2.9.1
 export PROJ_IMG=smartfran/${SERVICE_NAME}
 export ECR_REPOSITORY=382381053403.dkr.ecr.us-east-2.amazonaws.com
 export PROFILE=smartfran
