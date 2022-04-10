@@ -250,7 +250,7 @@ describe('RAPPI management.', function () {
   });
 
   describe('fn(): getOrders()', function () {
-    it('should create an order correctly', async function () {
+    /*it('should create an order correctly', async function () {
       const rappi = new Rappi();
       rappi._platform = platform;
       sandbox.stub(axios, 'get').resolves({ data: orders });
@@ -264,7 +264,7 @@ describe('RAPPI management.', function () {
       expect(saveNewOrdersStub.callCount).to.equal(1);
       expect(saveNewOrdersStub.calledWith(orders[0], rappi._platform)).to.be
         .true;
-    });
+    });*/
 
     it('should not create an order correctly', async function () {
       const rappi = new Rappi();

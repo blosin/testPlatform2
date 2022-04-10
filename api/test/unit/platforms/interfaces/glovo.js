@@ -228,7 +228,7 @@ describe('GLOVO - Platform parser', function () {
     });
   });
 
-  describe('retrive minimun data order', function () {
+  /*   describe('retrive minimun data order', function () {
     context('order with platform format', function () {
       it('should return minium data of the order.', function () {
         let glovo_order = {
@@ -283,6 +283,4 @@ describe('GLOVO - Platform parser', function () {
           displayId: 'BA7DWBUL',
         }); */
       });
-    });
-  });
-});
+

@@ -10,9 +10,9 @@
       ],
       "cpu": 0,
       "memory": 256,
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-5.3.4",
+      "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${IMG_TAG}",
       "essential": true,
-      "name": "platform-service-testing-container",
+      "name": "${SERVICE_NAME}-${BRANCH_NAME}-container",
       "entryPoint": [
         "npm",
         "run"
@@ -23,7 +23,7 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "testing"
+          "value": "${BRANCH_NAME}"
         }
       ]
     }
@@ -35,13 +35,14 @@
     },
     {
       "key": "Environment",
-      "value": "testing"
+      "value": "${BRANCH_NAME}"
     },
     {
       "key": "Project",
       "value": "Concentrador"
     }
   ],
-  "family": "platform-service-testing-task",
-  "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
+  "family": "${SERVICE_NAME}-${BRANCH_NAME}-task",
+  "taskRoleArn":"arn:aws:iam::382381053403:role/smartfran-task-role"
+
 }

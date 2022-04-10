@@ -1,0 +1,56 @@
+{
+    "containerDefinitions": [
+      {
+        "logConfiguration": {
+          "logDriver": "awslogs",
+          "options": {
+            "awslogs-group": "/ecs/platform-service-production-task",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        },
+        "portMappings": [
+          {
+            "hostPort": 3087,
+            "protocol": "tcp",
+            "containerPort": 3087
+          }
+        ],
+        "image": "${ECR_REPOSITORY}/${PROJ_IMG}:${BUILD_TAG}",
+        "essential": true,
+        "name": "platform-service-production-container",
+        "entryPoint": [
+          "npm",
+          "run"
+        ],
+        "command": [
+          "serve"
+        ],
+        "environment": [
+          {
+            "name": "NODE_ENV",
+            "value": "production"
+          }
+        ]
+      }
+    ],
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role",
+    "tags": [
+      {
+        "key": "Environment",
+        "value": "Production"
+      },
+      {
+        "key": "Project",
+        "value": "platform-service"
+      }
+    ],
+    "family": "platform-service-production-task",
+    "taskRoleArn": "arn:aws:iam::382381053403:role/smartfran-task-role"
+  }

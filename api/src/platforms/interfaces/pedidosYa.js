@@ -271,7 +271,6 @@ module.exports = {
                         skuComparator = validationSKU(options.integrationCode)
                           ? options.integrationCode
                           : 99999;
-
                         optionsString += ' ' + options.name;
                       } else {
                         optionsString +=
