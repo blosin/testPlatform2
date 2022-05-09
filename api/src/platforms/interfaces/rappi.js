@@ -68,12 +68,16 @@ module.exports = {
         }
       };
 
-      const customerMapper = (client) => {
+      const customerMapper = (client, clientOption) => {
         try {
           let customer = {};
 
           customer.id = client ? client.id : 1;
-          customer.name = client ? client.name : 'Sin información';
+          customer.name = client
+            ? client.name
+            : clientOption
+            ? clientOption.first_name
+            : 'Sin información';
           customer.address = client ? client.address : 'Sin información';
           customer.phone = client ? client.phone : 'Sin información';
           customer.email = client ? client.email : 'Sin información';
@@ -292,7 +296,8 @@ module.exports = {
         news.order = orderMapper(data, platform);
         news.order.payment = paymentenMapper(dataOrder, data.thirdParty);
         news.order.customer = customerMapper(
-          dataOrder.order_detail.billing_information
+          dataOrder.order_detail.billing_information,
+          dataOrder.customer
         );
         news.order.driver = driverMapper(dataOrder);
         news.order.details = detailsMapper(dataOrder);

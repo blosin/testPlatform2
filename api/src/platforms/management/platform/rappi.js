@@ -31,16 +31,18 @@ class Rappi extends Platform {
     if (
       this._platform &&
       this._platform.credentials &&
-      this._platform.credentials.data &&
-      this._platform.credentials.data.token
+      this._platform.credentials.data
     ) {
-      this.token = this._platform.credentials.data.token;
       this.baseUrl = JSON.parse(this._platform.credentials.data.baseUrl);
       const schedule = this._platform.credentials.data.schedule;
       this.statusResponse = this._platform.statusResponse;
-      this.clientId = this._platform.credentials.data.clientId;
-      this.clientSecret = this._platform.credentials.data.clientSecret;
-      console.log(424, schedule);
+      this.clientId = JSON.parse(this._platform.credentials.data.clientId);
+      this.clientSecret = JSON.parse(
+        this._platform.credentials.data.clientSecret
+      );
+      this.audienceUrl = JSON.parse(
+        this._platform.credentials.data.audience
+      );
       cron.schedule(schedule, () => {
         this.uuid = UUID();
         this.loginGetOrders();
@@ -55,36 +57,36 @@ class Rappi extends Platform {
   }
 
   async loginGetOrders() {
-    this.loginToAuth0()
-      .then((xAuth) => {
-        for (const property in this.baseUrl) {
+    for (const property in this.baseUrl) {
+       this.loginToAuth0(property)
+        .then((xAuth) => {
           this.getOrders(xAuth, this.baseUrl[property]);
-        }
-      })
-      .catch((error) => {
-        if (!error) error = '';
-        const msg = 'Failed to login.';
-        new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
-          error: error.toString()
+        })
+
+        .catch((error) => {
+          if (!error) error = '';
+          const msg = 'Failed to login.';
+          new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
+            error: error.toString()
+          });
         });
-      });
+    }
   }
 
-  async loginToAuth0() {
+  async loginToAuth0(country) {
     return new Promise(async (resolve, reject) => {
       try {
         const url = this.urlAuth;
-
+        console.log("Country", country);
         const payload = {
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
+          client_id: this.clientId[country],
+          client_secret: this.clientSecret[country],
           grant_type: 'client_credentials',
           audience:
             process.env.NODE_ENV == 'production'
-              ? 'https://services.rappi.com.ar/api/v2/restaurants-integrations-public-api'
+              ? this.audienceUrl[country]
               : 'https://int-public-api-v2/api'
         };
-        console.log('payload rappi', payload);
         const config = {
           headers: {
             'Content-Type': 'application/json'
@@ -130,7 +132,7 @@ class Rappi extends Platform {
 
         const response = await axios.get(url, options);
         let result, saved;
-        console.log('rappi', JSON.stringify(response.data));
+        console.log(`rappi ${urlBase}`, JSON.stringify(response.data));
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
             this.saveNewOrders(data, this._platform)
@@ -166,34 +168,34 @@ class Rappi extends Platform {
       try {
         if (this.statusResponse.receive) {
           /* LOGIN  */
-        const xAuth = await this.loginToAuth0();
+          const xAuth = await this.loginToAuth0(order.country);
 
-        /* SEND CONFIRMED */
-        const options = {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-authorization': 'bearer ' + xAuth
-          }
-        };
-        console.log('Countryy ', order);
-        let url =
-          process.env.NODE_ENV == 'production'
-            ? this.baseUrl[order.country] +
-              this.urlConfirmOrders +
-              order.id +
-              '/take'
-            : 'https://microservices.dev.rappi.com' +
-              this.urlConfirmOrders +
-              order.id +
-              '/take';
+          /* SEND CONFIRMED */
+          const options = {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-authorization': 'bearer ' + xAuth
+            }
+          };
+          console.log('Countryy ', order);
+          let url =
+            process.env.NODE_ENV == 'production'
+              ? this.baseUrl[order.country] +
+                this.urlConfirmOrders +
+                order.id +
+                '/take'
+              : 'https://microservices.dev.rappi.com' +
+                this.urlConfirmOrders +
+                order.id +
+                '/take';
 
-        console.log('Url prod ', url);
-        console.log('Options prod ', options);
+          console.log('Url prod ', url);
+          console.log('Options prod ', options);
 
-        const res = await axios.put(url, {}, options);
-        resolve(true);
-      } else resolve(false);
-    } catch (error) {
+          const res = await axios.put(url, {}, options);
+          resolve(true);
+        } else resolve(false);
+      } catch (error) {
         console.log('error send rappi', error.response);
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
@@ -214,6 +216,7 @@ class Rappi extends Platform {
    *
    * @param {*} order
    * @override
+   * No se usa ya que la orden se confirma apenas ingresa
    */
   branchRejectOrder(order, rejectId, rejectDesc) {
     return new Promise(async (resolve) => {

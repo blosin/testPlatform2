@@ -1,5 +1,5 @@
 REGION=us-east-1
-export BUILD_TAG=ps-5.3.4
+export BUILD_TAG=ps-5.4.3
 export PROJ_IMG=smartfran/platform-service
 export ECR_REPOSITORY=382381053403.dkr.ecr.us-east-2.amazonaws.com
 export PROFILE=smartfran
