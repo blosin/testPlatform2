@@ -8,7 +8,12 @@ class Product {
     section,
     index,
     image,
-    price
+    price,
+    gtin,
+    requiresAgeCheck,
+    measurementUnit,
+    contentQuantity,
+    prescriptionBehaviour
   ) {
     this.id = id;
     this.name = name;
@@ -19,6 +24,11 @@ class Product {
     this.index = index;
     this.image = image;
     this.price = price;
+    this.gtin = gtin;
+    this.requiresAgeCheck = requiresAgeCheck;
+    this.measurementUnit = measurementUnit;
+    this.contentQuantity = contentQuantity;
+    this.prescriptionBehaviour = prescriptionBehaviour;
   }
 
   get id() {
@@ -91,6 +101,46 @@ class Product {
 
   set price(price) {
     this.price = price;
+  }
+
+  get gtin() {
+    return this.gtin;
+  }
+
+  set gtin(gtin) {
+    this.gtin = gtin;
+  }
+
+  get requiresAgeCheck() {
+    return this.requiresAgeCheck;
+  }
+
+  set requiresAgeCheck(requiresAgeCheck) {
+    this.requiresAgeCheck = requiresAgeCheck;
+  }
+
+  get measurementUnit() {
+    return this.measurementUnit;
+  }
+
+  set measurementUnit(measurementUnit) {
+    this.measurementUnit = measurementUnit;
+  }
+
+  get contentQuantity() {
+    return this.contentQuantity;
+  }
+
+  set contentQuantity(contentQuantity) {
+    this.contentQuantity = contentQuantity;
+  }
+
+  get prescriptionBehaviour() {
+    return this.prescriptionBehaviour;
+  }
+
+  set prescriptionBehaviour(prescriptionBehaviour) {
+    this.prescriptionBehaviour = prescriptionBehaviour;
   }
 }
 

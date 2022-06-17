@@ -82,10 +82,7 @@ class Rappi extends Platform {
           client_id: this.clientId[country],
           client_secret: this.clientSecret[country],
           grant_type: 'client_credentials',
-          audience:
-            process.env.NODE_ENV == 'production'
-              ? this.audienceUrl[country]
-              : 'https://int-public-api-v2/api'
+          audience: this.audienceUrl[country]
         };
         const config = {
           headers: {
@@ -123,16 +120,11 @@ class Rappi extends Platform {
           }
         };
 
-        let url =
-          process.env.NODE_ENV == 'production'
-            ? urlBase
-            : 'https://microservices.dev.rappi.com';
-
-        url += this.urlGetOrders;
+        let url = urlBase + this.urlGetOrders;
 
         const response = await axios.get(url, options);
         let result, saved;
-        console.log(`rappi ${urlBase}`, JSON.stringify(response.data));
+        console.log(`rappi ${url}`, JSON.stringify(response.data));
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
             this.saveNewOrders(data, this._platform)

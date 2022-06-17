@@ -8,7 +8,7 @@ const Ensure = require('../helpers/Ensure');
  */
 class EventsClient {
   static _version() {
-    return '1.6.0';
+    return '1.8.2';
   }
 
   /**

@@ -1,6 +1,5 @@
 const MenuItemClient = require('../clients/MenuItemClient');
 const Ensure = require('../helpers/Ensure');
-
 /**
  * @class ProductsClient
  */
@@ -11,63 +10,91 @@ class ProductsClient extends MenuItemClient {
    */
   constructor(connection) {
     Ensure.argumentNotNull(connection, 'connection');
-    super(connection, 'products');
+    super(connection, 'product');
   }
 
-  /**
-   * Enable the product with the specified code
-   * @param integrationCode code of the product to be enabled
-   * @param restaurant restaurant id or restaurant code when using centralized keys
-   * @return {bool} if the product was enabled
-   * @throws ApiException if some error has occurred
-   */
-  async enable(integrationCode, restaurant = null) {
-    return super.enable(integrationCode, restaurant);
+  async _getByName(menuItem, restaurant) {
+    throw new Error('This operation is not allowed');
   }
 
-  /**
-   * Disable the product with the specified code
-   * @param integrationCode code of the product to be disabled
-   * @param restaurant restaurant id or restaurant code when using centralized keys
-   * @return {bool} if the product was disabled
-   * @throws ApiException if some error has occurred
-   */
-  async disable(integrationCode, restaurant = null) {
-    return super.disable(integrationCode, restaurant);
+  async _getItemPayload(menuItem, restaurantId) {
+    return this._productPayload(menuItem, restaurantId);
   }
 
-  /**
-   * Update the price of the product with the specified code
-   * @param integrationCode code of the product to be updated
-   * @param price new price of the product
-   * @param restaurant restaurant id or restaurant code when using centralized keys
-   * @return {bool} if the product was disabled
-   * @throws ApiException if some error has occurred
-   */
-  async price(integrationCode, price, restaurant = null) {
-    return super.price(integrationCode, price, restaurant);
+  async _getItemRoute() {
+    return 'product';
   }
 
-  /**
-   * Create the product with the specified restaurant code/id
-   * @param product new product to be created
-   * @param restaurant restaurant code or restaurant id when using centralized keys
-   * @return {bool} if the product was created
-   * @throws ApiException if some error has occurred
-   */
-  async create(product, restaurant = null) {
-    return super.create(product, restaurant);
+  async _getItemsRoute(product) {
+    return 'product/sectionIntegrationCode/' + product.section.integrationCode;
   }
 
-  /**
-   * Modify the product with the specified restaurant code/id
-   * @param product new product to be modified
-   * @param restaurant restaurant code or restaurant id when using centralized keys
-   * @return {bool} if the product was created
-   * @throws ApiException if some error has occurred
-   */
-  async modify(product, restaurant = null) {
-    return super.modify(product, restaurant);
+  async _getAllSchedules(scheduleItem, restaurantId) {
+    throw new Error('This operation is not allowed');
+  }
+
+  async _createSchedule(scheduleItem, restaurantId) {
+    throw new Error('This operation is not allowed');
+  }
+
+  async _deleteSchedule(scheduleItem, restaurantId) {
+    throw new Error('This operation is not allowed');
+  }
+
+  async _productPayload(product, restaurantId) {
+    let newProduct = { section: {} };
+
+    if (product !== null) {
+      if (product.section !== null) {
+        if (product.section.integrationCode !== null) {
+          newProduct.section.integrationCode = product.section.integrationCode;
+        }
+        if (product.section.name !== null) {
+          newProduct.section.name = product.section.name;
+        }
+      }
+      if (product.integrationCode !== null) {
+        newProduct.integrationCode = product.integrationCode;
+      }
+      if (product.gtin !== null) {
+        newProduct.gtin = product.gtin;
+      }
+      if (product.integrationName !== null) {
+        newProduct.integrationName = product.integrationName;
+      }
+      if (product.name !== null) {
+        newProduct.name = product.name;
+      }
+      if (product.index !== null) {
+        newProduct.index = product.index;
+      }
+      if (product.price !== null) {
+        newProduct.price = product.price;
+      }
+      if (product.enabled !== null) {
+        newProduct.enabled = product.enabled;
+      }
+      if (product.image !== null) {
+        newProduct.image = product.image;
+      }
+      if (product.description !== null) {
+        newProduct.description = product.description;
+      }
+      if (product.requiresAgeCheck !== null) {
+        newProduct.requiresAgeCheck = product.requiresAgeCheck;
+      }
+      if (product.measurementUnit !== null) {
+        newProduct.measurementUnit = product.measurementUnit;
+      }
+      if (product.contentQuantity !== null) {
+        newProduct.contentQuantity = product.contentQuantity;
+      }
+      if (product.prescriptionBehaviour !== null) {
+        newProduct.prescriptionBehaviour = product.prescriptionBehaviour;
+      }
+    }
+
+    return newProduct;
   }
 }
 module.exports = ProductsClient;

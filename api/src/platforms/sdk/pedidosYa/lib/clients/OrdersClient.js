@@ -343,5 +343,103 @@ class OrdersClient {
   get rejectMessage() {
     return this._rejectMessage;
   }
+
+  async getTaxes(productIntegrationCodes, restaurantId) {
+    try {
+      let request = new Request();
+      request.endpoint = this._connection._ismsUrl() + 'v1/product/taxes';
+      request.body = JSON.stringify(productIntegrationCodes);
+      request.headers = Object.assign(request.headers, {
+        'Peya-Partner-Id': restaurantId
+      });
+      let response = await this._connection.post(request);
+      if (response.statusCode === 200) {
+        return response.body.data;
+      }
+      throw ApiException.buildFromResponse(response);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw error;
+      }
+      throw new ApiException(error.message);
+    }
+  }
+
+  async reconcile(reconciliation, restaurantId) {
+    Ensure.argumentNotNull(reconciliation, 'reconciliation');
+    Ensure.greaterThanZero(restaurantId, 'restaurantId');
+    try {
+      let request = new Request();
+      request.endpoint = `${this._connection._iosUrl()}v1/orders/${
+        reconciliation.id
+      }/reconcile`;
+      request.headers = Object.assign(request.headers, {
+        'Peya-Partner-Id': restaurantId,
+        'Peya-Reception-System-Code': this._connection.credentials.clientId
+      });
+      request.timeout = 1000000;
+      let body = await JSON.stringify(reconciliation);
+      request.body = body;
+      let response = await this._connection.post(request);
+      if (response.statusCode === 200) {
+        return response.body;
+      }
+      throw ApiException.buildFromResponse(response);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw error;
+      }
+      throw new ApiException(error.message);
+    }
+  }
+
+  async checkout(orderId, restaurantId) {
+    Ensure.greaterThanZero(orderId, 'orderId');
+    Ensure.greaterThanZero(restaurantId, 'orderId');
+    try {
+      let request = new Request();
+      request.endpoint = `${this._connection._iosUrl()}v1/orders/${orderId}/checkout`;
+      request.headers = Object.assign(request.headers, {
+        'Peya-Partner-Id': restaurantId,
+        'Peya-Reception-System-Code': this._connection.credentials.clientId
+      });
+      request.timeout = 1000000;
+      let response = await this._connection.post(request);
+      if (response.statusCode === 200) {
+        return response.body;
+      }
+      throw ApiException.buildFromResponse(response);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw error;
+      }
+      throw new ApiException(error.message);
+    }
+  }
+
+  async foodIsReady(orderId, restaurantId) {
+    Ensure.greaterThanZero(orderId, 'orderId');
+    Ensure.greaterThanZero(restaurantId, 'restaurantId');
+    try {
+      let request = new Request();
+      request.endpoint = `${this._connection._iosUrl()}v1/orders/${orderId}/preparation-completion`;
+      request.headers = Object.assign(request.headers, {
+        'Peya-Partner-Id': restaurantId,
+        'Peya-Reception-System-Code': this._connection.credentials.clientId
+      });
+      request.timeout = 100000;
+      let response = await this._connection.post(request);
+      if (response.statusCode === 200) {
+        return response.body;
+      }
+      throw ApiException.buildFromResponse(response);
+    } catch (error) {
+      if (error instanceof ApiException) {
+        throw error;
+      }
+      throw new ApiException(error.message);
+    }
+  }
 }
+
 module.exports = OrdersClient;

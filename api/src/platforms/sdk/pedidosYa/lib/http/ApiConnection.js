@@ -25,10 +25,20 @@ class ApiConnection {
     this._tokenAge = null;
     this._tokenTimeout = 60;
     this._credentials = credentials;
+    this._restaurantId = null;
+    this._iSmSurl = this._ismsUrl();
   }
 
   get credentials() {
     return this._credentials;
+  }
+
+  get restaurantId() {
+    return this._restaurantId;
+  }
+
+  get iSmSurl() {
+    return this._iSmSurl;
   }
 
   /**
@@ -41,6 +51,8 @@ class ApiConnection {
     try {
       await this._doAuthenticate();
       request.headers.Authorization = this._token;
+      let encode = encodeURI(request.endpoint);
+      request.endpoint = encode;
       let response = await this._connection.get(request);
       if (response.statusCode === 403) {
         this._invalidateCredentials();
@@ -61,6 +73,9 @@ class ApiConnection {
     try {
       await this._doAuthenticate();
       request.headers.Authorization = this._token;
+      request.headers = Object.assign(request.headers, {
+        'Content-Type': 'application/json;charset=UTF-8'
+      });
       let response = await this._connection.post(request);
       if (response.statusCode === 403) {
         this._invalidateCredentials();
@@ -81,7 +96,33 @@ class ApiConnection {
     try {
       await this._doAuthenticate();
       request.headers.Authorization = this._token;
+      request.headers = Object.assign(request.headers, {
+        'Content-Type': 'application/json;charset=UTF-8'
+      });
       let response = await this._connection.put(request);
+      if (response.statusCode === 403) {
+        this._invalidateCredentials();
+      }
+      return response;
+    } catch (error) {
+      throw new ApiException(500, 0, error);
+    }
+  }
+
+  /**
+   * Call a generic Api PUT
+   * @param {Request} Request object
+   * @return {Response} Response object
+   * @throws {ApiException}
+   */
+  async delete(request) {
+    try {
+      await this._doAuthenticate();
+      request.headers.Authorization = this._token;
+      request.headers = Object.assign(request.headers, {
+        'Content-Type': 'application/json;charset=UTF-8'
+      });
+      let response = await this._connection.delete(request);
       if (response.statusCode === 403) {
         this._invalidateCredentials();
       }
@@ -107,6 +148,7 @@ class ApiConnection {
 
       let accessKey = 'access';
       let tokenKey = 'token';
+      let restaurantKey = 'restaurant';
 
       let body = {
         client_id: clientId,
@@ -125,6 +167,7 @@ class ApiConnection {
       if (response.statusCode === 200) {
         let json = response.body;
         let access = json[accessKey];
+        let restaurant = json[restaurantKey];
         let push = access.push;
         let pushAvailable = push.available;
 
@@ -134,6 +177,9 @@ class ApiConnection {
           this._credentials.orderSecretKey = push.keySecret;
           this._credentials.regionEndpoint = push.region;
           this._credentials.queueName = push.queueName;
+        }
+        if (!(username === null && password === null)) {
+          this._restaurantId = restaurant.id;
         }
         this._token = access[tokenKey];
         this._tokenAge = moment();
@@ -177,5 +223,23 @@ class ApiConnection {
     }
     return 'https://' + prefix + 'orders-api.pedidosya.com/v3/';
   }
+
+  _ismsUrl() {
+    let prefix = 'live';
+    if (this._credentials.environment !== Environments.PRODUCTION) {
+      prefix = 'stg';
+      return 'https://' + prefix + '-management-api.pedidosya.com/self-management/';
+    }
+    return 'https://management-api.pedidosya.com/self-management/';
+  }
+
+  _iosUrl() {
+    let prefix = 'live'
+    if (this._credentials.environment !== Environments.PRODUCTION) {
+      prefix = 'stg'
+      return `https://${prefix}-management-api.pedidosya.com/integrations-order/`
+    }
+    return 'https://management-api.pedidosya.com/integrations-order/'
+  }
 }
-module.exports = ApiConnection;
+module.exports = ApiConnection

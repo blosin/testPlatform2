@@ -72,6 +72,24 @@ class Connection {
     }
   }
 
+  /**
+   * Call a generic HTTP DELETE
+   * @param {Request} request
+   * @return {Response} response
+   */
+  async delete(request) {
+    try {
+      let httpClient = this._buildHttpClient(request);
+      const restResponse = await httpClient.delete(request.endpoint, request.body);
+      return this._buildResponse(restResponse);
+    } catch (error) {
+      if (error.response) {
+        return this._buildResponse(error.response);
+      }
+      throw new Error(error.message);
+    }
+  }
+
   _buildResponse(restResponse) {
     let response = new Response();
     response.content = JSON.stringify(restResponse.data);
@@ -85,7 +103,8 @@ class Connection {
       baseURL: this._baseUrl,
       timeout: request.timeout,
       headers: request.headers,
-      params: request.parameters
+      params: request.parameters,
+      data: request.body
     });
   }
 }
