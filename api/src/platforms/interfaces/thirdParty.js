@@ -64,7 +64,8 @@ module.exports = {
         if (
           (sku == null || sku.match(/[A-Za-z]/g) === null) &&
           sku != '9999' &&
-          sku != '999999'  && sku < 2147483647
+          sku != '999999' &&
+          sku < 2147483647
         )
           return true;
         return false;
@@ -158,7 +159,7 @@ module.exports = {
             det.promo = 0;
             det.promotion = false;
             det.groupId = 0;
-
+            det.canje = detail.canje;
             if (
               detail.promotion &&
               !!detail.optionGroups &&

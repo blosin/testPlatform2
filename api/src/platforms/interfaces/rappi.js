@@ -124,6 +124,7 @@ module.exports = {
               detHeader.description = detail.name;
               detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
               detHeader.note = detail.comments;
+              detHeader.canje = false;
 
               details.push(detHeader);
 
