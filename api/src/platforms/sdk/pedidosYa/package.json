@@ -15,7 +15,7 @@
     "clean": "rimraf ./lib",
     "build": "webpack --config ./internals/webpack/prod.js",
     "build:babel": "babel src --out-dir lib",
-    "prepare": "npm-run-all -s clean build",
+    "prepare": "npm-run-all -s build",
     "analysis": "webpack --config ./internals/webpack/analysis.js",
     "bundle:analysis": "npm-run-all -s clean analysis",
     "test-ci": "jest --ci --bail --coverage",
