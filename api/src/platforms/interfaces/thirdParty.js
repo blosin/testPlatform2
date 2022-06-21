@@ -159,7 +159,7 @@ module.exports = {
             det.promo = 0;
             det.promotion = false;
             det.groupId = 0;
-            det.canje = detail.canje;
+            det.canje = detail.canje ? 1 : 0;
             if (
               detail.promotion &&
               !!detail.optionGroups &&
