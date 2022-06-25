@@ -1,5 +1,5 @@
 class ApiException extends Error {
-  constructor(message = '', code = '') {
+  constructor(message, code) {
     super();
     this.message = message;
     this.code = code;
@@ -7,9 +7,9 @@ class ApiException extends Error {
 
   static buildFromResponse(response) {
     let instance = new this();
-    instance.code = response.body.code;
-    if (response.body.code) {
-      instance.message += response.body.messages.join(',');
+    if (response._body) {
+      instance.message = response._body.messages;
+      instance.code = response._statusCode;
     }
     return instance;
   }

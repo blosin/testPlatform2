@@ -11,10 +11,10 @@ import CustomError from '../../../utils/errors/customError';
 import { APP_PLATFORM } from '../../../utils/errors/codeError';
 import UUID from '../../../utils/errors/utils';
 
-import Credentials from '../../sdk/pedidosYa/lib/http/Credentials';
-import ApiClient from '../../sdk/pedidosYa/lib/ApiClient';
-import PaginationOptions from '../../sdk/pedidosYa/lib/utils/PaginationOptions';
-import Environments from '../../sdk/pedidosYa/lib/http/Environments';
+import Credentials from '../../sdk/pedidosYa/src/lib/http/Credentials';
+import ApiClient from '../../sdk/pedidosYa/src/lib/ApiClient';
+import PaginationOptions from '../../sdk/pedidosYa/src/lib/utils/PaginationOptions';
+import Environments from '../../sdk/pedidosYa/src/lib/http/Environments';
 import Aws from '../../../platforms/provider/aws';
 
 class PedidosYa extends Platform {
