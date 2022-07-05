@@ -159,7 +159,7 @@ module.exports = {
             det.promo = 0;
             det.promotion = false;
             det.groupId = 0;
-            det.canje = detail.canje ? 1 : 0;
+            det.canje =  0;
             if (
               detail.promotion &&
               !!detail.optionGroups &&
@@ -172,6 +172,32 @@ module.exports = {
               for (let option of detail.optionGroups) {
                 let optionalDet = {};
                 optionalDet.promo = 1;
+                optionalDet.productId = option.id;
+                optionalDet.groupId = groupId;
+                optionalDet.description = option.name;
+                optionalDet.sku = validationSKU(option.sku)
+                  ? option.sku
+                  : 99999;
+                optionalDet.optionalText = option.notes;
+                optionalDet.count = option.quantity || 1;
+                details.push(optionalDet);
+              }
+              groupId++;
+            }
+            else if (
+              detail.canje &&
+              !!detail.optionGroups &&
+              !!detail.optionGroups.length
+            ) {
+              det.canje = 1;
+              det.groupId = groupId;
+              det.promo = 2;
+              details.push(det);
+
+              for (let option of detail.optionGroups) {
+                let optionalDet = {};
+                optionalDet.promo = 1;
+                optionalDet.canje = 1;
                 optionalDet.productId = option.id;
                 optionalDet.groupId = groupId;
                 optionalDet.description = option.name;
