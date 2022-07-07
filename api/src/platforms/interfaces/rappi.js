@@ -31,10 +31,9 @@ module.exports = {
           //Se deja online ya que los pagos de rappi son siempre online
           paymentNews.typeId = 2;
           paymentNews.online = true;
-          //totalProducts + charges + tip + whims - totalRappiPay - total_products_with_discount
           paymentNews.shipping = 0;
           paymentNews.discount =
-            total_products_with_discount - total_products_without_discount;
+              total_products_without_discount - total_products_with_discount;
           paymentNews.voucher = '';
           paymentNews.subtotal = total_products_without_discount || 0;
           paymentNews.currency = '$';
