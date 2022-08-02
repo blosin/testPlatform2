@@ -16,7 +16,7 @@
           "containerPort": 3086
         }
       ],
-      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-5.4.4",
+      "image": "382381053403.dkr.ecr.us-east-2.amazonaws.com/smartfran/platform-service:ps-5.4.6",
       "essential": true,
       "name": "concentrador-service-production-container",
       "entryPoint": [
