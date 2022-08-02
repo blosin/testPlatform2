@@ -33,7 +33,7 @@ module.exports = {
           paymentNews.online = true;
           paymentNews.shipping = 0;
           paymentNews.discount =
-              total_products_without_discount - total_products_with_discount;
+            total_products_without_discount - total_products_with_discount;
           paymentNews.voucher = '';
           paymentNews.subtotal = total_products_without_discount || 0;
           paymentNews.currency = '$';
@@ -123,6 +123,7 @@ module.exports = {
               detHeader.description = detail.name;
               detHeader.sku = validationSKU(detail.sku) ? detail.sku : 99999;
               detHeader.note = detail.comments;
+              detHeader.canje = 0;
 
               details.push(detHeader);
 

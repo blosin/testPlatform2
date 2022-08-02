@@ -180,6 +180,7 @@ module.exports = {
                 ? detail.product.integrationCode
                 : 99999;
               detHeader.note = detail.notes;
+              detHeader.canje = 0;
 
               details.push(detHeader);
 
