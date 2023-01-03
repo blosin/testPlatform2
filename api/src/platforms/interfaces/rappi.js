@@ -319,7 +319,6 @@ module.exports = {
   },
 
   retriveMinimunData: function (data) {
-    console.log(343434, data);
     return {
       branchReference: data.store.external_id.toString(),
       posId: data.order_detail.order_id,

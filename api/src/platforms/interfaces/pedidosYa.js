@@ -292,7 +292,7 @@ module.exports = {
           }
           return details;
         } catch (error) {
-          console.log('-erreEE', error);
+          console.log('Error', error);
           const msg = 'No se pudo parsear la orden de PY.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,

@@ -450,7 +450,6 @@ class Platform {
     @param branchPlatform 
     */
   isClosedRestaurant(branchPlatform, lastGetNew) {
-    console.log("ACA");
     return new Promise(async (resolve) => {
       try {
         const timeToClose = 3;
@@ -553,7 +552,6 @@ class Platform {
   }
 
   getOrderBranches(branchReference) {
-    console.log("branchreferences", branchReference);
     const query = {
       'platforms.platform': this._platform._id,
       'platforms.branchReference': branchReference.toString()
@@ -626,7 +624,6 @@ class Platform {
    *  @param order  order received from the platform.
    *   */
   saveNewOrders(order) {
-    console.log("Orden", order);
     return new Promise(async (resolve, reject) => {
       let orderProccessed,
         newProccessed,
@@ -644,7 +641,6 @@ class Platform {
             error: 'There is no branch for this order'
           });
         branch = branches[0];
-        console.log("branch", branch);
         let trace, stateCod, newsCode, orderCreator;
         try {
           /* Check if restaurant is open */
@@ -652,7 +648,6 @@ class Platform {
             branch.platform,
             branch.lastGetNews
           );
-          console.log("opened?", isOpened,  branch.platform.isActive);
           if (isOpened && branch.platform.isActive) {
             stateCod = 'pend';
             newsCode = 'new_ord';
@@ -791,6 +786,7 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
+        console.log(error);
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
         reject(msg);
@@ -900,6 +896,8 @@ class Platform {
     });
   }
   async updateRejectedMessage(rejectedMessages) {
+    if (!rejectedMessages.length) return;
+
     //Update all platform rejectedMessages to false
     await rejectedMessageModel.updateMany(
       {
@@ -909,6 +907,7 @@ class Platform {
         isActive: false
       }
     );
+
     //Upsert each parameter and mark as active
     const promises = rejectedMessages.map((rejectedMessage) => {
       const query = {
@@ -920,9 +919,15 @@ class Platform {
           name: rejectedMessage.name,
           descriptionES: rejectedMessage.descriptionES,
           descriptionPT: rejectedMessage.descriptionPT,
-          forRestaurant: rejectedMessage.forRestaurant,
-          forLogistics: rejectedMessage.forLogistics,
-          forPickup: rejectedMessage.forPickup,
+          forRestaurant: rejectedMessage.forRestaurant
+            ? rejectedMessage.forRestaurant
+            : true,
+          forLogistics: rejectedMessage.forLogistics
+            ? rejectedMessage.forLogistics
+            : true,
+          forPickup: rejectedMessage.forPickup
+            ? rejectedMessage.forPickup
+            : true,
           id: rejectedMessage.id,
           isActive: true,
           platformId: this._platform.internalCode
@@ -937,6 +942,8 @@ class Platform {
   }
 
   async updateDeliveryTimes(deliveryTimes) {
+    if (!deliveryTimes.length) return;
+
     //Update all platform deliveryTimes to false
     await deliveryTimeModel.updateMany(
       {
