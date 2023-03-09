@@ -94,7 +94,7 @@ class Rappi extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
-        console.log("error loginToAuth0", JSON.stringify(error));
+        console.log("error loginToAuth0", error);
         if (!error) error = '';
         const msg = 'Failed to login. Auth0 Rappi';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -139,7 +139,7 @@ class Rappi extends Platform {
         }
         resolve(result);
       } catch (error) {
-        console.log("error getOrders", JSON.stringify(error));
+        console.log("error getOrders", error);
         if (!error) error = '';
         const msg = 'Failed to get orders.';
         const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {

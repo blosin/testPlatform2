@@ -896,7 +896,6 @@ class Platform {
     });
   }
   async updateRejectedMessage(rejectedMessages) {
-    if (!rejectedMessages.length) return;
 
     //Update all platform rejectedMessages to false
     await rejectedMessageModel.updateMany(
@@ -942,7 +941,6 @@ class Platform {
   }
 
   async updateDeliveryTimes(deliveryTimes) {
-    if (!deliveryTimes.length) return;
 
     //Update all platform deliveryTimes to false
     await deliveryTimeModel.updateMany(
