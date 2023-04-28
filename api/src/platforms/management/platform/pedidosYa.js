@@ -129,7 +129,7 @@ class PedidosYa extends Platform {
     });
   }
 
-  async interactWithOrders(data) { // aki posiblemente
+  async interactWithOrders(data) {
     this.updateLastContact();
     try {
       const savedOrder = await orderModel.findOne({
