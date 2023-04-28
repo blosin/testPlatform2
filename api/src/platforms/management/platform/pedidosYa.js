@@ -86,6 +86,7 @@ class PedidosYa extends Platform {
     );
   }
 
+
   /**
    * @override
    * Get platform rejectedMessages

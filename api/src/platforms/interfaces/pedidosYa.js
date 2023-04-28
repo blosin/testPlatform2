@@ -100,7 +100,7 @@ module.exports = {
           /* Totales */
           paymentNews.online = payment.online;
           paymentNews.shipping = payment.shippingNoDiscount;
-          paymentNews.subtotal = payment.subtotal;
+          paymentNews.subtotal = payment.amountNoDiscount; //subtotal;
           paymentNews.currency = payment.currencySymbol;
           paymentNews.note = payment.notes;
           return paymentNews;
@@ -349,7 +349,7 @@ module.exports = {
         news.order.driver = driverMapper(data.driver);
         news.extraData = extraDataMapper(branch, platform);
         news.order.totalAmount =
-          data.order.payment.subtotal - news.order.payment.discount;
+          (data.order.payment.amountNoDiscount - news.order.payment.discount);
 
         resolve(news);
       } catch (error) {
