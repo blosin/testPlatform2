@@ -14,7 +14,8 @@ class PlatformSingleton {
               credentials: '$credentials',
               statusResponse: '$statusResponse',
               deletedAt: '$deletedAt',
-              autoReply: '$autoReply'
+              autoReply: '$autoReply',
+              active: '$active'
             }
           },
           { $match: { deletedAt: null } }

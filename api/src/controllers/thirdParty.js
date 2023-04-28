@@ -86,7 +86,14 @@ const login = async (req, res) => {
 const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
 
-  const platform = initPlatform(req.token.internalCode, req.uuid);
+  const platform = initPlatform(req.token.internalCode, req.uuid);  
+  
+  //verifica si la plataforma esta activa en backoffice
+  if (platform._platform.active != undefined && !platform._platform.active){
+    const msg = 'Platform not active';   
+    res.status(200).json({ error: msg }).end();
+  }
+  
   if (isArray(req.body)) {
     req.body.forEach(async (data) => {
       let result = await req.body.filter((filtro) => filtro.id === data.id);

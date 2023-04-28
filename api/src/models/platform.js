@@ -11,6 +11,10 @@ const platformSchema = new Schema(
       required: true,
       unique: true
     },
+    active: {
+      type: Boolean,     
+      required: true,     
+    },
     internalCode: {
       type: Number,
       unique: true,
