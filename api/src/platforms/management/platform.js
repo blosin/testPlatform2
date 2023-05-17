@@ -34,6 +34,7 @@ class Platform {
    * Can be overriden.
    * */
   getDeliveryTimes() {
+    console.log("El método getDeliveryTimes() está siendo utilizado"); //agregado para verificar la utilización del método
     return new Promise((resolve) => {
       const data = require('../../assets/deliveryTimes').generic;
       data.forEach((obj) => (obj.platformId = this._platform.internalCode));
