@@ -26,7 +26,7 @@ class Platform {
    * Can be overriden.
    */
   cronGetPlatformParameters() {
-    const schedule = '* * * * *';
+    const schedule = '55 * * * *';
     cron.schedule(schedule, () => this.getPlatformParameters());
   }
 

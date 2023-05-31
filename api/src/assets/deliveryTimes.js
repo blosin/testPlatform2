@@ -64,11 +64,19 @@ module.exports.generic = [
         "order": 1
     },
     {
-        "description":"15 minutos",
-        "id":7,
-        "maxMinutes":15,
-        "minMinutes":15,
-        "name":"Minutos15",
-        "order":12 
+        "description": "48 horas",
+        "id": 7,
+        "maxMinutes": 2880,
+        "minMinutes": 2880,
+        "name": "Horas48",
+        "order": 10
+    },
+    {
+        "description": "Entre 30' y 45'",
+        "id": 2,
+        "maxMinutes": 45,
+        "minMinutes": 30,
+        "name": "Entre30Y45",
+        "order": 2
     }
 ]
