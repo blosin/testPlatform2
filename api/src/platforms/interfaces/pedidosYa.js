@@ -349,8 +349,7 @@ module.exports = {
         news.order.driver = driverMapper(data.driver);
         news.extraData = extraDataMapper(branch, platform);
         news.order.totalAmount =
-          (data.order.payment.amountNoDiscount - news.order.payment.discount);
-
+          (data.order.payment.amountNoDiscount - news.order.payment.discount) + news.order.payment.shipping ;
         resolve(news);
       } catch (error) {
         const msg = 'No se pudo parsear la orden de PY.';
