@@ -5,7 +5,7 @@ import NewsTypesSingleton from '../../../utils/newsType';
 import RejectedMessagesSingleton from '../../../utils/rejectedMessages';
 import orderModel from '../../../models/order';
 import branchModel from '../../../models/branch';
-import logger from '../../../config/logger';
+import logger, { data } from '../../../config/logger';
 import moment from 'moment';
 import CustomError from '../../../utils/errors/customError';
 import { APP_PLATFORM } from '../../../utils/errors/codeError';

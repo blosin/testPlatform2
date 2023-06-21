@@ -11,6 +11,8 @@ import checkRoutePermissions from './middlewares/route-permissions';
 import CustomError from './utils/errors/customError';
 import { CORE } from './utils/errors/codeError';
 import UUID from './utils/errors/utils';
+import router from './routes/peya';
+
 const settings = require('./config/settings');
 
 let urlPrefix = '/api';
@@ -22,7 +24,9 @@ const exceptions = [
   { url: `${urlPrefix}/glovo/orders`, methods: ['POST'] },
   { url: /\/api\/glovo\/orders\/?.*/, methods: ['GET', 'POST'] },
   { url: /\/testing\/glovo\/orders\/?.*/, methods: ['GET', 'POST'] },
-  { url: `/` }
+  { url: `/` },
+  { url: /\/order\/?.*/, methods: ['POST'] },
+  { url: /\/remoteId\/?.*/, methods: ['PUT'] },
 ];
 
 const cors = require('cors');
@@ -69,5 +73,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.use(urlPrefix, routes);
+
+app.use('/',router);
 
 export { app, server };

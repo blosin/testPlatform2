@@ -19,7 +19,11 @@ fs.readdirSync(__dirname)
 	})
 	.forEach((file) => {
 		file = file.replace('.js', '');
-		router.use('/' + file.replace('.js', ''), require(path.join(__dirname, file)));
+		if (file === 'peya') {
+			return;
+		} else {
+			router.use('/' + file.replace('.js', ''), require(path.join(__dirname, file)));
+		}
 	});
 
 module.exports = router;
