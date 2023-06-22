@@ -1,10 +1,10 @@
 import PlatformFactory from '../platforms/management/factory_platform';
 import SetNews from '../platforms/management/strategies/set-news';
 
-const getOrder = (req, res) => {
+const saveOrder = (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
 
-    const platform = initPlatform(req.token.internalCode, req.uuid);
+    const platform = initPlatform(113, req.uuid);
 
     //verifica si la plataforma esta activa en backoffice
     if (platform._platform.active != undefined && !platform._platform.active) {
@@ -21,19 +21,19 @@ const getOrder = (req, res) => {
                     .json({
                         error: `The array has more than one order with the id:${data.id}`
                     })
-                    .end();
-            return res.status(200).json(
-                {
-                    "remoteResponse": {
-                        "remoteOrderId": "POS_RESTAURANT_0001_ORDER_000001"
-                    }
-                }
-            ).end();
+                    .end();            
         });
         const resultProm = req.body.map((data) => platform.validateNewOrders(data));
         Promise.all(resultProm)
             .then((resultPromise) => {
-                res.status(200).send(resultPromise).end();
+                res.status(200).json(
+                    {
+                        "remoteResponse": {
+                            "remoteOrderId": "POS_RESTAURANT_0001_ORDER_000001"
+                        }
+                    }
+                ).end();
+                //res.status(200).send(resultPromise).end();
             })
             .catch((error) => {
                 res.status(400).json(error).end();
@@ -42,7 +42,14 @@ const getOrder = (req, res) => {
         platform
             .validateNewOrders(req.body)
             .then((ordersSaved) => {
-                res.status(200).send(ordersSaved).end();
+                res.status(200).json(
+                    {
+                        "remoteResponse": {
+                            "remoteOrderId": "POS_RESTAURANT_0001_ORDER_000001"
+                        }
+                    }
+                ).end();
+                // res.status(200).send(ordersSaved).end();
             })
             .catch((error) => res.status(400).json(error).end());
 };
@@ -81,6 +88,6 @@ const initPlatform = (internalCode, uuid) => {
 
 
 module.exports = {
-    getOrder,
+    saveOrder,
     updateOrder
 };

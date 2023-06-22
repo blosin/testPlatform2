@@ -85,6 +85,10 @@ const login = async (req, res) => {
 
 const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
+  /*console.log(req);
+
+  console.log('sigue requuid');
+  console.log(req.uuid);*/
 
   const platform = initPlatform(req.token.internalCode, req.uuid);  
   

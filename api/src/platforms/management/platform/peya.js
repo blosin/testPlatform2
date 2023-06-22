@@ -5,7 +5,7 @@ import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
 
-class ThirdParty extends Platform {
+class Peya extends Platform {
   constructor(platform) {
     super(platform);
     this.urlReceive = 'RecibirPedido';

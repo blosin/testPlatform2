@@ -1,6 +1,7 @@
 'use strict';
 import RappiSingleton from './platform/instance/rappiSingleton';
 import PedidosYaSingleton from './platform/instance/pedidosYaSingleton';
+import PeyaSingleton from './platform/instance/peyaSingleton';
 import PadSingleton from './platform/instance/padSingleton';
 import GlovoSingleton from './platform/instance/glovoSingleton';
 import RapiboySingleton from './platform/instance/rapiboySingleton';
@@ -17,6 +18,14 @@ class PlatformFactory {
         if (setInstance) PedidosYaSingleton.getInstance(platform);
         else {
           platformSingleton = PedidosYaSingleton.getInstance(platform);
+          platformSingleton.uuid = uuid;
+          return platformSingleton;
+        }
+
+      case 113: //'PEDIDOSYA'
+        if (setInstance) PeyaSingleton.getInstance(platform);
+        else {
+          platformSingleton = PeyaSingleton.getInstance(platform);
           platformSingleton.uuid = uuid;
           return platformSingleton;
         }
