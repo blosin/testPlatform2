@@ -51,7 +51,7 @@ class Peya extends Platform {
       this.autoReply = this._platform.autoReply;
       console.log(`${this._platform.name}.\t\t Inicializated.`);
     } else {
-      const msg = 'Can not initializate ThirParty.';
+      const msg = 'Can not initializate Peya.';
       new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
         platform: this._platform
       });
