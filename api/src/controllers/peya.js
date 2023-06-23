@@ -64,17 +64,18 @@ const updateOrder = async (req, res) => {
         const setNews = new SetNews(req.token);
         let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };
         const result = await setNews.setNews(newToSet, req.body.id);
-        res.status(200).send(result).end();
+        return res.status(200).json(
+            {
+                "status": "ORDER_CANCELLED",
+                "message": "customer cancelled order"
+            }
+        ).end();
+        //res.status(200).send(result).end();
     } catch (error) {
         return res.status(400).json(error).end();
     }
 
-    return res.status(200).json(
-        {
-            "status": "ORDER_CANCELLED",
-            "message": "customer cancelled order"
-        }
-    ).end();
+
 
 };
 
