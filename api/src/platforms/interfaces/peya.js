@@ -247,8 +247,10 @@ module.exports = {
     });
   },
   retriveMinimunData: function (data) {
+    console.log('***empieza data****');
+    console.log(data);
     return {
-      branchReference: data.restaurant.integrationCode,
+      branchReference: data.branchId.toString(), //data.restaurant.integrationCode,
       posId: data.id,
       originalId: data.id.toString(),
       displayId: data.id.toString()
