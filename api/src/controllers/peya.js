@@ -3,6 +3,7 @@ import SetNews from '../platforms/management/strategies/set-news';
 
 const saveOrder = (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
+    req.body.branchId = req.params.remoteId;
 
     const platform = initPlatform(113, req.uuid);
 
