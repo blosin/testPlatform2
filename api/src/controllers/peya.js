@@ -1,5 +1,8 @@
 import PlatformFactory from '../platforms/management/factory_platform';
 import SetNews from '../platforms/management/strategies/set-news';
+import PlatformSingleton from '../utils/platforms';
+import { isArray } from 'lodash';
+
 
 const saveOrder = (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
@@ -75,9 +78,6 @@ const updateOrder = async (req, res) => {
     } catch (error) {
         return res.status(400).json(error).end();
     }
-
-
-
 };
 
 const initPlatform = (internalCode, uuid) => {

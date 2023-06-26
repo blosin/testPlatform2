@@ -396,6 +396,12 @@ class Peya extends Platform {
     });
   }
 
+  /** */
+  importParser() {
+    return require('../../interfaces/peya');
+  }
+
+
   /**
    * @override
    * Get platform rejectedMessages
