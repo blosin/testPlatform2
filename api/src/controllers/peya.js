@@ -7,6 +7,7 @@ import { isArray } from 'lodash';
 const saveOrder = (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
     req.body.branchId = req.params.remoteId;
+    req.body.state = "PENDING";
 
     const platform = initPlatform(113, req.uuid);
 
@@ -33,7 +34,7 @@ const saveOrder = (req, res) => {
                 res.status(200).json(
                     {
                         "remoteResponse": {
-                            "remoteOrderId": "POS_RESTAURANT_0001_ORDER_000001"
+                            "remoteOrderId": req.body.id
                         }
                     }
                 ).end();

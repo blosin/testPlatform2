@@ -510,11 +510,10 @@ class Platform {
       }
 
       /* Find branch associated to de references given by the platform */
-
       let foundBranch = await branchModel
         .findOne({
-          'platforms.branchReference': minOrders.branchReference,
-          'platforms.platform': this._platform._id
+          'platforms.branchReference': minOrders.branchReference.toString(),
+          'platforms.platform': this._platform._id.toString()
         })
         .lean();
       if (!foundBranch) {
@@ -635,14 +634,17 @@ class Platform {
       const { posId, originalId, displayId, branchReference } =
         this.parser.retriveMinimunData(order);
       try {
+  
         let branches = await this.getOrderBranches(branchReference);
         if (branches.length == 0)
           reject({
             error: 'There is no branch for this order'
           });
+        
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
         try {
+      
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
             branch.platform,
@@ -662,6 +664,7 @@ class Platform {
           throw { orderId: originalId, error };
         }
         try {
+        
           orderCreator = {
             thirdParty: this._platform.name,
             internalCode: this._platform.internalCode,
@@ -672,6 +675,7 @@ class Platform {
             branchId: branch.branchId,
             order
           };
+         
           const newCreator = await this.parser.newsFromOrders(
             orderCreator,
             this._platform,
@@ -682,6 +686,7 @@ class Platform {
           );
           /* If restaurant is closed, mark the new as viewed. */
           if (!isOpened) {
+
             newCreator.viewed = new Date();
             const rej = RejectedMessagesSingleton.closedResRejectedMessages;
             newCreator.extraData.rejected = {
@@ -700,6 +705,7 @@ class Platform {
               entity: 'CONCENTRADOR'
             };
           }
+          
           trace = newsModel.createTrace({
             typeId: newCreator.typeId,
             orderStatusId: newCreator.order.statusId
@@ -710,6 +716,7 @@ class Platform {
             internalCode: this._platform.internalCode,
             originalId
           };
+        
           const newsQuery = {
             order: {
               id: displayId,
@@ -717,16 +724,19 @@ class Platform {
             }
           };
           const options = { new: true, upsert: true };
+    
           promiseOrder = orderModel.findOneAndUpdate(
             orderQuery,
             orderCreator,
             options
           );
+   
           promiseNew = newsModel.findOneAndUpdate(
             newsQuery,
             newCreator,
             options
           );
+         
           orderProccessed = orderCreator;
           newProccessed = newCreator;
         } catch (error) {
@@ -761,7 +771,8 @@ class Platform {
             meta: { error: error.toString() }
           });
         }
-        reject({
+ 
+        reject({          
           orderId: originalId,
           error: `Order: ${originalId} can not be proccessed correctly.`
         });

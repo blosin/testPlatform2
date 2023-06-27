@@ -66,6 +66,7 @@ module.exports = {
           /* Descuentos */
           paymentNews.discount = 0;
           paymentNews.voucher = '';
+
           discounts.forEach((d, i) => {
             if (i === 0) {
               paymentNews.discount = d.amount;
@@ -88,7 +89,7 @@ module.exports = {
           /* Totales */
           paymentNews.online = payment.status === 'paid';
           paymentNews.shipping = 0;
-          
+ 
           price.deliveryFees.forEach((d, i) => {
             if (i === 0) {
               paymentNews.shipping = d.value;              
@@ -102,7 +103,7 @@ module.exports = {
           paymentNews.note = '';
           return paymentNews;
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de PY.';
+          const msg = 'No se pudo parsear la orden de PY. paymentenMapper';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -159,6 +160,7 @@ module.exports = {
             let det = {};          
              /* detail.product.section.integrationName.trim().toLowerCase() ==
               'promo'*/// ver promos            
+  
               det.productId = detail.id;
               det.count = detail.quantity;
               det.price = detail.paidPrice;
@@ -169,7 +171,7 @@ module.exports = {
               let skuComparator = validationSKU(detail.integrationCode)
                 ? detail.integrationCode
                 : 99999;
-              det.note = detail.comments.customerComment;
+              det.note = detail.comment;
               det.sku = skuComparator;
               det.optionalText = detail.comment;
               details.push(det);           
@@ -225,10 +227,11 @@ module.exports = {
         news.order = orderMapper(data, platform);
         news.order.customer = customerMapper(data.order.customer);
         news.order.details = detailsMapper(data.order);
+
         news.order.payment = paymentenMapper(
-          data.payment,
-          data.discounts,
-          data.price          
+          data.order.payment,
+          data.order.discounts,
+          data.order.price          
         );
         news.order.driver = driverMapper(data.order.delivery);
         news.extraData = extraDataMapper(branch, platform);
