@@ -86,8 +86,9 @@ module.exports = {
           )
             paymentNews.typeId = paymentType.CREDIT.paymentId;    
 
-          /* Totales */
-          paymentNews.online = payment.status === 'paid';
+          /* Totales */        
+          paymentNews.online = payment.type === 'paid' &&  payment.status === 'online';//peya
+  
           paymentNews.shipping = 0;
  
           price.deliveryFees.forEach((d, i) => {
@@ -250,8 +251,6 @@ module.exports = {
     });
   },
   retriveMinimunData: function (data) {
-    console.log('***empieza data****');
-    console.log(data);
     return {
       branchReference: data.branchId.toString(), //data.restaurant.integrationCode,
       posId: data.id,

@@ -50,7 +50,7 @@ const saveOrder = (req, res) => {
                 res.status(200).json(
                     {
                         "remoteResponse": {
-                            "remoteOrderId": "POS_RESTAURANT_0001_ORDER_000001"
+                            "remoteOrderId": req.body.id
                         }
                     }
                 ).end();
