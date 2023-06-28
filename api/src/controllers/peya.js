@@ -2,6 +2,7 @@ import PlatformFactory from '../platforms/management/factory_platform';
 import SetNews from '../platforms/management/strategies/set-news';
 import PlatformSingleton from '../utils/platforms';
 import { isArray } from 'lodash';
+import NewsTypeSingleton from '../utils/newsType';
 
 
 const saveOrder = (req, res) => {
@@ -34,7 +35,7 @@ const saveOrder = (req, res) => {
                 res.status(200).json(
                     {
                         "remoteResponse": {
-                            "remoteOrderId": req.body.id
+                            "remoteOrderId": req.body.token
                         }
                     }
                 ).end();
@@ -50,7 +51,7 @@ const saveOrder = (req, res) => {
                 res.status(200).json(
                     {
                         "remoteResponse": {
-                            "remoteOrderId": req.body.id
+                            "remoteOrderId": req.body.token
                         }
                     }
                 ).end();
@@ -61,14 +62,17 @@ const saveOrder = (req, res) => {
 
 const updateOrder = async (req, res) => {
     try {
-        if (!req.body.id || !req.body.branchId) {
+        if (!req.params.remoteOrderId || !req.params.remoteId) {
             const msg = 'Insuficient parameters.';
             logger.error({ message: msg, meta: { body: req.body } });
             return res.status(400).json({ error: msg }).end();
         }
+
         const setNews = new SetNews(req.token);
+
         let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };
-        const result = await setNews.setNews(newToSet, req.body.id);
+
+        const result = await setNews.setNews(newToSet, req.params.remoteOrderId);
         return res.status(200).json(
             {
                 "status": "ORDER_CANCELLED",
