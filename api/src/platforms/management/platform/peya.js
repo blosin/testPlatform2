@@ -200,6 +200,7 @@ class Peya extends Platform {
                 status: 'order_accepted'
             };
             const headers = {
+              'Authorization': `Bearer ${ this.tokenPeya } `,
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlConfirmed}/${order.id}`;
