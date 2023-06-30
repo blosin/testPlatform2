@@ -66,8 +66,7 @@ const updateOrder = async (req, res) => {
             const msg = 'Insuficient parameters.';
             logger.error({ message: msg, meta: { body: req.body } });
             return res.status(400).json({ error: msg }).end();
-        }
-
+        }     
         const setNews = new SetNews(req.token);
 
         let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };

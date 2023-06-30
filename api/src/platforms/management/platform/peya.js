@@ -4,6 +4,8 @@ import NewsStateSingleton from '../../../utils/newsState';
 import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
+import settings from '../../../config/settings';
+import cron from 'node-cron';
 
 class Peya extends Platform {
   constructor(platform) {
@@ -16,6 +18,7 @@ class Peya extends Platform {
     this.urlDelivered = 'EntregarPedido';
     this.urlRejectedType = 'MotivosRechazo';
     this.urlDeliveryTime = 'TiemposEntrega';
+    this.tokenPeya = '';
     this.init();
     this.cronGetPlatformParameters();
   }
@@ -57,6 +60,39 @@ class Peya extends Platform {
       });
     }
   }
+
+    /**
+   * This cron is for update platform parameters in DB.
+   * Can be overriden.
+   */
+    cronGetPlatformParameters() {
+      const schedule = '55 * * * *';
+      const schedulePeyaLogin = '*/25 * * * *';// va con 25
+    //  let currentDate = new Date();
+     // let currentMinute = currentDate.getMinutes();     
+      
+      //const schedulePeyaLogin = `*/${currentMinute.toString()} * * * *`
+      cron.schedule(schedule, () => this.getPlatformParameters());
+      cron.schedule(schedulePeyaLogin, () => this.peyaLogin());
+      // mon de login
+
+    }
+
+    peyaLogin () { 
+      const dataSend = new URLSearchParams();
+      dataSend.append('username',settings.peyaParams.username);
+      dataSend.append('password', settings.peyaParams.password);
+      dataSend.append('grant_type',settings.peyaParams.grant_type);
+      const configData = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+      axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then( r => {       
+        this.tokenPeya = r.access_token;
+      });
+
+    }
 
   /**
    * @param {*} order
@@ -347,45 +383,12 @@ class Peya extends Platform {
   getDeliveryTimes() {
     return new Promise(async (resolve) => {
       try {
-        let deliveryTimes = [];
-        let deliveryTimesRes;
-        if (this.statusResponse.deliveryTimes) {
-          if (this.token) {
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlDeliveryTime}`;
-            deliveryTimesRes = await axios.get(
-              url,
-              { Token: this.token },
-              headers
-            );
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlDeliveryTime}`;
-            deliveryTimesRes = await axios.get(url, {}, this.authData);
-          }
-          deliveryTimes = deliveryTimesRes.data.map((obj, index) => {
-            const minutes =
-              parseInt(obj.m_Item2.split(':')[0], 10) * 60 +
-              parseInt(obj.m_Item2.split(':')[1], 10);
-            return {
-              name: obj.m_Item2,
-              description: obj.m_Item2,
-              minMinutes: minutes,
-              maxMinutes: minutes,
-              order: index + 1,
-              id: parseInt(obj.m_Item1, 10),
-              platformId: this._platform.internalCode
-            };
-          });
-          resolve(deliveryTimes);
-        } else {
-          deliveryTimes = require('../../../assets/deliveryTimes').generic;
-          deliveryTimes.forEach(
-            (obj) => (obj.platformId = this._platform.internalCode)
-          );
-          resolve(deliveryTimes);
-        }
+        let deliveryTimes = [];         
+        deliveryTimes = require('../../../assets/deliveryTimes').generic;
+        deliveryTimes.forEach(
+          (obj) => (obj.platformId = this._platform.internalCode)
+        );
+        resolve(deliveryTimes);        
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
@@ -409,46 +412,13 @@ class Peya extends Platform {
   getRejectedMessages() {
     return new Promise(async (resolve) => {
       try {
-        let data = [];
-        let rejectedMessagesRes;
-        if (this.statusResponse.rejectedMessages) {
-          if (this.token) {
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlRejectedType}`;
-            deliveryTimesRes = await axios.get(
-              url,
-              { Token: this.token },
-              headers
-            );
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlRejectedType}`;
-            rejectedMessagesRes = await axios.get(url, {}, this.authData);
-          }
-
-          data = rejectedMessagesRes.data.map((obj) => {
-            return {
-              name: obj.m_Item2,
-              descriptionES: obj.m_Item2,
-              descriptionPT: obj.m_Item2,
-              forRestaurant: true,
-              forLogistics: true,
-              forPickup: true,
-              id: parseInt(obj.m_Item1, 10),
-              platformId: this._platform.internalCode
-            };
-          });
-          resolve(data);
-          return;
-        } else {
-          data = require('../../../assets/rejectedMessages').generic;
-          const negatives =
-            require('../../../assets/rejectedMessages').negatives;
-          data = data.concat(negatives);
-          data.forEach((obj) => (obj.platformId = this._platform.internalCode));
-          resolve(data);
-        }
+        let data = [];        
+        data = require('../../../assets/rejectedMessages').generic;
+        const negatives =
+          require('../../../assets/rejectedMessages').negatives;
+        data = data.concat(negatives);
+        data.forEach((obj) => (obj.platformId = this._platform.internalCode));
+        resolve(data);        
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {

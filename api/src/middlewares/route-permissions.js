@@ -13,8 +13,9 @@ const required = (req, res, next) => {
       jwt.verify(
         req.headers.authorization.split(' ')[1],
         settings.token.secret,
-        (err, token) => {
+        (err, token) => {       
           if (err) throw 'El token está corrupto.';
+          
           req.token = token.user;
           if (!req.token.permissions) req.token.permissions = [];
           if (!req.token.permissions.some((p) => req.path.includes(p)))

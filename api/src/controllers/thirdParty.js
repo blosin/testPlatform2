@@ -126,11 +126,19 @@ const saveOrder = (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
+
+
+
+
+    
     if (!req.body.id || !req.body.branchId) {
       const msg = 'Insuficient parameters.';
       logger.error({ message: msg, meta: { body: req.body } });
       return res.status(400).json({ error: msg }).end();
     }
+  
+    console.log("req.token")
+    console.log(req.token);
     const setNews = new SetNews(req.token);
     let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };
     const result = await setNews.setNews(newToSet, req.body.id);
