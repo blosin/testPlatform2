@@ -244,6 +244,11 @@ class Peya extends Platform {
             const url = `${this.baseUrl}${this.urlDispatched}/${order.id}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
+          }
+          else{
+            const url = `${this.baseUrl}/v2/orders/${order.Id}/preparation-completed`;
+            const res = await axios.post(url,null,headers);
+            resolve(true);
           } 
         } else resolve(false);
       } catch (error) {
@@ -373,7 +378,6 @@ class Peya extends Platform {
   importParser() {
     return require('../../interfaces/peya');
   }
-
 
   /**
    * @override
