@@ -10,11 +10,11 @@ import cron from 'node-cron';
 class Peya extends Platform {
   constructor(platform) {
     super(platform);
-    this.urlReceive = 'RecibirPedido';
+    this.urlReceive = '/v2/order/status/';
     this.urlView = 'VistarPedido';
-    this.urlRejected = 'CancelarPedido';
-    this.urlConfirmed = 'ConfirmarPedido';
-    this.urlDispatched = 'EnviarPedido';
+    this.urlRejected = '/v2/order/status/';
+    this.urlConfirmed = '/v2/order/status/';
+    this.urlDispatched = '/v2/order/status/';
     this.urlDelivered = 'EntregarPedido';
     this.urlRejectedType = 'MotivosRechazo';
     this.urlDeliveryTime = 'TiemposEntrega';
@@ -194,27 +194,18 @@ class Peya extends Platform {
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
         if (this.statusResponse.confirm) {
-          if (this.token) {
             const body = {
-              Token: this.token,
-              IdPedido: order.id,
-              Demora: deliveryTimeId
+                acceptanceTime: deliveryTimeId,
+                remoteOrderId: order.id,
+                status: 'order_accepted'
             };
             const headers = {
               'Content-Type': 'application/json'
             };
-            const url = `${this.baseUrl}${this.urlConfirmed}`;
+            const url = `${this.baseUrl}${this.urlConfirmed}/${order.id}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlConfirmed}`;
-            const res = await axios.post(
-              url,
-              { IdPedido: order.id, Demora: deliveryTimeId },
-              this.authData
-            );
-            resolve(true);
-          }
+          
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
