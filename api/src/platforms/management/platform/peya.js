@@ -233,26 +233,18 @@ class Peya extends Platform {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
         if (this.statusResponse.dispatch) {
-          if (this.token) {
+          if (order.expeditionType === 'pickup' || (order?.delivery?.riderPickupTime === null) ) {
             const body = {
-              Token: this.token,
-              IdPedido: order.id
+                status: 'order_picked_up'
             };
             const headers = {
+              'Authorization': `Bearer ${ this.tokenPeya } `,
               'Content-Type': 'application/json'
             };
-            const url = `${this.baseUrl}${this.urlDispatched}`;
+            const url = `${this.baseUrl}${this.urlDispatched}/${order.id}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlDispatched}`;
-            const res = await axios.post(
-              url,
-              { IdPedido: order.id },
-              this.authData
-            );
-            resolve(true);
-          }
+          } 
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
@@ -327,32 +319,18 @@ class Peya extends Platform {
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
         if (this.statusResponse.reject) {
-          if (this.token) {
             const body = {
-              Token: this.token,
-              IdPedido: order.id,
-              IdMotivo: rejectMessageId,
-              nota: rejectMessageNote ? rejectMessageNote : ''
+                message: rejectMessageNote,
+                reason: rejectMessageNote,
+                status: "order_rejected"
             };
             const headers = {
+              'Authorization': `Bearer ${ this.tokenPeya }`,              
               'Content-Type': 'application/json'
             };
-            const url = `${this.baseUrl}${this.urlRejected}`;
+            const url = `${this.baseUrl}${this.urlRejected}/${order.id}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlRejected}`;
-            const res = await axios.post(
-              url,
-              {
-                IdPedido: order.id,
-                IdMotivo: rejectMessageId,
-                nota: rejectMessageNote ? rejectMessageNote : ''
-              },
-              this.authData
-            );
-            resolve(true);
-          }
         } else resolve(false);
       } catch (error) {
         if (!error) error = '';
