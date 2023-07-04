@@ -13,9 +13,10 @@ const saveOrder = (req, res) => {
     const platform = initPlatform(113, req.uuid);
 
     //verifica si la plataforma esta activa en backoffice
-    if (platform._platform.active != undefined && !platform._platform.active) {
-        const msg = 'Platform not active';
-        res.status(200).json({ error: msg }).end();
+    if (platform._platform.active != undefined && !platform._platform.active) {     
+        res.status(400).json( {
+            reason: 'Error',
+            message: 'Platform not active'}).end();
     }
 
     if (isArray(req.body)) {
@@ -32,6 +33,11 @@ const saveOrder = (req, res) => {
         const resultProm = req.body.map((data) => platform.validateNewOrders(data));
         Promise.all(resultProm)
             .then((resultPromise) => {
+                if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED'){                
+                    res.status(400).json({
+                        reason: 'Error',
+                        message: 'CLOSED RESTAURANT REJECTED'}).end();
+                }
                 res.status(200).json(
                     {
                         "remoteResponse": {
@@ -48,6 +54,11 @@ const saveOrder = (req, res) => {
         platform
             .validateNewOrders(req.body)
             .then((ordersSaved) => {
+                if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){            
+                    res.status(400).json({
+                        reason: 'Error',
+                        message: 'CLOSED RESTAURANT REJECTED'}).end();
+                }
                 res.status(200).json(
                     {
                         "remoteResponse": {

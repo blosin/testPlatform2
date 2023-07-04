@@ -19,6 +19,7 @@ class Peya extends Platform {
     this.urlRejectedType = 'MotivosRechazo';
     this.urlDeliveryTime = 'TiemposEntrega';
     this.tokenPeya = '';
+    this.chainCode = settings.chainCode;
     this.init();
     this.cronGetPlatformParameters();
   }
@@ -93,6 +94,136 @@ class Peya extends Platform {
       });
 
     }
+
+      /**
+   * Can be overriden.
+   * */
+  openRestaurant(branchId) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const dateNow = new Date();
+        const branch = await branchModel.findOne({ branchId });
+        const platformBranch = this.getBranchPlatform(
+          branch.platforms,
+          this._platform._id
+        );
+        const closedProg = branchModel.findProgClosedToOpen(
+          platformBranch,
+          dateNow
+        );
+
+        if (typeof closedProg == 'string')
+          throw `${closedProg} RestaurantCode: ${branchId}.`;
+
+        const dateFromUTC = moment(dateNow);
+
+        await branchModel.updateOne(
+          {
+            branchId,
+            'platforms.platform': this._platform._id
+          },
+          {
+            $set: {
+              'platforms.$[].progClosed.$[i].open': dateFromUTC
+            }
+          },
+          {
+            arrayFilters: [{ 'i._id': closedProg._id }]
+          }
+        );
+        const body = {
+          "availabilityState": "OPEN",
+          "platformKey": branchId,
+          "platformRestaurantId": branchId
+        };
+        const headers = {
+          'Authorization': `Bearer ${ this.tokenPeya } `,
+          'Content-Type': 'application/json'
+        };
+        ///v2/chains/{chainCode}/remoteVendors/{posVendorId}/availability
+        const url = `${this.baseUrl}/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        await axios.put(url, body, headers);
+        resolve();
+      } catch (error) {
+        error = { error: error.toString(), platform: this._platform };
+        const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
+        logger.error({ message: msg, meta: error });
+        reject(msg);
+      }
+    });
+  }
+
+  /**
+   * Can be overriden.
+   * */
+  closeRestaurant(branchId, timeToClose, description) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const dateNow = new Date();
+        const branch = await branchModel.findOne({ branchId });
+        const platformBranch = this.getBranchPlatform(
+          branch.platforms,
+          this._platform._id
+        );
+        const validatedClosed = branchModel.validateNewProgClosed(
+          platformBranch,
+          dateNow,
+          timeToClose
+        );
+        const dateFromUTC = moment(dateNow);
+        const dateToUTC = moment(dateNow).add(timeToClose, 'm');
+
+        if (validatedClosed != '')
+          throw `${validatedClosed} RestaurantCode: ${branchId}.`;
+
+        await branchModel.updateOne(
+          {
+            branchId,
+            'platforms.platform': this._platform._id
+          },
+          {
+            $push: {
+              'platforms.$.progClosed': {
+                close: dateFromUTC,
+                open: dateToUTC,
+                description: description
+              }
+            }
+          }
+        );
+        const body = {
+          "availabilityState": "CLOSED",
+          "closedReason": "CLOSED RESTAURANT REJECTED",          
+          "platformKey": branchId,
+          "platformRestaurantId": branchId
+      
+        };
+        const headers = {
+          'Authorization': `Bearer ${ this.tokenPeya } `,
+          'Content-Type': 'application/json'
+        };       
+        const url = `${this.baseUrl}/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        await axios.put(url, body, headers);
+        resolve();
+      } catch (error) {
+        error = {
+          error: error.toString(),
+          branchId,
+          platform: this._platform,
+          timeToClose,
+          description
+        };
+        const msg = `Failed to closeRestaurant. RestaurantCode: ${branchId}.`;
+        logger.error({ message: msg, meta: error });
+        reject(msg);
+      }
+    });
+  }
+
+
+
+
+
 
   /**
    * @param {*} order
