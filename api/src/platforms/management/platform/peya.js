@@ -62,42 +62,42 @@ class Peya extends Platform {
     }
   }
 
-    /**
-   * This cron is for update platform parameters in DB.
-   * Can be overriden.
-   */
-    cronGetPlatformParameters() {
-      const schedule = '55 * * * *';
-      const schedulePeyaLogin = '*/25 * * * *';// va con 25
+  /**
+ * This cron is for update platform parameters in DB.
+ * Can be overriden.
+ */
+  cronGetPlatformParameters() {
+    const schedule = '55 * * * *';
+    const schedulePeyaLogin = '*/25 * * * *';// va con 25
     //  let currentDate = new Date();
-     // let currentMinute = currentDate.getMinutes();     
-      
-      //const schedulePeyaLogin = `*/${currentMinute.toString()} * * * *`
-      cron.schedule(schedule, () => this.getPlatformParameters());
-      cron.schedule(schedulePeyaLogin, () => this.peyaLogin());
-      // mon de login
+    // let currentMinute = currentDate.getMinutes();     
 
-    }
+    //const schedulePeyaLogin = `*/${currentMinute.toString()} * * * *`
+    cron.schedule(schedule, () => this.getPlatformParameters());
+    cron.schedule(schedulePeyaLogin, () => this.peyaLogin());
+    // mon de login
 
-    peyaLogin () { 
-      const dataSend = new URLSearchParams();
-      dataSend.append('username',settings.peyaParams.username);
-      dataSend.append('password', settings.peyaParams.password);
-      dataSend.append('grant_type',settings.peyaParams.grant_type);
-      const configData = {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+  }
+
+  peyaLogin() {
+    const dataSend = new URLSearchParams();
+    dataSend.append('username', settings.peyaParams.username);
+    dataSend.append('password', settings.peyaParams.password);
+    dataSend.append('grant_type', settings.peyaParams.grant_type);
+    const configData = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
-      axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then( r => {       
-        this.tokenPeya = r.access_token;
-      });
-
     }
+    axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
+      this.tokenPeya = r.access_token;
+    });
 
-      /**
-   * Can be overriden.
-   * */
+  }
+
+  /**
+* Can be overriden.
+* */
   openRestaurant(branchId) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -137,7 +137,7 @@ class Peya extends Platform {
           "platformRestaurantId": branchId
         };
         const headers = {
-          'Authorization': `Bearer ${ this.tokenPeya } `,
+          'Authorization': `Bearer ${this.tokenPeya}`,
           'Content-Type': 'application/json'
         };
         ///v2/chains/{chainCode}/remoteVendors/{posVendorId}/availability
@@ -193,15 +193,15 @@ class Peya extends Platform {
         );
         const body = {
           "availabilityState": "CLOSED",
-          "closedReason": "CLOSED RESTAURANT REJECTED",          
+          "closedReason": "CLOSED RESTAURANT REJECTED",
           "platformKey": branchId,
           "platformRestaurantId": branchId
-      
+
         };
         const headers = {
-          'Authorization': `Bearer ${ this.tokenPeya } `,
+          'Authorization': `Bearer ${this.tokenPeya}`,
           'Content-Type': 'application/json'
-        };       
+        };
         const url = `${this.baseUrl}/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
         await axios.put(url, body, headers);
         resolve();
@@ -220,52 +220,13 @@ class Peya extends Platform {
     });
   }
 
-
-
-
-
-
   /**
    * @param {*} order
    * @override
    */
   receiveOrder(order) {
     return new Promise(async (resolve) => {
-      try {
-        if (this.statusResponse.receive) {
-          if (this.token) {
-            const body = {
-              Token: this.token,
-              IdPedido: order.id
-            };
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-
-            const url = `${this.baseUrl}${this.urlReceive}`;
-            const res = await axios.post(url, body, headers);
-            resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlReceive}`;
-            const res = await axios.post(
-              url,
-              { IdPedido: order.id },
-              this.authData
-            );
-            resolve(true);
-          }
-        } else resolve(false);
-      } catch (error) {
-        if (!error) error = '';
-        const msg = 'Failed to send the received status.';
-        const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
-          orderId: order.id ? order.id.toString() : '-',
-          branchId: order.branchId ? order.branchId.toString() : '-',
-          platformId: order.platformId ? order.platformId.toString() : '-',
-          error: error.toString()
-        });
-        resolve(err);
-      }
+      resolve(false);
     });
   }
 
@@ -278,28 +239,7 @@ class Peya extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('view');
         await this.updateOrderState(order, state);
-        if (this.statusResponse.view) {
-          if (this.token) {
-            const body = {
-              Token: this.token,
-              IdPedido: order.id
-            };
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlView}`;
-            const res = await axios.post(url, body, headers);
-            resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlView}`;
-            const res = await axios.post(
-              url,
-              { IdPedido: order.id },
-              this.authData
-            );
-            resolve(true);
-          }
-        } else resolve(false);
+        resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
@@ -324,21 +264,19 @@ class Peya extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
-        if (this.statusResponse.confirm) {
-            const body = {
-                acceptanceTime: deliveryTimeId,
-                remoteOrderId: order.id,
-                status: 'order_accepted'
-            };
-            const headers = {
-              'Authorization': `Bearer ${ this.tokenPeya } `,
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlConfirmed}/${order.id}`;
-            const res = await axios.post(url, body, headers);
-            resolve(true);
-          
-        } else resolve(false);
+
+          const body = {
+            acceptanceTime: deliveryTimeId,
+            remoteOrderId: order.id,
+            status: 'order_accepted'
+          };
+          const headers = {
+            'Authorization': `Bearer ${this.tokenPeya}`,
+            'Content-Type': 'application/json'
+          };
+          const url = `${this.baseUrl}${this.urlConfirmed}/${order.id}`;
+          const res = await axios.post(url, body, headers);
+          resolve(true);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -363,25 +301,23 @@ class Peya extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
-        if (this.statusResponse.dispatch) {
-          if (order.expeditionType === 'pickup' || (order?.delivery?.riderPickupTime === null) ) {
+          if (order.expeditionType === 'pickup' || (order?.delivery?.riderPickupTime === null)) {
             const body = {
-                status: 'order_picked_up'
+              status: 'order_picked_up'
             };
             const headers = {
-              'Authorization': `Bearer ${ this.tokenPeya } `,
+              'Authorization': `Bearer ${this.tokenPeya}`,
               'Content-Type': 'application/json'
             };
             const url = `${this.baseUrl}${this.urlDispatched}/${order.id}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
           }
-          else{
+          else {
             const url = `${this.baseUrl}/v2/orders/${order.Id}/preparation-completed`;
-            const res = await axios.post(url,null,headers);
+            const res = await axios.post(url, null, headers);
             resolve(true);
-          } 
-        } else resolve(false);
+          }
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
@@ -406,28 +342,7 @@ class Peya extends Platform {
       try {
         const state = NewsStateSingleton.stateByCod('delivery');
         await this.updateOrderState(order, state);
-        if (this.statusResponse.delivery) {
-          if (this.token) {
-            const body = {
-              Token: this.token,
-              IdPedido: order.id
-            };
-            const headers = {
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlDelivered}`;
-            const res = await axios.post(url, body, headers);
-            resolve(true);
-          } else if (this.authData) {
-            const url = `${this.baseUrl}${this.urlDelivered}`;
-            const res = await axios.post(
-              url,
-              { IdPedido: order.id },
-              this.authData
-            );
-            resolve(true);
-          }
-        } else resolve(false);
+        resolve(false);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
@@ -454,20 +369,18 @@ class Peya extends Platform {
         console.log('rejectMessageNote', rejectMessageNote);
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
-        if (this.statusResponse.reject) {
-            const body = {
-                message: rejectMessageNote,
-                reason: rejectMessageNote,
-                status: "order_rejected"
-            };
-            const headers = {
-              'Authorization': `Bearer ${ this.tokenPeya }`,              
-              'Content-Type': 'application/json'
-            };
-            const url = `${this.baseUrl}${this.urlRejected}/${order.id}`;
-            const res = await axios.post(url, body, headers);
-            resolve(true);
-        } else resolve(false);
+        const body = {
+          message: rejectMessageNote,
+          reason: rejectMessageNote,
+          status: "order_rejected"
+        };
+        const headers = {
+          'Authorization': `Bearer ${this.tokenPeya}`,
+          'Content-Type': 'application/json'
+        };
+        const url = `${this.baseUrl}${this.urlRejected}/${order.id}`;
+        const res = await axios.post(url, body, headers);
+        resolve(true);
       } catch (error) {
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
@@ -489,12 +402,12 @@ class Peya extends Platform {
   getDeliveryTimes() {
     return new Promise(async (resolve) => {
       try {
-        let deliveryTimes = [];         
+        let deliveryTimes = [];
         deliveryTimes = require('../../../assets/deliveryTimes').generic;
         deliveryTimes.forEach(
           (obj) => (obj.platformId = this._platform.internalCode)
         );
-        resolve(deliveryTimes);        
+        resolve(deliveryTimes);
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
@@ -517,13 +430,13 @@ class Peya extends Platform {
   getRejectedMessages() {
     return new Promise(async (resolve) => {
       try {
-        let data = [];        
+        let data = [];
         data = require('../../../assets/rejectedMessages').generic;
         const negatives =
           require('../../../assets/rejectedMessages').negatives;
         data = data.concat(negatives);
         data.forEach((obj) => (obj.platformId = this._platform.internalCode));
-        resolve(data);        
+        resolve(data);
       } catch (error) {
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
