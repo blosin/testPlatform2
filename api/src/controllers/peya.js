@@ -33,7 +33,19 @@ const saveOrder = (req, res) => {
         const resultProm = req.body.map((data) => platform.validateNewOrders(data));
         Promise.all(resultProm)
             .then((resultPromise) => {
-                if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED'){                
+                if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED'){    
+                    const body = {
+                        "availabilityState": "CLOSED",
+                        "closedReason": "CLOSED RESTAURANT REJECTED",
+                        "platformKey": req.body.branchId,
+                        "platformRestaurantId": req.body.branchId              
+                    };
+                    const headers = {
+                        'Authorization': `Bearer ${this.tokenPeya}`,
+                        'Content-Type': 'application/json'
+                    };
+                    const url = `${this.baseUrl}/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+                    axios.put(url, body, headers).then();            
                     res.status(400).json({
                         reason: 'Error',
                         message: 'CLOSED RESTAURANT REJECTED'}).end();
@@ -44,8 +56,7 @@ const saveOrder = (req, res) => {
                             "remoteOrderId": req.body.token
                         }
                     }
-                ).end();
-                //res.status(200).send(resultPromise).end();
+                ).end();              
             })
             .catch((error) => {
                 res.status(400).json(error).end();
@@ -54,7 +65,19 @@ const saveOrder = (req, res) => {
         platform
             .validateNewOrders(req.body)
             .then((ordersSaved) => {
-                if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){            
+                if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){    
+                    const body = {
+                        "availabilityState": "CLOSED",
+                        "closedReason": "CLOSED RESTAURANT REJECTED",
+                        "platformKey": req.body.branchId,
+                        "platformRestaurantId": req.body.branchId              
+                    };
+                    const headers = {
+                        'Authorization': `Bearer ${this.tokenPeya}`,
+                        'Content-Type': 'application/json'
+                    };
+                    const url = `${this.baseUrl}/v2/chains/${this.chainCode}/remoteVendores/${req.body.branchId}/availability`;
+                    axios.put(url, body, headers).then();             
                     res.status(400).json({
                         reason: 'Error',
                         message: 'CLOSED RESTAURANT REJECTED'}).end();
@@ -65,8 +88,7 @@ const saveOrder = (req, res) => {
                             "remoteOrderId": req.body.token
                         }
                     }
-                ).end();
-                // res.status(200).send(ordersSaved).end();
+                ).end();                
             })
             .catch((error) => res.status(400).json(error).end());
 };
