@@ -664,7 +664,7 @@ class Platform {
           throw { orderId: originalId, error };
         }
         try {
-        
+          
           orderCreator = {
             thirdParty: this._platform.name,
             internalCode: this._platform.internalCode,
@@ -676,6 +676,9 @@ class Platform {
             order
           };
          
+          if (order.peya){
+            orderCreator.peya = true;
+          }
           const newCreator = await this.parser.newsFromOrders(
             orderCreator,
             this._platform,
@@ -684,6 +687,9 @@ class Platform {
             branch,
             this.uuid
           );
+          if (order.peya){
+            newCreator.peya = true;
+          }
           /* If restaurant is closed, mark the new as viewed. */
           if (!isOpened) {
 

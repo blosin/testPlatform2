@@ -16,6 +16,9 @@ import ApiClient from '../../sdk/pedidosYa/src/lib/ApiClient';
 import PaginationOptions from '../../sdk/pedidosYa/src/lib/utils/PaginationOptions';
 import Environments from '../../sdk/pedidosYa/src/lib/http/Environments';
 import Aws from '../../../platforms/provider/aws';
+import settings from '../../../config/settings';
+import cron from 'node-cron';
+
 
 class PedidosYa extends Platform {
   constructor(platform) {
@@ -61,6 +64,39 @@ class PedidosYa extends Platform {
       }
   }
 
+   /**
+ * This cron is for update platform parameters in DB.
+ * Can be overriden.
+ */
+   cronGetPlatformParameters() {
+    const schedule = '55 * * * *';
+    const schedulePeyaLogin = '*/25 * * * *';// va con 25
+    //  let currentDate = new Date();
+    // let currentMinute = currentDate.getMinutes();     
+
+    //const schedulePeyaLogin = `*/${currentMinute.toString()} * * * *`
+    cron.schedule(schedule, () => this.getPlatformParameters());
+    cron.schedule(schedulePeyaLogin, () => this.peyaLogin());
+    // mon de login
+
+  }
+
+  peyaLogin() {
+    const dataSend = new URLSearchParams();
+    dataSend.append('username', settings.peyaParams.username);
+    dataSend.append('password', settings.peyaParams.password);
+    dataSend.append('grant_type', settings.peyaParams.grant_type);
+    const configData = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }
+    axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
+      this.tokenPeya = r.access_token;
+    });
+
+  }
+
   /**
    *
    * @override
@@ -92,7 +128,28 @@ class PedidosYa extends Platform {
    * Get platform rejectedMessages
    * */
   getDeliveryTimes() {
-    return this._api.order.deliveryTime.getAll();
+    if (this.statusResponse.deliveryTimes) {
+      return this._api.order.deliveryTime.getAll();
+    }
+    else{
+      return new Promise(async (resolve) => {
+        try {
+          let deliveryTimes = [];
+          deliveryTimes = require('../../../assets/deliveryTimes').generic;
+          deliveryTimes.forEach(
+            (obj) => (obj.platformId = this._platform.internalCode)
+          );
+          resolve(deliveryTimes);
+        } catch (error) {
+          const msg = 'Can not get parameters of ThirdParty.';
+          const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
+            platformError: error
+          });
+          resolve(err);
+        }
+      });
+  
+    }    
   }
 
   /**
@@ -100,12 +157,34 @@ class PedidosYa extends Platform {
    * Get platform rejectedMessages
    * */
   getRejectedMessages() {
-    return new Promise(async (resolve, reject) => {
-      let data = await this._api.order.rejectMessage.getAll();
-      let negatives = require('../../../assets/rejectedMessages').negatives;
-      data = data.concat(negatives);
-      resolve(data);
-    });
+    if (this.statusResponse.rejectedMessages) {
+      return new Promise(async (resolve, reject) => {
+        let data = await this._api.order.rejectMessage.getAll();
+        let negatives = require('../../../assets/rejectedMessages').negatives;
+        data = data.concat(negatives);
+        resolve(data);
+      });
+    }
+    else{
+      return new Promise(async (resolve) => {
+        try {
+          let data = [];
+          data = require('../../../assets/rejectedMessages').generic;
+          const negatives =
+            require('../../../assets/rejectedMessages').negatives;
+          data = data.concat(negatives);
+          data.forEach((obj) => (obj.platformId = this._platform.internalCode));
+          resolve(data);
+        } catch (error) {
+          const msg = 'Can not get parameters of ThirdParty.';
+          const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
+            platformError: error
+          });
+          resolve(err);
+        }
+      });
+    }
+
   }
 
   initRestaurant(idRef) {
@@ -210,6 +289,11 @@ class PedidosYa extends Platform {
    * @override
    */
   receiveOrder(order) {
+    if (order.peya){
+      return new Promise(async (resolve) => {
+        resolve(false);
+      });
+    }
     return new Promise(async (resolve) => {
       try {
         console.log('receive', this.statusResponse.receive);
@@ -245,6 +329,25 @@ class PedidosYa extends Platform {
    * @override
    */
   viewOrder(order) {
+    if (order.peya){
+      return new Promise(async (resolve) => {
+        try {
+          const state = NewsStateSingleton.stateByCod('view');
+          await this.updateOrderState(order, state);
+          resolve(false);
+        } catch (error) {
+          if (!error) error = '';
+          const msg = 'Failed to send the viewed status.';
+          const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
+            orderId: order.id ? order.id.toString() : '-',
+            branchId: order.branchId ? order.branchId.toString() : '-',
+            platformId: order.platformId ? order.platformId.toString() : '-',
+            error: error.toString()
+          });
+          resolve(err);
+        }
+      });
+    }
     return new Promise(async (resolve) => {
       let idRef = '';
       try {
@@ -298,6 +401,37 @@ class PedidosYa extends Platform {
    * @override
    */
   confirmOrder(order, deliveryTimeId) {
+    if (order.peya){
+      return new Promise(async (resolve) => {
+        try {
+          const state = NewsStateSingleton.stateByCod('confirm');
+          await this.updateOrderState(order, state);
+  
+            const body = {
+              acceptanceTime: deliveryTimeId,
+              remoteOrderId: order.id,
+              status: 'order_accepted'
+            };
+            const headers = {
+              'Authorization': `Bearer ${this.tokenPeya}`,
+              'Content-Type': 'application/json'
+            };
+            const url = `https://integration-middleware.stg.restaurant-partners.com/${this.urlConfirmed}/${order.id}`;
+            const res = await axios.post(url, body, headers);
+            resolve(true);
+        } catch (error) {
+          if (!error) error = '';
+          const msg = 'Failed to send the confirmed status.';
+          const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
+            orderId: order.id ? order.id.toString() : '-',
+            branchId: order.branchId ? order.branchId.toString() : '-',
+            platformId: order.platformId ? order.platformId.toString() : '-',
+            error: error.toString()
+          });
+          resolve(err);
+        }
+      });
+    }
     return new Promise(async (resolve) => {
       try {
         console.log('confirm', this.statusResponse.confirm);
@@ -350,6 +484,38 @@ class PedidosYa extends Platform {
    * @override
    */
   branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
+    if (order.peya){
+      return new Promise(async (resolve) => {
+        try {
+          console.log('rejectMessageId', rejectMessageId);
+          console.log('rejectMessageNote', rejectMessageNote);
+          const state = NewsStateSingleton.stateByCod('rej');
+          await this.updateOrderState(order, state);
+          const body = {
+            message: rejectMessageNote,
+            reason: rejectMessageNote,
+            status: "order_rejected"
+          };
+          const headers = {
+            'Authorization': `Bearer ${this.tokenPeya}`,
+            'Content-Type': 'application/json'
+          };
+          const url = `https://integration-middleware.stg.restaurant-partners.com/${this.urlRejected}/${order.id}`;
+          const res = await axios.post(url, body, headers);
+          resolve(true);
+        } catch (error) {
+          if (!error) error = '';
+          const msg = 'Failed to send the rejected status.';
+          const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
+            orderId: order.id ? order.id.toString() : '-',
+            branchId: order.branchId ? order.branchId.toString() : '-',
+            platformId: order.platformId ? order.platformId.toString() : '-',
+            error: error.toString()
+          });
+          resolve(err);
+        }
+      });
+    }
     return new Promise(async (resolve) => {
       try {
         console.log('reject', this.statusResponse.reject);
@@ -399,6 +565,41 @@ class PedidosYa extends Platform {
    * @override
    */
   dispatchOrder(order) {
+    if (order.peya){
+      return new Promise(async (resolve) => {
+        try {
+          const state = NewsStateSingleton.stateByCod('dispatch');
+          await this.updateOrderState(order, state);
+            if (order.expeditionType === 'pickup' || (order?.delivery?.riderPickupTime === null)) {
+              const body = {
+                status: 'order_picked_up'
+              };
+              const headers = {
+                'Authorization': `Bearer ${this.tokenPeya}`,
+                'Content-Type': 'application/json'
+              };
+              const url = `${this.baseUrl}${this.urlDispatched}/${order.id}`;
+              const res = await axios.post(url, body, headers);
+              resolve(true);
+            }
+            else {
+              const url = `https://integration-middleware.stg.restaurant-partners.com/v2/orders/${order.Id}/preparation-completed`;
+              const res = await axios.post(url, null, headers);
+              resolve(true);
+            }
+        } catch (error) {
+          if (!error) error = '';
+          const msg = 'Failed to send the dispatched status.';
+          const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
+            orderId: order.id ? order.id.toString() : '-',
+            branchId: order.branchId ? order.branchId.toString() : '-',
+            platformId: order.platformId ? order.platformId.toString() : '-',
+            error: error.toString()
+          });
+          resolve(err);
+        }
+      });
+    }
     return new Promise(async (resolve) => {
       try {
         console.log('dispatch', this.statusResponse.dispatch);
@@ -524,6 +725,26 @@ class PedidosYa extends Platform {
             arrayFilters: [{ 'i._id': closedProg._id }]
           }
         );
+
+
+        const body = {
+          "availabilityState": "OPEN",
+          "platformKey": branchId,
+          "platformRestaurantId": branchId
+        };
+        const headers = {
+          'Authorization': `Bearer ${this.tokenPeya}`,
+          'Content-Type': 'application/json'
+        };
+        ///v2/chains/{chainCode}/remoteVendors/{posVendorId}/availability
+        const url = `https://integration-middleware.stg.restaurant-partners.com/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        await axios.put(url, body, headers);
+
+
+
+
+
+
         this.updateLastContact();
         resolve(opened);
       } catch (error) {
@@ -595,6 +816,24 @@ class PedidosYa extends Platform {
             }
           }
         );
+
+        const body = {
+          "availabilityState": "CLOSED",
+          "closedReason": "CLOSED RESTAURANT REJECTED",
+          "platformKey": branchId,
+          "platformRestaurantId": branchId
+
+        };
+        const headers = {
+          'Authorization': `Bearer ${this.tokenPeya}`,
+          'Content-Type': 'application/json'
+        };
+        const url = `https://integration-middleware.stg.restaurant-partners.com/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        await axios.put(url, body, headers);
+
+
+
+
         this.updateLastContact;
         resolve(closed);
       } catch (error) {

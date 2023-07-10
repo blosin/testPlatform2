@@ -3,14 +3,16 @@ import SetNews from '../platforms/management/strategies/set-news';
 import PlatformSingleton from '../utils/platforms';
 import { isArray } from 'lodash';
 import NewsTypeSingleton from '../utils/newsType';
+import branches from '../config/branches.json'
 
 
 const saveOrder = (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
-    req.body.branchId = req.params.remoteId;
+    req.body.branchId = branches.find(r => r.name === req.params.remoteId).branchId;
+   
     req.body.state = "PENDING";
 
-    const platform = initPlatform(113, req.uuid);
+    const platform = initPlatform(1, req.uuid);
 
     //verifica si la plataforma esta activa en backoffice
     if (platform._platform.active != undefined && !platform._platform.active) {     
@@ -21,6 +23,7 @@ const saveOrder = (req, res) => {
 
     if (isArray(req.body)) {
         req.body.forEach(async (data) => {
+            data.peya = true;
             let result = await req.body.filter((filtro) => filtro.id === data.id);
             if (result.length > 1)
                 return res
@@ -62,6 +65,7 @@ const saveOrder = (req, res) => {
                 res.status(400).json(error).end();
             });
     } else
+        req.body.peya = true;
         platform
             .validateNewOrders(req.body)
             .then((ordersSaved) => {
