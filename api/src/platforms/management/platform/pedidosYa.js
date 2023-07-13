@@ -18,6 +18,7 @@ import Environments from '../../sdk/pedidosYa/src/lib/http/Environments';
 import Aws from '../../../platforms/provider/aws';
 import settings from '../../../config/settings';
 import cron from 'node-cron';
+import branches from '../config/branches.json'
 
 
 class PedidosYa extends Platform {
@@ -726,24 +727,22 @@ class PedidosYa extends Platform {
           }
         );
 
-
-        const body = {
-          "availabilityState": "OPEN",
-          "platformKey": branchId,
-          "platformRestaurantId": branchId
-        };
-        const headers = {
+        let namePlatform = branches.find(r => r.branchId === branchId).name;
+        let headers = {
           'Authorization': `Bearer ${this.tokenPeya}`,
           'Content-Type': 'application/json'
         };
-        ///v2/chains/{chainCode}/remoteVendors/{posVendorId}/availability
-        const url = `https://integration-middleware.stg.restaurant-partners.com/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`
+        let statusPos = await axios.get(urlAvailability,null,headers);
+       
+        let body = {
+          "availabilityState": "OPEN",
+          "platformKey": statusPos.platformKey,
+          "platformRestaurantId": platformKey.platformRestaurantId
+        };
+
+        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendores/${namePlatform}/availability`;
         await axios.put(url, body, headers);
-
-
-
-
-
 
         this.updateLastContact();
         resolve(opened);
@@ -817,22 +816,23 @@ class PedidosYa extends Platform {
           }
         );
 
-        const body = {
-          "availabilityState": "CLOSED",
-          "closedReason": "CLOSED RESTAURANT REJECTED",
-          "platformKey": branchId,
-          "platformRestaurantId": branchId
-
-        };
-        const headers = {
+          
+        let namePlatform = branches.find(r => r.branchId === branchId).name;
+        let headers = {
           'Authorization': `Bearer ${this.tokenPeya}`,
           'Content-Type': 'application/json'
         };
-        const url = `https://integration-middleware.stg.restaurant-partners.com/v2/chains/${this.chainCode}/remoteVendores/${branchId}/availability`;
+        let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`
+        let statusPos = await axios.get(urlAvailability,null,headers);
+       
+        let body = {
+          "availabilityState": "CLOSED",
+          "closedReason": "OTHER",
+          "platformKey": statusPos.platformKey,
+          "platformRestaurantId": statusPos.platformRestaurantId
+        };      
+        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendores/${namePlatform}/availability`;
         await axios.put(url, body, headers);
-
-
-
 
         this.updateLastContact;
         resolve(closed);

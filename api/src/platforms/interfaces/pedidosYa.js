@@ -25,9 +25,9 @@ module.exports = {
         const orderMapper = (data, platform) => {
           try {
             let order = {};
-            order.id = data.order.token;
-            order.originalId = data.order.token;
-            order.displayId = data.order.token;
+            order.id = data.order.code;
+            order.originalId = data.order.code;
+            order.displayId = data.order.code;
             order.platformId = platform.internalCode;
             order.statusId = NewsStateSingleton.idByCod(stateCod);
             order.orderTime = data.order.createdAt;
@@ -599,9 +599,9 @@ module.exports = {
     if (data.peya){
       return {
         branchReference: data.branchId.toString(), //data.restaurant.integrationCode,
-        posId: data.token,
-        originalId: data.token,
-        displayId: data.token
+        posId: data.code,
+        originalId: data.code,
+        displayId: data.code
       };
     }
     else{

@@ -8,15 +8,16 @@ module.exports = {
     noexpires: '100y' // expires in 100 years
   },
   peyaParams: {
-    username: 'stg03-plugin-integracion-smartpedidos-001',
-    password: 'fcv5LSvsx7', 
-    grant_type: 'client_credentials' // expires in 1800s
+    username: 'us-plugin-smartfran-001',
+    password: 'DQdq6viGNe', 
+    grant_type: 'client_credentials',// expires in 1800s
+    secret : 'ooHie6eipahnee2i'
   },
   tokenStatic:
     '94c5426e3e001bfaef3563ecb6d3e2503df61684cbda87f3d7b36d66eaaaef245bf90a085f5743a3d70f47a9638c05db189d51d14a4709e177625853b4bc45d6',
-  apiUrlLastMile: 'http://localhost:3088/api', //de momento se usa esta cambiar una vez que se cree el microservicio,
-  peya: 'https://integration-middleware.stg.restaurant-partners.com',
-  chainCode: 1,
+  apiUrlLastMile: 'http://localhost:3088/api', //de momento se usa esta cambiar una vez que se cree el microservicio,       
+  peya: 'https://integration-middleware.us.restaurant-partners.com',
+  chainCode: 'LATAMSMARTPEDIDOSTEST0001',
   baseUrl: process.env.BASE_URL || 'http://localhost',
   port: process.env.NODE_PORT || 3087,
   url: function () {

@@ -25,6 +25,18 @@ const required = (req, res, next) => {
         }
       );
     }
+    if(peyaOrder){
+      jwt.verify(
+        req.headers.authorization,
+        settings.peyaParams.secret,
+        (err, token) => {       
+          if (err) throw 'Error el token está corrupto.';
+          if (!token.payload.service.includes('middleware')){
+            throw 'El token está corrupto.';
+          }         
+        }
+      );
+    }
     next();
   } catch (msg) {
     const err = new CustomError(CORE.TOKEN, msg, '11111', { token: req.token });
