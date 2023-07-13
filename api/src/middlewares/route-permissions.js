@@ -5,7 +5,9 @@ import { CORE } from '../utils/errors/codeError';
 
 const required = (req, res, next) => {
   try {
+    let peyaOrder = req.url.startsWith('/order/'); 
     if (
+      !peyaOrder &&
       req.headers &&
       req.headers.authorization &&
       req.headers.authorization.split(' ')[0] === 'Bearer'
