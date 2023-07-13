@@ -18,12 +18,18 @@ import Environments from '../../sdk/pedidosYa/src/lib/http/Environments';
 import Aws from '../../../platforms/provider/aws';
 import settings from '../../../config/settings';
 import cron from 'node-cron';
-import branches from '../config/branches.json'
-
+import branches from '../../../config/branches.json'
 
 class PedidosYa extends Platform {
   constructor(platform) {
     super(platform);
+    this.urlRejected = 'CancelarPedido';
+    this.urlConfirmed = 'v2/order/status';
+    this.urlDispatchedVendor = 'v2/order/status';
+    this.urlDispatched = 'v2/orders';
+    this.urlDelivered = 'EntregarPedido';
+    this.urlRejectedType = 'v2/order/status';
+    this.urlDeliveryTime = 'TiemposEntrega';    
     this._platform = platform;
     this.init();
     this.cronGetPlatformParameters();
@@ -417,7 +423,7 @@ class PedidosYa extends Platform {
               'Authorization': `Bearer ${this.tokenPeya}`,
               'Content-Type': 'application/json'
             };
-            const url = `https://integration-middleware.stg.restaurant-partners.com/${this.urlConfirmed}/${order.id}`;
+            const url = `${settings.peya}/${this.urlConfirmed}/${order.token}`;
             const res = await axios.post(url, body, headers);
             resolve(true);
         } catch (error) {
@@ -501,7 +507,7 @@ class PedidosYa extends Platform {
             'Authorization': `Bearer ${this.tokenPeya}`,
             'Content-Type': 'application/json'
           };
-          const url = `https://integration-middleware.stg.restaurant-partners.com/${this.urlRejected}/${order.id}`;
+          const url = `${settings.peya}/${this.urlRejected}/${order.token}`;
           const res = await axios.post(url, body, headers);
           resolve(true);
         } catch (error) {
@@ -579,12 +585,12 @@ class PedidosYa extends Platform {
                 'Authorization': `Bearer ${this.tokenPeya}`,
                 'Content-Type': 'application/json'
               };
-              const url = `${this.baseUrl}${this.urlDispatched}/${order.id}`;
+              const url = `${settings.peya}${this.urlDispatchedVendor}/${order.token}`;
               const res = await axios.post(url, body, headers);
               resolve(true);
             }
             else {
-              const url = `https://integration-middleware.stg.restaurant-partners.com/v2/orders/${order.Id}/preparation-completed`;
+              const url = `${settings.peya}/${settings.urlDispatched}/${order.token}/preparation-completed`
               const res = await axios.post(url, null, headers);
               resolve(true);
             }

@@ -5,7 +5,7 @@ import { CORE } from '../utils/errors/codeError';
 
 const required = (req, res, next) => {
   try {
-    let peyaOrder = req.url.startsWith('/order/'); 
+    let peyaOrder = req.url.startsWith('/order/') || req.url.startsWith('/remoteId/') ; 
     if (
       !peyaOrder &&
       req.headers &&
@@ -25,13 +25,13 @@ const required = (req, res, next) => {
         }
       );
     }
-    if(peyaOrder){
+    if(peyaOrder && req.headers.authorization.split(' ')[0] === 'Bearer'){
       jwt.verify(
-        req.headers.authorization,
+        req.headers.authorization.split(' ')[1],
         settings.peyaParams.secret,
         (err, token) => {       
           if (err) throw 'Error el token está corrupto.';
-          if (!token.payload.service.includes('middleware')){
+          if (!token.service.includes('middleware')){
             throw 'El token está corrupto.';
           }         
         }
