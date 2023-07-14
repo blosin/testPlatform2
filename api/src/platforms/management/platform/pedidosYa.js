@@ -747,7 +747,7 @@ class PedidosYa extends Platform {
           "platformRestaurantId": platformKey.platformRestaurantId
         };
 
-        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendores/${namePlatform}/availability`;
+        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`;
         await axios.put(url, body, headers);
 
         this.updateLastContact();
@@ -820,9 +820,7 @@ class PedidosYa extends Platform {
               }
             }
           }
-        );
-
-          
+        );          
         let namePlatform = branches.find(r => r.branchId === branchId).name;
         let headers = {
           'Authorization': `Bearer ${this.tokenPeya}`,
@@ -837,7 +835,7 @@ class PedidosYa extends Platform {
           "platformKey": statusPos.platformKey,
           "platformRestaurantId": statusPos.platformRestaurantId
         };      
-        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendores/${namePlatform}/availability`;
+        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`;
         await axios.put(url, body, headers);
 
         this.updateLastContact;
