@@ -803,7 +803,8 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
-        console.log(error);
+        //console.log(error);
+        console.log('error al crear orden');
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
         reject(msg);

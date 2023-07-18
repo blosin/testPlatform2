@@ -180,7 +180,8 @@ module.exports = {
             }
             return details;
           } catch (error) {
-            console.log('Error', error);
+            //console.log('Error', error);
+            console.log('Error de Mapper');
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -524,7 +525,8 @@ module.exports = {
             }
             return details;
           } catch (error) {
-            console.log('Error', error);
+            //console.log('Error', error);
+            console.log('Error de Mapper');
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
