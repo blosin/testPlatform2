@@ -744,7 +744,7 @@ class PedidosYa extends Platform {
         let body = {
           "availabilityState": "OPEN",
           "platformKey": statusPos.platformKey,
-          "platformRestaurantId": platformKey.platformRestaurantId
+          "platformRestaurantId": statusPos.platformRestaurantId
         };
 
         const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`;
