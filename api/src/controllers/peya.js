@@ -36,21 +36,25 @@ const saveOrder = (req, res) => {
         const resultProm = req.body.map((data) => platform.validateNewOrders(data));
         Promise.all(resultProm)
             .then((resultPromise) => {
-                if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED') {                     
-                    let headers = {
-                    'Authorization': `Bearer ${this.tokenPeya}`,
-                    'Content-Type': 'application/json'
-                    };
+                if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED') {      
+                    
+                    const headersConfig = {
+                        headers: { 
+                          'Authorization': `Bearer ${this.tokenPeya}`,
+                          'Content-Type': 'application/json'
+                        }
+                    };                    
+               
                     let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                    let statusPos = axios.get(urlAvailability,null,headers).then(r => {                                        
+                    axios.get(urlAvailability,null,headersConfig).then(r => {                                        
                         let body = {
                             "availabilityState": "CLOSED",
                             "closedReason": "OTHER",
-                            "platformKey": statusPos.platformKey,
-                            "platformRestaurantId": statusPos.platformRestaurantId
+                            "platformKey": r.data[0].platformKey,
+                            "platformRestaurantId": r.data[0].platformRestaurantId
                         };      
                         const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                        axios.put(url, body, headers).then();                       
+                        axios.put(url, body, headersConfig).then();                       
                     });         
                     res.status(400).json({
                         reason: 'Error',
@@ -73,20 +77,22 @@ const saveOrder = (req, res) => {
             .validateNewOrders(req.body)
             .then((ordersSaved) => {
                 if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){    
-                    let headers = {
-                        'Authorization': `Bearer ${this.tokenPeya}`,
-                        'Content-Type': 'application/json'
-                    };
+                    const headersConfig = {
+                        headers: { 
+                          'Authorization': `Bearer ${this.tokenPeya}`,
+                          'Content-Type': 'application/json'
+                        }
+                    };  
                     let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                    axios.get(urlAvailability,null,headers).then(statusPos => {                                        
+                    axios.get(urlAvailability,null,headersConfig).then(statusPos => {                                        
                         let body = {
                             "availabilityState": "CLOSED",
                             "closedReason": "OTHER",
-                            "platformKey": statusPos.platformKey,
-                            "platformRestaurantId": statusPos.platformRestaurantId
+                            "platformKey": statusPos.data[0].platformKey,
+                            "platformRestaurantId": statusPos.data[0].platformRestaurantId
                         };      
                         const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                        axios.put(url, body, headers).then();                       
+                        axios.put(url, body, headersConfig).then();                       
                     });                                
                     res.status(400).json({
                         reason: 'Error',
