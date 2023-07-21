@@ -18,7 +18,7 @@ import Environments from '../../sdk/pedidosYa/src/lib/http/Environments';
 import Aws from '../../../platforms/provider/aws';
 import settings from '../../../config/settings';
 import cron from 'node-cron';
-import branches from '../../../config/branches.json'
+import axios from 'axios';
 
 class PedidosYa extends Platform {
   constructor(platform) {
@@ -31,6 +31,7 @@ class PedidosYa extends Platform {
     this.urlRejectedType = 'v2/order/status';
     this.urlDeliveryTime = 'TiemposEntrega';    
     this._platform = platform;
+    this.tokenPeya='';
     this.init();
     this.cronGetPlatformParameters();
   }
@@ -55,6 +56,7 @@ class PedidosYa extends Platform {
             Environments[this._platform.credentials.data.environment];
           this.statusResponse = this._platform.statusResponse;
           this._api = new ApiClient(this.credentials);
+          this.peyaLogin();
           this.getOrders();
           console.log(`${this._platform.name}.\t Inicializated.`);
         } catch (error) {
@@ -88,7 +90,7 @@ class PedidosYa extends Platform {
 
   }
 
-  peyaLogin() {
+  async peyaLogin() {
     const dataSend = new URLSearchParams();
     dataSend.append('username', settings.peyaParams.username);
     dataSend.append('password', settings.peyaParams.password);
@@ -98,8 +100,11 @@ class PedidosYa extends Platform {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     }
-    axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
-      this.tokenPeya = r.access_token;
+   await axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
+    
+  //  console.log(r);
+      this.tokenPeya = r.data.access_token;
+ 
     });
 
   }
@@ -419,12 +424,14 @@ class PedidosYa extends Platform {
               remoteOrderId: order.id,
               status: 'order_accepted'
             };
-            const headers = {
-              'Authorization': `Bearer ${this.tokenPeya}`,
-              'Content-Type': 'application/json'
+            const headersConfig = {
+              headers:{
+                'Authorization': `Bearer ${this.tokenPeya}`,
+                'Content-Type': 'application/json'
+              }          
             };
             const url = `${settings.peya}/${this.urlConfirmed}/${order.token}`;
-            const res = await axios.post(url, body, headers);
+            const res = await axios.post(url, body, headersConfig);
             resolve(true);
         } catch (error) {
           if (!error) error = '';
@@ -503,12 +510,14 @@ class PedidosYa extends Platform {
             reason: rejectMessageNote,
             status: "order_rejected"
           };
-          const headers = {
-            'Authorization': `Bearer ${this.tokenPeya}`,
-            'Content-Type': 'application/json'
+          const headersConfig = {
+            headers:{
+              'Authorization': `Bearer ${this.tokenPeya}`,
+              'Content-Type': 'application/json'
+            }          
           };
           const url = `${settings.peya}/${this.urlRejected}/${order.token}`;
-          const res = await axios.post(url, body, headers);
+          const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
           if (!error) error = '';
@@ -581,12 +590,14 @@ class PedidosYa extends Platform {
               const body = {
                 status: 'order_picked_up'
               };
-              const headers = {
-                'Authorization': `Bearer ${this.tokenPeya}`,
-                'Content-Type': 'application/json'
+              const headersConfig = {
+                headers:{
+                  'Authorization': `Bearer ${this.tokenPeya}`,
+                  'Content-Type': 'application/json'
+                }          
               };
               const url = `${settings.peya}${this.urlDispatchedVendor}/${order.token}`;
-              const res = await axios.post(url, body, headers);
+              const res = await axios.post(url, body, headersConfig);
               resolve(true);
             }
             else {
@@ -731,24 +742,7 @@ class PedidosYa extends Platform {
           {
             arrayFilters: [{ 'i._id': closedProg._id }]
           }
-        );
-
-        let namePlatform = branches.find(r => r.branchId === branchId).name;
-        let headers = {
-          'Authorization': `Bearer ${this.tokenPeya}`,
-          'Content-Type': 'application/json'
-        };
-        let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`
-        let statusPos = await axios.get(urlAvailability,null,headers);
-       
-        let body = {
-          "availabilityState": "OPEN",
-          "platformKey": statusPos.platformKey,
-          "platformRestaurantId": statusPos.platformRestaurantId
-        };
-
-        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`;
-        await axios.put(url, body, headers);
+        );     
 
         this.updateLastContact();
         resolve(opened);
@@ -821,23 +815,7 @@ class PedidosYa extends Platform {
             }
           }
         );          
-        let namePlatform = branches.find(r => r.branchId === branchId).name;
-        let headers = {
-          'Authorization': `Bearer ${this.tokenPeya}`,
-          'Content-Type': 'application/json'
-        };
-        let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`
-        let statusPos = await axios.get(urlAvailability,null,headers);
        
-        let body = {
-          "availabilityState": "CLOSED",
-          "closedReason": "OTHER",
-          "platformKey": statusPos.platformKey,
-          "platformRestaurantId": statusPos.platformRestaurantId
-        };      
-        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${namePlatform}/availability`;
-        await axios.put(url, body, headers);
-
         this.updateLastContact;
         resolve(closed);
       } catch (error) {

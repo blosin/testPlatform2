@@ -3,17 +3,17 @@ import SetNews from '../platforms/management/strategies/set-news';
 import PlatformSingleton from '../utils/platforms';
 import { isArray } from 'lodash';
 import NewsTypeSingleton from '../utils/newsType';
-import branches from '../config/branches.json'
+import branches from '../config/branches.json';
+import axios from 'axios';
+import settings from '../config/settings';
 
-
-const saveOrder = (req, res) => {
+const saveOrder = async (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
     req.body.branchId = branches.find(r => r.name === req.params.remoteId).branchId;
    
     req.body.state = "PENDING";
 
     const platform = initPlatform(1, req.uuid);
-
     //verifica si la plataforma esta activa en backoffice
     if (platform._platform.active != undefined && !platform._platform.active) {     
         res.status(400).json( {
@@ -35,18 +35,18 @@ const saveOrder = (req, res) => {
         });
         const resultProm = req.body.map((data) => platform.validateNewOrders(data));
         Promise.all(resultProm)
-            .then((resultPromise) => {
+            .then(async (resultPromise) => {
                 if (resultPromise.state === 'CLOSED_RESTAURANT_REJECTED') {      
                     
                     const headersConfig = {
                         headers: { 
-                          'Authorization': `Bearer ${this.tokenPeya}`,
+                          'Authorization': `Bearer ${platform.tokenPeya}`,
                           'Content-Type': 'application/json'
                         }
                     };                    
                
                     let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                    axios.get(urlAvailability,null,headersConfig).then(r => {                                        
+                    await axios.get(urlAvailability,null,headersConfig).then(r => {                                        
                         let body = {
                             "availabilityState": "CLOSED",
                             "closedReason": "OTHER",
@@ -55,7 +55,7 @@ const saveOrder = (req, res) => {
                         };      
                         const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
                         axios.put(url, body, headersConfig).then();                       
-                    });         
+                    });                         
                     res.status(400).json({
                         reason: 'Error',
                         message: 'CLOSED RESTAURANT REJECTED'}).end();            
@@ -75,25 +75,26 @@ const saveOrder = (req, res) => {
         req.body.peya = true;
         platform
             .validateNewOrders(req.body)
-            .then((ordersSaved) => {
-                if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){    
-                    const headersConfig = {
+            .then(async (ordersSaved) => {
+                if (ordersSaved.state === 'CLOSED_RESTAURANT_REJECTED'){                             
+                    const headersConfig2 = {
                         headers: { 
-                          'Authorization': `Bearer ${this.tokenPeya}`,
+                          'Authorization': `Bearer ${platform.tokenPeya}`,
                           'Content-Type': 'application/json'
                         }
-                    };  
+                    };                    
                     let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                    axios.get(urlAvailability,null,headersConfig).then(statusPos => {                                        
-                        let body = {
-                            "availabilityState": "CLOSED",
-                            "closedReason": "OTHER",
-                            "platformKey": statusPos.data[0].platformKey,
-                            "platformRestaurantId": statusPos.data[0].platformRestaurantId
-                        };      
-                        const url = `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
-                        axios.put(url, body, headersConfig).then();                       
-                    });                                
+                   
+                    let statuspos = await axios.get(urlAvailability,headersConfig2);
+                    let body = {
+                        "availabilityState": "CLOSED",
+                        "closedReason": "OTHER",
+                        "platformKey": statuspos.data[0].platformKey,
+                        "platformRestaurantId": statuspos.data[0].platformRestaurantId
+                    };     
+                                       
+                    let temp = await axios.put(urlAvailability, body, headersConfig2); 
+                                         
                     res.status(400).json({
                         reason: 'Error',
                         message: 'CLOSED RESTAURANT REJECTED'}).end();
