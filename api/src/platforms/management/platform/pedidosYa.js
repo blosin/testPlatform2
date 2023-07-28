@@ -23,7 +23,7 @@ import axios from 'axios';
 class PedidosYa extends Platform {
   constructor(platform) {
     super(platform);
-    this.urlRejected = 'CancelarPedido';
+    this.urlRejected = 'v2/order/status';
     this.urlConfirmed = 'v2/order/status';
     this.urlDispatchedVendor = 'v2/order/status';
     this.urlDispatched = 'v2/orders';
@@ -300,8 +300,11 @@ class PedidosYa extends Platform {
    * @param {*} order
    * @override
    */
-  receiveOrder(order) {
-    if (order.peya){
+  async receiveOrder(order) {
+    let fullOrder = await orderModel.findOne({
+      'order.code': order.id
+    });   
+    if (fullOrder.order.peya){      
       return new Promise(async (resolve) => {
         resolve(false);
       });
@@ -340,8 +343,11 @@ class PedidosYa extends Platform {
    * @param {*} order
    * @override
    */
-  viewOrder(order) {
-    if (order.peya){
+  async viewOrder(order) {
+    let fullOrder = await orderModel.findOne({
+      'order.code': order.id
+    });
+    if (fullOrder.order.peya){     
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('view');
@@ -412,8 +418,12 @@ class PedidosYa extends Platform {
    * @param {*} deliveryTimeId
    * @override
    */
-  confirmOrder(order, deliveryTimeId) {
-    if (order.peya){
+  async confirmOrder(order, deliveryTimeId) {
+    let fullOrder = await orderModel.findOne({
+      'order.code': order.id
+    });   
+ 
+    if (fullOrder.order.peya){     
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('confirm');
@@ -430,10 +440,13 @@ class PedidosYa extends Platform {
                 'Content-Type': 'application/json'
               }          
             };
-            const url = `${settings.peya}/${this.urlConfirmed}/${order.token}`;
+            const url = `${settings.peya}/${this.urlConfirmed}/${fullOrder.order.token}`;
+         
             const res = await axios.post(url, body, headersConfig);
+           
             resolve(true);
         } catch (error) {
+         
           if (!error) error = '';
           const msg = 'Failed to send the confirmed status.';
           const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -446,6 +459,7 @@ class PedidosYa extends Platform {
         }
       });
     }
+  
     return new Promise(async (resolve) => {
       try {
         console.log('confirm', this.statusResponse.confirm);
@@ -497,8 +511,14 @@ class PedidosYa extends Platform {
    * @param {*} rejectMessageNote
    * @override
    */
-  branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
-    if (order.peya){
+  async branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
+   
+    let fullOrder = await orderModel.findOne({
+      'order.code': order.id
+    });
+   
+    if (fullOrder.order.peya){
+    
       return new Promise(async (resolve) => {
         try {
           console.log('rejectMessageId', rejectMessageId);
@@ -516,11 +536,13 @@ class PedidosYa extends Platform {
               'Content-Type': 'application/json'
             }          
           };
-          const url = `${settings.peya}/${this.urlRejected}/${order.token}`;
+          
+          const url = `${settings.peya}/${this.urlRejected}/${fullOrder.order.token}`;
           const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
           if (!error) error = '';
+         
           const msg = 'Failed to send the rejected status.';
           const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
             orderId: order.id ? order.id.toString() : '-',
@@ -580,8 +602,13 @@ class PedidosYa extends Platform {
    * @param {*} order
    * @override
    */
-  dispatchOrder(order) {
-    if (order.peya){
+  async dispatchOrder(order) {
+    let fullOrder = await orderModel.findOne({
+      'order.code': order.id
+    });
+   
+    if (fullOrder.order.peya){
+    
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('dispatch');
@@ -596,12 +623,12 @@ class PedidosYa extends Platform {
                   'Content-Type': 'application/json'
                 }          
               };
-              const url = `${settings.peya}${this.urlDispatchedVendor}/${order.token}`;
+              const url = `${settings.peya}${this.urlDispatchedVendor}/${fullOrder.order.token}`;
               const res = await axios.post(url, body, headersConfig);
               resolve(true);
             }
             else {
-              const url = `${settings.peya}/${settings.urlDispatched}/${order.token}/preparation-completed`
+              const url = `${settings.peya}/${settings.urlDispatched}/${fullOrder.order.token}/preparation-completed`
               const res = await axios.post(url, null, headers);
               resolve(true);
             }
