@@ -37,7 +37,7 @@ module.exports = {
             order.preOrder = data.order.preOrder;
             order.observations =
               data.order.comments.customerComment;
-            order.ownDelivery = data.order.delivery!==null && data.order.delivery.riderPickupTime === "";
+            order.ownDelivery = data.order.delivery!==null && data.order.delivery.riderPickupTime === null;
             if (data.order.pickup === null) order.ownDelivery = false;
             return order;
           } catch (error) {
@@ -61,22 +61,22 @@ module.exports = {
           return false;
         };
   
-        const paymentenMapper = (payment, discounts, price) => {
+        const paymentenMapper = (payment, price) => {
           try {
             let paymentNews = {};
             /* Descuentos */
             paymentNews.discount = 0;
             paymentNews.voucher = '';
-  
-            discounts.forEach((d, i) => {
-              if (i === 0) {
-                paymentNews.discount = d.amount;
-                paymentNews.voucher = d.name;
-              } else {
-                paymentNews.discount += d.amount;
-                paymentNews.voucher += ` | ${d.notes}`;
-              }
-            });
+            paymentNews.discount = price.discountAmountTotal;
+            // discounts.forEach((d, i) => {
+            //   if (i === 0) {
+            //     paymentNews.discount = d.amount;
+            //     paymentNews.voucher = d.name;
+            //   } else {
+            //     paymentNews.discount += d.amount;
+            //     paymentNews.voucher += ` | ${d.notes}`;
+            //   }
+            // });
             /* Tipo pago - vuelto - pago parcial */
             paymentNews.remaining = 0; /* Vuelto - Inicializado con 0 */
             paymentNews.partial = 0; /* Con cuanto paga - Inicializado con 0 */
@@ -118,11 +118,11 @@ module.exports = {
         const customerMapper = (customerRecive) => {
           try {
             let customer = {};
-            customer.id = customerRecive.id;
-            customer.name = customerRecive.firstName + ' ' + customerRecive.lastName;
-            customer.address = null;
-            customer.phone = customerRecive.mobilePhone;
-            customer.email = customerRecive.email;
+            customer.id = customerRecive.customer.id;
+            customer.name = customerRecive.customer.firstName + ' ' + customerRecive.customer.lastName;
+            customer.address = customerRecive.delivery.address.street + customerRecive.delivery.address.number;
+            customer.phone = customerRecive.customer.mobilePhone;
+            customer.email = customerRecive.customer.email;
             customer.dni = null;
             return customer;
           } catch (error) {
@@ -175,8 +175,11 @@ module.exports = {
                   : 99999;
                 det.note = detail.comment;
                 det.sku = skuComparator;
-                det.optionalText = detail.comment;
-                details.push(det);           
+                //det.optionalText = detail.comment;
+                for (let product of detail.selectedToppings) {
+                  det.optionalText += product.name+' '+product.quantity+ ' '+ product.price + '\n';
+                }                          
+                details.push(det); 
             }
             return details;
           } catch (error) {
@@ -228,12 +231,11 @@ module.exports = {
           news.branchId = data.branchId;
   
           news.order = orderMapper(data, platform);
-          news.order.customer = customerMapper(data.order.customer);
+          news.order.customer = customerMapper(data.order);
           news.order.details = detailsMapper(data.order);
   
           news.order.payment = paymentenMapper(
             data.order.payment,
-            data.order.discounts,
             data.order.price          
           );
           news.order.driver = driverMapper(data.order.delivery);
