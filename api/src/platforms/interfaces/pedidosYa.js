@@ -31,17 +31,17 @@ module.exports = {
             order.platformId = platform.internalCode;
             order.statusId = NewsStateSingleton.idByCod(stateCod);
             order.orderTime = data.order.createdAt;
-            order.deliveryTime = data.order.delivery.expectedDeliveryTime;
+            order.deliveryTime = data.order.delivery ? data.order.delivery.expectedDeliveryTime : null;
             order.pickupOnShop = data.order.pickup;// ver
             order.pickupDateOnShop = data.order.pickup;//VER
             order.preOrder = data.order.preOrder;
             order.observations =
               data.order.comments.customerComment;
-            order.ownDelivery = data.order.delivery!==null && data.order.delivery.riderPickupTime === null;
+            order.ownDelivery = data.order.delivery && !data.order.delivery.riderPickupTime;
             if (data.order.pickup === null) order.ownDelivery = false;
             return order;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY orderMapper';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -120,13 +120,13 @@ module.exports = {
             let customer = {};
             customer.id = customerRecive.customer.id;
             customer.name = customerRecive.customer.firstName + ' ' + customerRecive.customer.lastName;
-            customer.address = customerRecive.delivery.address.street + customerRecive.delivery.address.number;
+            customer.address = customerRecive.delivery && customerRecive.delivery.address ? customerRecive.delivery.address.street + customerRecive.delivery.address.number: null;
             customer.phone = customerRecive.customer.mobilePhone;
             customer.email = customerRecive.customer.email;
             customer.dni = null;
             return customer;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY customerMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -165,7 +165,7 @@ module.exports = {
     
                 det.productId = detail.id;
                 det.count = detail.quantity;
-                det.price = detail.paidPrice;
+                det.price = parseFloat(detail.unitPrice);
                 det.promo = 0;
                 det.groupId = '0';
                 det.discount = detail.discountAmount;
@@ -175,17 +175,21 @@ module.exports = {
                   : 99999;
                 det.note = detail.comment;
                 det.sku = skuComparator;
-                //det.optionalText = detail.comment;
+                det.optionalText = "";
+                let totalPrice = 0;
                 for (let product of detail.selectedToppings) {
-                  det.optionalText += product.name+' '+product.quantity+ ' '+ product.price + '\n';
-                }                          
+                  totalPrice += parseFloat(product.price);
+                  det.optionalText += `${product.name} x ${product.quantity}, `; // ${product.price} '/'`;
+                }         
+                det.price += parseFloat(totalPrice);
+                det.optionalText += `Total Extra $ ${totalPrice}`;
                 details.push(det); 
             }
             return details;
           } catch (error) {
             //console.log('Error', error);
             console.log('Error de Mapper');
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY detailsMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -206,7 +210,7 @@ module.exports = {
               country: branch.address.country ? branch.address.country : ''
             };
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY extraDataMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -244,7 +248,7 @@ module.exports = {
             
           resolve(news);
         } catch (error) {
-          const msg = 'No se pudo parsear la orden de PY.';
+          const msg = 'No se pudo parsear la orden de PY extraDataMapper2.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
             branch,
@@ -277,7 +281,7 @@ module.exports = {
             if (data.order.pickup) order.ownDelivery = false;
             return order;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY orderMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -340,7 +344,7 @@ module.exports = {
             paymentNews.note = payment.notes;
             return paymentNews;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY paymentenMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -361,7 +365,7 @@ module.exports = {
             customer.dni = order.user.identityCard;
             return customer;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY customerMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
@@ -382,7 +386,7 @@ module.exports = {
             };
             return driver;
           } catch (error) {
-            const msg = 'No se pudo parsear la orden de PY.';
+            const msg = 'No se pudo parsear la orden de PY driverMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
               branch,
