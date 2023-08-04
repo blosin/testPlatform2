@@ -119,18 +119,14 @@ const setNews = (req, res) => {
 
 const updateDate = async (req, res) => {
   try {
-    console.log('updateDate 1')
     const platformFactory = new PlatformFactory();
     const pedidosYaInternalCode = 1;
     const pedidosYa = platformFactory.createPlatform(
       PlatformSingleton.getByCod(pedidosYaInternalCode),
       req.uuid
     );
-    console.log('updateDate 2')
     pedidosYa.callHeartBeat(req.token);
-    console.log('updateDate 3')
     udpdateLastGetNews(req.token.branchId);
-    console.log('updateDate 4')
     return res.status(200).json({}).end();
   } catch (error) {
     const msg = 'No se pudieron obtener novedades de la sucursal';

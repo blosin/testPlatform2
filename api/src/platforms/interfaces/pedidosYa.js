@@ -32,8 +32,8 @@ module.exports = {
             order.statusId = NewsStateSingleton.idByCod(stateCod);
             order.orderTime = data.order.createdAt;
             order.deliveryTime = data.order.delivery ? data.order.delivery.expectedDeliveryTime : null;
-            order.pickupOnShop = data.order.pickup;// ver
-            order.pickupDateOnShop = data.order.pickup;//VER
+            order.pickupOnShop = data.order.pickup ? true : false;
+            order.pickupDateOnShop = data.order.pickup ? data.order.pickup.pickupTime : null;
             order.preOrder = data.order.preOrder;
             order.observations =
               data.order.comments.customerComment;
@@ -80,16 +80,18 @@ module.exports = {
             /* Tipo pago - vuelto - pago parcial */
             paymentNews.remaining = 0; /* Vuelto - Inicializado con 0 */
             paymentNews.partial = 0; /* Con cuanto paga - Inicializado con 0 */
+
             if (payment.type.includes("cash")) {
               paymentNews.typeId = paymentType.Efectivo.paymentId;          
             } else if (
               payment.type.includes("card")
             )
-              paymentNews.typeId = paymentType.CREDIT.paymentId;    
+            paymentNews.typeId = paymentType.CREDIT.paymentId;    
   
             /* Totales */        
-            paymentNews.online = payment.type === 'paid' &&  payment.status === 'online';//peya
-    
+            paymentNews.online = payment.status === 'paid'; // payment.type === 'paid' &&  payment.status === 'online';//peya payment.status === 'paid' // 
+            if (paymentNews.online) paymentNews.typeId = paymentType.CREDIT.paymentId;
+
             paymentNews.shipping = 0;
    
             price.deliveryFees.forEach((d, i) => {
@@ -175,20 +177,23 @@ module.exports = {
                   : 99999;
                 det.note = detail.comment;
                 det.sku = skuComparator;
-                det.optionalText = "";
+                let contador = 0;
                 let totalPrice = 0;
                 for (let product of detail.selectedToppings) {
+                  if (contador===0){
+                    det.optionalText = "";
+                    contador++;
+                  }
                   totalPrice += parseFloat(product.price);
                   det.optionalText += `${product.name} x ${product.quantity}, `; // ${product.price} '/'`;
                 }         
                 det.price += parseFloat(totalPrice);
-                det.optionalText += `Total Extra $ ${totalPrice}`;
+                if(det.optionalText)
+                  det.optionalText += totalPrice != 0 ? `Total Extra $ ${totalPrice}` : "";
                 details.push(det); 
             }
             return details;
           } catch (error) {
-            //console.log('Error', error);
-            console.log('Error de Mapper');
             const msg = 'No se pudo parsear la orden de PY detailsMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -531,8 +536,6 @@ module.exports = {
             }
             return details;
           } catch (error) {
-            //console.log('Error', error);
-            console.log('Error de Mapper');
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,

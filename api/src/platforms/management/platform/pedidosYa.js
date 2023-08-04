@@ -102,7 +102,6 @@ class PedidosYa extends Platform {
     }
    await axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
     
-  //  console.log(r);
       this.tokenPeya = r.data.access_token;
  
     });
