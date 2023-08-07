@@ -422,7 +422,7 @@ class PedidosYa extends Platform {
       'order.code': order.id
     });   
  
-    if (fullOrder.order.peya){     
+    if (fullOrder.order.peya){ 
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('confirm');
@@ -605,9 +605,11 @@ class PedidosYa extends Platform {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
-   
+
     if (fullOrder.order.peya){
-    
+      const token = fullOrder.order.token.split('-_-');
+      fullOrder.order.token = token[1];
+
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('dispatch');
