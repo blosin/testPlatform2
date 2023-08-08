@@ -629,7 +629,7 @@ class PedidosYa extends Platform {
               resolve(true);
             }
             else {
-              const url = `${settings.peya}/${settings.urlDispatched}/${fullOrder.order.token}/preparation-completed`
+              const url = `${settings.peya}/${this.urlDispatched}/${fullOrder.order.token}/preparation-completed`
               const res = await axios.post(url, null, headers);
               resolve(true);
             }
