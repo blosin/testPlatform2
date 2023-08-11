@@ -607,8 +607,8 @@ class PedidosYa extends Platform {
     });
 
     if (fullOrder.order.peya){
-      const token = fullOrder.order.token.split('-_-');
-      fullOrder.order.token = token[1];
+      // const token = fullOrder.order.token.split('-_-');
+      // fullOrder.order.token = `${token[0]}-_-${token[1]}`;
 
       return new Promise(async (resolve) => {
         try {
