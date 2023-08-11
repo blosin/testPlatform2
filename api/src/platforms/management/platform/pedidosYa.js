@@ -29,9 +29,9 @@ class PedidosYa extends Platform {
     this.urlDispatched = 'v2/orders';
     this.urlDelivered = 'EntregarPedido';
     this.urlRejectedType = 'v2/order/status';
-    this.urlDeliveryTime = 'TiemposEntrega';    
+    this.urlDeliveryTime = 'TiemposEntrega';
     this._platform = platform;
-    this.tokenPeya='';
+    this.tokenPeya = '';
     this.init();
     this.cronGetPlatformParameters();
   }
@@ -73,11 +73,11 @@ class PedidosYa extends Platform {
       }
   }
 
-   /**
- * This cron is for update platform parameters in DB.
- * Can be overriden.
- */
-   cronGetPlatformParameters() {
+  /**
+* This cron is for update platform parameters in DB.
+* Can be overriden.
+*/
+  cronGetPlatformParameters() {
     const schedule = '55 * * * *';
     const schedulePeyaLogin = '*/25 * * * *';// va con 25
     //  let currentDate = new Date();
@@ -100,10 +100,10 @@ class PedidosYa extends Platform {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     }
-   await axios.post(`${settings.peya}/v2/login`, dataSend.toString(), configData).then(r => {
-    
+    await axios.post(`${this._platform.credentials.data.baseUrl}/v2/login`, dataSend.toString(), configData).then(r => {
+
       this.tokenPeya = r.data.access_token;
- 
+
     });
 
   }
@@ -142,7 +142,7 @@ class PedidosYa extends Platform {
     if (this.statusResponse.deliveryTimes) {
       return this._api.order.deliveryTime.getAll();
     }
-    else{
+    else {
       return new Promise(async (resolve) => {
         try {
           let deliveryTimes = [];
@@ -159,8 +159,8 @@ class PedidosYa extends Platform {
           resolve(err);
         }
       });
-  
-    }    
+
+    }
   }
 
   /**
@@ -176,7 +176,7 @@ class PedidosYa extends Platform {
         resolve(data);
       });
     }
-    else{
+    else {
       return new Promise(async (resolve) => {
         try {
           let data = [];
@@ -302,8 +302,8 @@ class PedidosYa extends Platform {
   async receiveOrder(order) {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
-    });   
-    if (fullOrder.order.peya){      
+    });
+    if (fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         resolve(false);
       });
@@ -346,7 +346,7 @@ class PedidosYa extends Platform {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
-    if (fullOrder.order.peya){     
+    if (fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('view');
@@ -420,32 +420,32 @@ class PedidosYa extends Platform {
   async confirmOrder(order, deliveryTimeId) {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
-    });   
- 
-    if (fullOrder.order.peya){ 
+    });
+
+    if (fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('confirm');
           await this.updateOrderState(order, state);
-  
-            const body = {
-              acceptanceTime: deliveryTimeId,
-              remoteOrderId: order.id,
-              status: 'order_accepted'
-            };
-            const headersConfig = {
-              headers:{
-                'Authorization': `Bearer ${this.tokenPeya}`,
-                'Content-Type': 'application/json'
-              }          
-            };
-            const url = `${settings.peya}/${this.urlConfirmed}/${fullOrder.order.token}`;
-         
-            const res = await axios.post(url, body, headersConfig);
-           
-            resolve(true);
+
+          const body = {
+            acceptanceTime: deliveryTimeId,
+            remoteOrderId: order.id,
+            status: 'order_accepted'
+          };
+          const headersConfig = {
+            headers: {
+              'Authorization': `Bearer ${this.tokenPeya}`,
+              'Content-Type': 'application/json'
+            }
+          };
+          const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlConfirmed}/${fullOrder.order.token}`;
+
+          const res = await axios.post(url, body, headersConfig);
+
+          resolve(true);
         } catch (error) {
-         
+
           if (!error) error = '';
           const msg = 'Failed to send the confirmed status.';
           const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -458,7 +458,7 @@ class PedidosYa extends Platform {
         }
       });
     }
-  
+
     return new Promise(async (resolve) => {
       try {
         console.log('confirm', this.statusResponse.confirm);
@@ -511,13 +511,13 @@ class PedidosYa extends Platform {
    * @override
    */
   async branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
-   
+
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
-   
-    if (fullOrder.order.peya){
-    
+
+    if (fullOrder.order.peya) {
+
       return new Promise(async (resolve) => {
         try {
           console.log('rejectMessageId', rejectMessageId);
@@ -525,23 +525,23 @@ class PedidosYa extends Platform {
           const state = NewsStateSingleton.stateByCod('rej');
           await this.updateOrderState(order, state);
           const body = {
-            message: rejectMessageNote,
-            reason: rejectMessageNote,
+            message: 'BAD_WEATHER',//rejectMessageNote,
+            reason: 'BAD_WEATHER',//rejectMessageNote,
             status: "order_rejected"
           };
           const headersConfig = {
-            headers:{
+            headers: {
               'Authorization': `Bearer ${this.tokenPeya}`,
               'Content-Type': 'application/json'
-            }          
+            }
           };
-          
-          const url = `${settings.peya}/${this.urlRejected}/${fullOrder.order.token}`;
+
+          const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlRejected}/${fullOrder.order.token}`;
           const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
           if (!error) error = '';
-         
+
           const msg = 'Failed to send the rejected status.';
           const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
             orderId: order.id ? order.id.toString() : '-',
@@ -606,7 +606,7 @@ class PedidosYa extends Platform {
       'order.code': order.id
     });
 
-    if (fullOrder.order.peya){
+    if (fullOrder.order.peya) {
       // const token = fullOrder.order.token.split('-_-');
       // fullOrder.order.token = `${token[0]}-_-${token[1]}`;
 
@@ -614,25 +614,25 @@ class PedidosYa extends Platform {
         try {
           const state = NewsStateSingleton.stateByCod('dispatch');
           await this.updateOrderState(order, state);
-            if (order.expeditionType === 'pickup' || (order?.delivery?.riderPickupTime === null)) {
-              const body = {
-                status: 'order_picked_up'
-              };
-              const headersConfig = {
-                headers:{
-                  'Authorization': `Bearer ${this.tokenPeya}`,
-                  'Content-Type': 'application/json'
-                }          
-              };
-              const url = `${settings.peya}${this.urlDispatchedVendor}/${fullOrder.order.token}`;
-              const res = await axios.post(url, body, headersConfig);
-              resolve(true);
+          const headersConfig = {
+            headers: {
+              'Authorization': `Bearer ${this.tokenPeya}`,
+              'Content-Type': 'application/json'
             }
-            else {
-              const url = `${settings.peya}/${this.urlDispatched}/${fullOrder.order.token}/preparation-completed`
-              const res = await axios.post(url, null, headers);
-              resolve(true);
-            }
+          };
+          if (order.expeditionType.toString().trim() == 'pickup' || (order?.delivery?.riderPickupTime === null)) {
+            const body = {
+              status: 'order_picked_up'
+            };
+            const url = `${this._platform.peya.credentials.data.baseUrl}${this.urlDispatchedVendor}/${fullOrder.order.token}`;
+            const res = await axios.post(url, body, headersConfig);
+            resolve(true);
+          }
+          else {
+            const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlDispatched}/${fullOrder.order.token}/preparation-completed`
+            const res = await axios.post(url, null, headersConfig);
+            resolve(true);
+          }
         } catch (error) {
           if (!error) error = '';
           const msg = 'Failed to send the dispatched status.';
@@ -770,7 +770,7 @@ class PedidosYa extends Platform {
           {
             arrayFilters: [{ 'i._id': closedProg._id }]
           }
-        );     
+        );
 
         this.updateLastContact();
         resolve(opened);
@@ -842,8 +842,8 @@ class PedidosYa extends Platform {
               }
             }
           }
-        );          
-       
+        );
+
         this.updateLastContact;
         resolve(closed);
       } catch (error) {

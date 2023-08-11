@@ -60,7 +60,9 @@ const branchSchema = new Schema(
         branchReference: { type: String },
         branchIdReference: { type: String },
         progClosed: [{ close: Date, open: Date, description: String }],
-        isActive: { type: Boolean, default: true }
+        isActive: { type: Boolean, default: true },
+        StateAPI: { type: Boolean },
+        branchName: { type: String }        
       }
     ],
     lastGetNews: { type: Date },

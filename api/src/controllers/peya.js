@@ -3,14 +3,19 @@ import SetNews from '../platforms/management/strategies/set-news';
 import PlatformSingleton from '../utils/platforms';
 import { isArray } from 'lodash';
 import NewsTypeSingleton from '../utils/newsType';
-import branches from '../config/branches.json';
 import axios from 'axios';
 import settings from '../config/settings';
+import branch from '../models/branch';
+import platforms from '../models/platform'
 
 const saveOrder = async (req, res) => {
     /* TODO: VALIDATE DATA TYPE OF INPUT */
-    req.body.branchId = branches.find(r => r.name === req.params.remoteId).branchId;
-   
+    //req.body.branchId = branches.find(r => r.name === req.params.remoteId).branchId;
+    
+    let peya = await platforms.findOne({ name: 'PedidosYa'});
+    let currentBranch = await branch.findOne({'platforms._id':peya.id, 'platforms.branchName':req.params.remoteId});
+    req.body.branchId = currentBranch.branchId;
+
     req.body.state = "PENDING";
 
     const platform = initPlatform(1, req.uuid);
@@ -44,7 +49,7 @@ const saveOrder = async (req, res) => {
                         }
                     };   
                                      
-                    let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${remoteId}/availability`;
+                    let urlAvailability= `${platform._platform.credentials.data.baseUrl}/v2/chains/${settings.chainCode}/remoteVendors/${remoteId}/availability`;
                    
                    let statuspos = await axios.get(urlAvailability,headersConfig2);
                     let body = {
@@ -84,7 +89,7 @@ const saveOrder = async (req, res) => {
                           'Content-Type': 'application/json'
                         }
                     };                    
-                    let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
+                    let urlAvailability= `${platform._platform.credentials.data.baseUrl}/v2/chains/${settings.chainCode}/remoteVendors/${req.params.remoteId}/availability`;
                    
                    let statuspos = await axios.get(urlAvailability,headersConfig2);
                     let body = {
