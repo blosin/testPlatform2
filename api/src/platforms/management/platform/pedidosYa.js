@@ -418,6 +418,7 @@ class PedidosYa extends Platform {
    * @override
    */
   async confirmOrder(order, deliveryTimeId) {
+    
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
@@ -439,13 +440,12 @@ class PedidosYa extends Platform {
               'Content-Type': 'application/json'
             }
           };
-          const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlConfirmed}/${fullOrder.order.token}`;
 
+          const url = `${this._platform.credentials.data.baseUrl}/${this.urlConfirmed}/${fullOrder.order.token}`;
+          
           const res = await axios.post(url, body, headersConfig);
-
           resolve(true);
         } catch (error) {
-
           if (!error) error = '';
           const msg = 'Failed to send the confirmed status.';
           const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -511,7 +511,6 @@ class PedidosYa extends Platform {
    * @override
    */
   async branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
-
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
@@ -520,8 +519,6 @@ class PedidosYa extends Platform {
 
       return new Promise(async (resolve) => {
         try {
-          console.log('rejectMessageId', rejectMessageId);
-          console.log('rejectMessageNote', rejectMessageNote);
           const state = NewsStateSingleton.stateByCod('rej');
           await this.updateOrderState(order, state);
           const body = {
@@ -536,7 +533,7 @@ class PedidosYa extends Platform {
             }
           };
 
-          const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlRejected}/${fullOrder.order.token}`;
+          const url = `${this._platform.credentials.data.baseUrl}/${this.urlRejected}/${fullOrder.order.token}`;
           const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
@@ -620,16 +617,17 @@ class PedidosYa extends Platform {
               'Content-Type': 'application/json'
             }
           };
-          if (order.expeditionType.toString().trim() == 'pickup' || (order?.delivery?.riderPickupTime === null)) {
+
+          if (fullOrder.order.expeditionType.trim() == 'pickup' || (fullOrder?.order?.delivery?.riderPickupTime === null)) {
             const body = {
               status: 'order_picked_up'
             };
-            const url = `${this._platform.peya.credentials.data.baseUrl}${this.urlDispatchedVendor}/${fullOrder.order.token}`;
+            const url = `${this._platform.credentials.data.baseUrl}/${this.urlDispatchedVendor}/${fullOrder.order.token}`;
             const res = await axios.post(url, body, headersConfig);
             resolve(true);
           }
           else {
-            const url = `${this._platform.peya.credentials.data.baseUrl}/${this.urlDispatched}/${fullOrder.order.token}/preparation-completed`
+            const url = `${this._platform.credentials.data.baseUrl}/${this.urlDispatched}/${fullOrder.order.token}/preparation-completed`
             const res = await axios.post(url, null, headersConfig);
             resolve(true);
           }
