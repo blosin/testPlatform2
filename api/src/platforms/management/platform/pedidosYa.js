@@ -86,8 +86,6 @@ class PedidosYa extends Platform {
     //const schedulePeyaLogin = `*/${currentMinute.toString()} * * * *`
     cron.schedule(schedule, () => this.getPlatformParameters());
     cron.schedule(schedulePeyaLogin, () => this.peyaLogin());
-    // mon de login
-
   }
 
   async peyaLogin() {
@@ -172,7 +170,9 @@ class PedidosYa extends Platform {
       return new Promise(async (resolve, reject) => {
         let data = await this._api.order.rejectMessage.getAll();
         let negatives = require('../../../assets/rejectedMessages').negatives;
+        let peyaRejects = require('../../../assets/rejectedMessages').peyaRejects;
         data = data.concat(negatives);
+        data = data.concat(peyaRejects);
         resolve(data);
       });
     }
@@ -183,7 +183,9 @@ class PedidosYa extends Platform {
           data = require('../../../assets/rejectedMessages').generic;
           const negatives =
             require('../../../assets/rejectedMessages').negatives;
+          let peyaRejects = require('../../../assets/rejectedMessages').peyaRejects;
           data = data.concat(negatives);
+          data = data.concat(peyaRejects);  
           data.forEach((obj) => (obj.platformId = this._platform.internalCode));
           resolve(data);
         } catch (error) {
@@ -515,17 +517,29 @@ class PedidosYa extends Platform {
       'order.code': order.id
     });
 
+    const peyaRejectsToSearch =
+    require('../../../assets/rejectedMessages').peyaRejectsToSearch;
+    let message = peyaRejectsToSearch.find(r => r.id == rejectMessageId);
+    console.log(message);
     if (fullOrder.order.peya) {
-
+      let body = undefined;
+      if (message)
+        body = {
+          message: message.message,
+          reason: message.reason,
+          status: "order_rejected"
+        };      
+      else
+        body = {
+          message: 'Producto no disponible',//rejectMessageNote,
+          reason: 'ITEM_UNAVAILABLE',//rejectMessageNote,
+          status: "order_rejected"
+        };
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('rej');
           await this.updateOrderState(order, state);
-          const body = {
-            message: 'BAD_WEATHER',//rejectMessageNote,
-            reason: 'BAD_WEATHER',//rejectMessageNote,
-            status: "order_rejected"
-          };
+     
           const headersConfig = {
             headers: {
               'Authorization': `Bearer ${this.tokenPeya}`,
@@ -552,16 +566,25 @@ class PedidosYa extends Platform {
     }
     return new Promise(async (resolve) => {
       try {
+     
         console.log('reject', this.statusResponse.reject);
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
         if (this.statusResponse.reject) {
-          const res = await this._api.order.reject(
-            order.id,
-            rejectMessageId,
-            rejectMessageNote
-          );
+          let res = undefined;
+          if (message)
+            res = await this._api.order.reject(
+              order.id,
+              7,
+              'Faltan productos para tu pedido'
+            );
+          else
+            res = await this._api.order.reject(
+              order.id,
+              rejectMessageId,
+              rejectMessageNote
+            );
           resolve(res);
         } else resolve(false);
       } catch (error) {
