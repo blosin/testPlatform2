@@ -64,7 +64,7 @@ class Aws {
       handleMessageBatch: async (messages) => {
         sqs.getQueueAttributes(sqsParams, function (err, data) {
           if (err) {
-            console.log(err, err.stack);
+            console.log('Error pollFromQueue');
           } else {
             sizeMessageSQS = parseInt(
               data.Attributes.ApproximateNumberOfMessages

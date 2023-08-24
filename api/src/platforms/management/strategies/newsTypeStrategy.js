@@ -126,7 +126,7 @@ class NewsTypeStrategy {
         );
         return resolve(updated);
       } catch (err) {
-        console.log(err);
+        console.log('Error updateNew');
         const msg = 'No se pudo actualizar la novedad.';
         const meta = { findQuery, updateQuery, options, err };
         const error = new CustomError(DB.FINDBYID, msg, this.uuid, meta);

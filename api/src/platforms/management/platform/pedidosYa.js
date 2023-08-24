@@ -234,7 +234,7 @@ class PedidosYa extends Platform {
           if (data.logistics) data.driver = await this.retriveDriver(data);
           this.saveNewOrders(data, this._platform);
         } else {
-          console.log('La orden ya esta guardada', data.id);
+          console.log('La orden ya esta guardada');
         }
       }
       // ------ REJECTED
@@ -312,7 +312,7 @@ class PedidosYa extends Platform {
     }
     return new Promise(async (resolve) => {
       try {
-        console.log('receive', this.statusResponse.receive);
+        console.log('receive');
         if (this.statusResponse.receive) {
           const branch = await branchModel.findOne({
             branchId: order.branchId
@@ -370,7 +370,7 @@ class PedidosYa extends Platform {
     return new Promise(async (resolve) => {
       let idRef = '';
       try {
-        console.log('view:', this.statusResponse.view);
+        console.log('view');
         const state = NewsStateSingleton.stateByCod('view');
         await this.updateOrderState(order, state);
         if (this.statusResponse.view) {
@@ -463,7 +463,7 @@ class PedidosYa extends Platform {
 
     return new Promise(async (resolve) => {
       try {
-        console.log('confirm', this.statusResponse.confirm);
+        console.log('confirm');
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('confirm');
         await this.updateOrderState(order, state);
@@ -520,7 +520,6 @@ class PedidosYa extends Platform {
     const peyaRejectsToSearch =
     require('../../../assets/rejectedMessages').peyaRejectsToSearch;
     let message = peyaRejectsToSearch.find(r => r.id == rejectMessageId);
-    console.log(message);
     if (fullOrder.order.peya) {
       let body = undefined;
       if (message)
@@ -567,7 +566,7 @@ class PedidosYa extends Platform {
     return new Promise(async (resolve) => {
       try {
      
-        console.log('reject', this.statusResponse.reject);
+        console.log('reject');
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
@@ -669,7 +668,7 @@ class PedidosYa extends Platform {
     }
     return new Promise(async (resolve) => {
       try {
-        console.log('dispatch', this.statusResponse.dispatch);
+        console.log('dispatch');
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('dispatch');
         await this.updateOrderState(order, state);
@@ -727,7 +726,7 @@ class PedidosYa extends Platform {
               .map((idRef) => this._api.event.heartBeat(parseInt(idRef, 10)));
             const hb = await Promise.all(hbProm);
             this.updateLastContact();
-            console.log('HB sended: ', platformBranch.branchIdReference);
+            console.log('HB sended');
             resolve(hb);
           } else {
             resolve();

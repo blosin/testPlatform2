@@ -46,7 +46,6 @@ class ReceiveStrategy extends NewsTypeStrategy {
       try {
         this.savedNew = await this.findNew(this.newToSet.id);
         const isValid = true;
-        console.log(343434,this.savedNew)
         const platformResult = await this.platform.receiveOrder(
           this.savedNew.order
         );

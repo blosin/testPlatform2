@@ -144,29 +144,7 @@ const saveOrder = async (req, res) => {
             })
             
 };
-/*
-const ClosedPOS = async(remoteId) => {
-    console.log(remoteId);
-  /* const headersConfig2 = {
-        headers: { 
-          'Authorization': `Bearer ${platform.tokenPeya}`,
-          'Content-Type': 'application/json'
-        }
-    };                    
-    let urlAvailability= `${settings.peya}/v2/chains/${settings.chainCode}/remoteVendors/${remoteId}/availability`;
-   
-   let statuspos = await axios.get(urlAvailability,headersConfig2);
-    let body = {
-        "availabilityState": "CLOSED",
-        "closedReason": "OTHER",
-        "platformKey": statuspos.data[0].platformKey,
-        "platformRestaurantId": statuspos.data[0].platformRestaurantId
-    };     
-              
-    let temp = await axios.put(urlAvailability, body, headersConfig2); 
-    console.log('ClosedPOS  2')
-}
-*/
+
 const updateOrder = async (req, res) => {
     try {
         if (!req.params.remoteOrderId || !req.params.remoteId) {

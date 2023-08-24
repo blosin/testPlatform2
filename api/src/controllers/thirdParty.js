@@ -85,9 +85,6 @@ const login = async (req, res) => {
 
 const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
-   ///console.log('sigue requuid');
-  //console.log(req.token.internalCode);
-
   const platform = initPlatform(req.token.internalCode, req.uuid);  
   
   //verifica si la plataforma esta activa en backoffice

@@ -187,7 +187,7 @@ class ApiConnection {
       }
       throw ApiException.buildFromResponse(response);
     } catch (error) {
-      console.log(error);
+      console.log('error authenticate');
     }
   }
 

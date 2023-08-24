@@ -59,7 +59,7 @@ class Performance extends Platform {
         // const res = await axios.put('url', body, headers);
         resolve({});
       } catch (error) {
-        console.log(error);
+        console.log('Error Confirm Order');
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {

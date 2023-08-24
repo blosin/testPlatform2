@@ -297,7 +297,7 @@ class OrdersClient {
       });
       consumer.start();
     } catch (error) {
-      console.log(error);
+      console.log('error _loadOrdersFromQueue');
     }
   }
 

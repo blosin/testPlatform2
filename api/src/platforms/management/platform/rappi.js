@@ -77,7 +77,6 @@ class Rappi extends Platform {
     return new Promise(async (resolve, reject) => {
       try {
         const url = this.urlAuth;
-        console.log("Country", country);
         const payload = {
           client_id: this.clientId[country],
           client_secret: this.clientSecret[country],
@@ -94,8 +93,8 @@ class Rappi extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
-        //console.log("error loginToAuth0", error);
         console.log('error loginToAuth0');
+
         if (!error) error = '';
         const msg = 'Failed to login. Auth0 Rappi';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -125,7 +124,7 @@ class Rappi extends Platform {
 
         const response = await axios.get(url, options);
         let result, saved;
-        console.log(`rappi ${url}`, JSON.stringify(response.data));
+        //console.log(`rappi ${url}`, JSON.stringify(response.data));
         if (!!response.data[0]) {
           saved = response.data.map((data) =>
             this.saveNewOrders(data, this._platform)
@@ -140,7 +139,6 @@ class Rappi extends Platform {
         }
         resolve(result);
       } catch (error) {
-        //console.log("error getOrders", error);
         console.log("error getOrders");
         if (!error) error = '';
         const msg = 'Failed to get orders.';
@@ -171,7 +169,6 @@ class Rappi extends Platform {
               'x-authorization': 'bearer ' + xAuth
             }
           };
-          console.log('Countryy ', order);
           let url =
             process.env.NODE_ENV == 'production'
               ? this.baseUrl[order.country] +
@@ -183,14 +180,10 @@ class Rappi extends Platform {
                 order.id +
                 '/take';
 
-          console.log('Url prod ', url);
-          console.log('Options prod ', options);
-
           const res = await axios.put(url, {}, options);
           resolve(true);
         } else resolve(false);
       } catch (error) {
-        //console.log('error send rappi', JSON.stringify(error.response));
         console.log('error send rappi');
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
@@ -249,7 +242,6 @@ class Rappi extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
-        console.log('error  rappi', JSON.stringify(error.response));
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
         if (!error) error = '';

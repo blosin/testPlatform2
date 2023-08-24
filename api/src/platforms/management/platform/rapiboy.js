@@ -167,8 +167,6 @@ class Rapiboy extends Platform {
             IdPedido: order.id,
             Motivo: rejectMessageId
           };
-          console.log('BODY', body);
-
           const headers = {
             'Content-Type': 'application/json'
           };

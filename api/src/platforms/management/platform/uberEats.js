@@ -116,7 +116,6 @@ class UberEats extends Platform {
           return axios.get(urlDetails, options);
         });
         let ordersDetails = await Promise.all(ordersDetail);
-        console.log(ordersDetails);
         ordersDetails.forEach((singleOrder) =>
           this.saveNewOrders(singleOrder.data).then((newsOrder) => {
             this.loginToUberEats('eats.order').then((confirmToken) => {

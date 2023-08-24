@@ -294,8 +294,6 @@ class ThirdParty extends Platform {
   branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
     return new Promise(async (resolve) => {
       try {
-        console.log('rejectMessageId', rejectMessageId);
-        console.log('rejectMessageNote', rejectMessageNote);
         const state = NewsStateSingleton.stateByCod('rej');
         await this.updateOrderState(order, state);
         if (this.statusResponse.reject) {
