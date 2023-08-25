@@ -59,87 +59,151 @@ class Platform {
    * Update platform parameters
    * */
   async getPlatformParameters() {
-    const [rejectedMessages, deliveryTimes] = await Promise.all([
-      this.getRejectedMessages(),
-      this.getDeliveryTimes()
-    ]);
-    this.updateRejectedMessage(rejectedMessages);
-    this.updateDeliveryTimes(deliveryTimes);
+    try {
+      const [rejectedMessages, deliveryTimes] = await Promise.all([
+        this.getRejectedMessages(),
+        this.getDeliveryTimes()
+      ]);
+      this.updateRejectedMessage(rejectedMessages);
+      this.updateDeliveryTimes(deliveryTimes);
+    } catch (error) {
+      logError.create({
+        message: 'Falló getPlatformParameters',
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
    * Can be overriden.
    * */
   receiveOrder(order, branchId) {
-    return Promise.resolve(this.doesNotApply);
+    try {
+      return Promise.resolve(this.doesNotApply);
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló receiveOrder',
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
    * Can be overriden.
    * */
   viewOrder(order, branchId) {
-    return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('view');
-      await this.updateOrderState(order, state);
-      return resolve(this.doesNotApply);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const state = NewsStateSingleton.stateByCod('view');
+        await this.updateOrderState(order, state);
+        return resolve(this.doesNotApply);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló viewOrder',
+        error: { message: error.message }
+      });
+    }
   }
-
   /**
    * Can be overriden.
    * */
   confirmOrder(order, branchId, deliveryTimeId) {
-    return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('confirm');
-      await this.updateOrderState(order, state);
-      return resolve(this.doesNotApply);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const state = NewsStateSingleton.stateByCod('confirm');
+        await this.updateOrderState(order, state);
+        return resolve(this.doesNotApply);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló confirmOrder',
+        error: { message: error.message }
+      });
+    }
+
   }
 
   /**
    * Can be overriden.
    * */
   dispatchOrder(order) {
-    return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('dispatch');
-      await this.updateOrderState(order, state);
-      return resolve(this.doesNotApply);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const state = NewsStateSingleton.stateByCod('dispatch');
+        await this.updateOrderState(order, state);
+        return resolve(this.doesNotApply);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló dispatchOrder',
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
    * Can be overriden.
    * */
   deliveryOrder(order) {
-    return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('delivery');
-      await this.updateOrderState(order, state);
-      return resolve(this.doesNotApply);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const state = NewsStateSingleton.stateByCod('delivery');
+        await this.updateOrderState(order, state);
+        return resolve(this.doesNotApply);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló deliveryOrder',
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
    * Can be overriden.
    * */
   branchRejectOrder(order, rejectMessageId, rejectMessageNote) {
-    return new Promise(async (resolve) => {
-      const state = NewsStateSingleton.stateByCod('rej');
-      await this.updateOrderState(order, state);
-      return resolve(this.doesNotApply);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const state = NewsStateSingleton.stateByCod('rej');
+        await this.updateOrderState(order, state);
+        return resolve(this.doesNotApply);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló branchRejectOrder',
+        error: { message: error.message }
+      });
+    }
   }
 
   retriveDriver(order) {
-    return new Promise(async (resolve) => {
-      const noDriver = {
-        name: 'Sin Informacion',
-        driver: null,
-        pickupDate: null,
-        estimatedDeliveryDate: null
-      };
-      return resolve(noDriver);
-    });
+    try {
+      return new Promise(async (resolve) => {
+        const noDriver = {
+          name: 'Sin Informacion',
+          driver: null,
+          pickupDate: null,
+          estimatedDeliveryDate: null
+        };
+        return resolve(noDriver);
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló retriveDriver',
+        error: { message: error.message }
+      });
+    }
   }
+
   /**
    * Can be overriden.
    * */
@@ -177,12 +241,24 @@ class Platform {
           }
         );
         resolve();
-      } catch (error) {
-        error = { error: error.toString(), platform: this._platform };
-        const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
-        logger.error({ message: msg, meta: error });
-        reject(msg);
       }
+      catch (error) {
+        try {
+          logError.create({
+            message: 'Falló openRestaurant: ' + branchId,
+            error: error.message
+          });
+        } catch (error) {
+          logError.create({
+            message: 'Falló openRestaurant: ' + branchId,
+            error: { message: 'Error inesperado en openRestaurant' }
+          });
+        }
+      }
+      error = { error: error.toString(), platform: this._platform };
+      const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
+      logger.error({ message: msg, meta: error });
+      reject(msg);
     });
   }
 
@@ -226,6 +302,17 @@ class Platform {
         );
         resolve();
       } catch (error) {
+        try {
+          logError.create({
+            message: 'Falló closeRestaurant: ' + branchId,
+            error: error.message
+          });
+        } catch (error) {
+          logError.create({
+            message: 'Falló closeRestaurant: ' + branchId,
+            error: { message: 'Error inesperado en closeRestaurant' }
+          });
+        }
         error = {
           error: error.toString(),
           branchId,
@@ -268,6 +355,17 @@ class Platform {
         rejectedExtraData
       );
     } catch (error) {
+      try {
+        logError.create({
+          message: 'Falló rejectWrongOrderAutomatically: ' + order.id,
+          error: error.message
+        });
+      } catch (error) {
+        logError.create({
+          message: 'Falló rejectWrongOrderAutomatically: ' + order.id,
+          error: { message: 'Error inesperado en rejectWrongOrderAutomatically' }
+        });
+      }
       const msg = `Order: ${order.id}. Failed to reject automatically the order.`;
       error = { error: error.toString(), order };
       logger.error({ message: msg, meta: error });
@@ -293,6 +391,17 @@ class Platform {
         }
       );
     } catch (error) {
+      try {
+        logError.create({
+          message: 'Falló updateOrderState: ' + order.id,
+          error: { message: error.message, order: order, state: state }
+        });
+      } catch (error) {
+        logError.create({
+          message: 'Falló updateOrderState: ' + order.id,
+          error: { message: 'Error inesperado en updateOrderState' }
+        });
+      }
       const msg = 'Failed to update order state.';
       error = { order, state, error: error.toString() };
       logger.error({ message: msg, meta: error });
@@ -332,6 +441,18 @@ class Platform {
         }
       );
     } catch (error) {
+      try {
+        logError.create({
+          message: 'Falló updateNewsState: ' + order.id,
+          error: { message: error.message, order: order }
+        });
+      } catch (error) {
+        logError.create({
+          message: 'Falló updateNewsState: ' + order.id,
+          error: { message: 'Error inesperado en updateNewsState' }
+        });
+      }
+
       const msg = 'Failed to update news state.';
       const formatError = {
         order,
@@ -347,33 +468,49 @@ class Platform {
   }
 
   async updateLastContact() {
-    await platformModel.updateOne(
-      {
-        internalCode: this._platform.internalCode
-      },
-      {
-        $set: { lastContact: new Date() }
-      }
-    );
+    try {
+      await platformModel.updateOne(
+        {
+          internalCode: this._platform.internalCode
+        },
+        {
+          $set: { lastContact: new Date() }
+        }
+      );
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló updateLastContact',
+        error: { message: error.message }
+      });
+    }
   }
 
   getOrderById(id) {
-    return orderModel
-      .aggregate([
-        {
-          $match: {
-            originalId: id,
-            internalCode: this._platform.internalCode
-          }
-        },
-        { $limit: 1 }
-      ])
-      .project({ order: true, _id: false })
-      .then((ordersRes) => ordersRes.pop())
-      .then((orderRes) => {
-        if (orderRes) return { ...orderRes.order };
-        else throw 'Order not found.';
+    try {
+      return orderModel
+        .aggregate([
+          {
+            $match: {
+              originalId: id,
+              internalCode: this._platform.internalCode
+            }
+          },
+          { $limit: 1 }
+        ])
+        .project({ order: true, _id: false })
+        .then((ordersRes) => ordersRes.pop())
+        .then((orderRes) => {
+          if (orderRes) return { ...orderRes.order };
+          else throw 'Order not found.';
+        });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló getOrderById' + id,
+        error: { message: error.message }
       });
+    }
   }
 
   /**
@@ -396,6 +533,10 @@ class Platform {
           throw error;
         }
       } catch (message) {
+        logError.create({
+          message: 'Falló rejectPlatformOrder' + orderId,
+          error: { message: error.message }
+        });
         logger.error({ message, meta: { originalId } });
         return reject(message);
       }
@@ -425,6 +566,10 @@ class Platform {
           });
         return resolve(savedOrder.order);
       } catch (error) {
+        logError.create({
+          message: 'Falló findOrder' + orderId,
+          error: { message: error.message }
+        });
         const errBody = { orderId, error: error.toString() };
         logger.error({ meta: errBody });
         return reject(errBody);
@@ -438,9 +583,17 @@ class Platform {
     @returns branchPlatform with its data.
     */
   getBranchPlatform(platforms, platformId) {
-    return platforms.find(
-      (p) => p.platform.toString() == platformId.toString()
-    );
+    try {
+      return platforms.find(
+        (p) => p.platform.toString() == platformId.toString()
+      );
+    }
+    catch (error) {
+      logError.create({
+        message: 'Falló getBranchPlatform' + platformId,
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
@@ -471,6 +624,10 @@ class Platform {
         } else if (diffLastGetNews > timeToClose) closed = true;
         return resolve(!closed);
       } catch (error) {
+        logError.create({
+          message: 'Falló isClosedRestaurant',
+          error: { message: error.message, branchPlatform: branchPlatform, lastGetNew: lastGetNew }
+        });
         error = { error: error.toString() };
         const msg = `Can not validate if restaurant is closed.`;
         logger.error({ message: msg, meta: error });
@@ -482,7 +639,14 @@ class Platform {
    * Can be overriden.
    * */
   importParser() {
-    return require('../interfaces/thirdParty');
+    try {
+      return require('../interfaces/thirdParty');
+    } catch (error) {
+      logError.create({
+        message: 'Fail importParser',
+        error: { message: error.message }
+      })
+    }
   }
 
   /**
@@ -490,64 +654,72 @@ class Platform {
    * */
 
   validateNewOrders(newOrder) {
-    this.updateLastContact();
-    return new Promise(async (resolve, reject) => {
-      let orderSaved;
-      const minOrders = this.parser.retriveMinimunData(newOrder);
-      /* Validate  orders */
-      let order = await orderModel
-        .find({
-          originalId: minOrders.originalId,
-          internalCode: this._platform.internalCode,
-          state: { $ne: NewsStateSingleton.stateByCod('rej_closed') }
-        })
-        .lean();
-
-      if (order.length) {
-        const error = `Order: ${order[0].originalId} already exists.`;
-        logger.error({ message: error, meta: { newOrder } });
-        return reject({ error });
-      }
-
-      /* Find branch associated to de references given by the platform */
-      let foundBranch = await branchModel
-        .findOne({
-          'platforms.branchReference': minOrders.branchReference.toString(),
-          'platforms.platform': this._platform._id.toString()
-        })
-        .lean();
-      if (!foundBranch) {
-        const error = `The branch not exists. ${minOrders.branchReference}`;
-        logger.error({ message: error, meta: { newOrder } });
-        return reject({ error });
-      }
-      if (foundBranch.autoReply && this._platform.autoReply) {
-        this.saveNewOrdersAutomally(newOrder, foundBranch).then((res) => {
-          orderSaved = {
-            id: res.posId,
-            state: res.state,
-            branchId: res.order.branchId.toString()
-          };
-          return resolve(orderSaved);
-        });
-      } else {
-        this.saveNewOrders(newOrder)
-          .then((res) => {
-            if (!res) throw 'Orders could not been processed.';
-
-            if (foundBranch.branchId == res.order.branchId)
-              orderSaved = {
-                id: res.posId,
-                state: res.state,
-                branchId: res.order.branchId.toString()
-              };
-            return resolve(orderSaved);
+    try {
+      this.updateLastContact();
+      return new Promise(async (resolve, reject) => {
+        let orderSaved;
+        const minOrders = this.parser.retriveMinimunData(newOrder);
+        /* Validate  orders */
+        let order = await orderModel
+          .find({
+            originalId: minOrders.originalId,
+            internalCode: this._platform.internalCode,
+            state: { $ne: NewsStateSingleton.stateByCod('rej_closed') }
           })
-          .catch((error) => {
-            reject(error);
+          .lean();
+
+        if (order.length) {
+          const error = `Order: ${order[0].originalId} already exists.`;
+          logger.error({ message: error, meta: { newOrder } });
+          return reject({ error });
+        }
+
+        /* Find branch associated to de references given by the platform */
+        let foundBranch = await branchModel
+          .findOne({
+            'platforms.branchReference': minOrders.branchReference.toString(),
+            'platforms.platform': this._platform._id.toString()
+          })
+          .lean();
+        if (!foundBranch) {
+          const error = `The branch not exists. ${minOrders.branchReference}`;
+          logger.error({ message: error, meta: { newOrder } });
+          return reject({ error });
+        }
+        if (foundBranch.autoReply && this._platform.autoReply) {
+          this.saveNewOrdersAutomally(newOrder, foundBranch).then((res) => {
+            orderSaved = {
+              id: res.posId,
+              state: res.state,
+              branchId: res.order.branchId.toString()
+            };
+            return resolve(orderSaved);
           });
-      }
-    });
+        } else {
+          this.saveNewOrders(newOrder)
+            .then((res) => {
+              if (!res) throw 'Orders could not been processed.';
+
+              if (foundBranch.branchId == res.order.branchId)
+                orderSaved = {
+                  id: res.posId,
+                  state: res.state,
+                  branchId: res.order.branchId.toString()
+                };
+              return resolve(orderSaved);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        }
+      });
+    }
+    catch (error) {
+      logError.create({
+        message: 'Fail validateNewOrders',
+        error: { message: error.message, newOrder: newOrder }
+      })
+    }
   }
 
   getOrderBranches(branchReference) {
@@ -634,17 +806,17 @@ class Platform {
       const { posId, originalId, displayId, branchReference } =
         this.parser.retriveMinimunData(order);
       try {
-  
+
         let branches = await this.getOrderBranches(branchReference);
         if (branches.length == 0)
           reject({
             error: 'There is no branch for this order'
           });
-        
+
         branch = branches[0];
         let trace, stateCod, newsCode, orderCreator;
         try {
-      
+
           /* Check if restaurant is open */
           isOpened = await this.isClosedRestaurant(
             branch.platform,
@@ -664,7 +836,7 @@ class Platform {
           throw { orderId: originalId, error };
         }
         try {
-          
+
           orderCreator = {
             thirdParty: this._platform.name,
             internalCode: this._platform.internalCode,
@@ -675,8 +847,8 @@ class Platform {
             branchId: branch.branchId,
             order
           };
-         
-          if (order.peya){
+
+          if (order.peya) {
             orderCreator.peya = true;
           }
           const newCreator = await this.parser.newsFromOrders(
@@ -687,7 +859,7 @@ class Platform {
             branch,
             this.uuid
           );
-          if (order.peya){
+          if (order.peya) {
             newCreator.peya = true;
           }
           /* If restaurant is closed, mark the new as viewed. */
@@ -711,7 +883,7 @@ class Platform {
               entity: 'CONCENTRADOR'
             };
           }
-          
+
           trace = newsModel.createTrace({
             typeId: newCreator.typeId,
             orderStatusId: newCreator.order.statusId
@@ -722,7 +894,7 @@ class Platform {
             internalCode: this._platform.internalCode,
             originalId
           };
-        
+
           const newsQuery = {
             order: {
               id: displayId,
@@ -730,19 +902,19 @@ class Platform {
             }
           };
           const options = { new: true, upsert: true };
-    
+
           promiseOrder = orderModel.findOneAndUpdate(
             orderQuery,
             orderCreator,
             options
           );
-   
+
           promiseNew = newsModel.findOneAndUpdate(
             newsQuery,
             newCreator,
             options
           );
-         
+
           orderProccessed = orderCreator;
           newProccessed = newCreator;
         } catch (error) {
@@ -777,8 +949,8 @@ class Platform {
             meta: { error: error.toString() }
           });
         }
- 
-        reject({          
+
+        reject({
           orderId: originalId,
           error: `Order: ${originalId} can not be proccessed correctly.`
         });
@@ -803,6 +975,10 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
+        logError.create({
+          message: 'Failed saveNewOrders',
+          error: { message: error.message, order: order }
+        })
         console.log('error al crear orden');
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
@@ -884,6 +1060,10 @@ class Platform {
           throw err;
         }
       } catch (error) {
+        logError.create({
+          message: 'Failed saveNewOrdersAutomally 1',
+          error: { message: error.message, order: order, branch: branch }
+        });
         reject({
           orderId: originalId,
           error: `Order: ${originalId} can not be proccessed correctly.`
@@ -905,94 +1085,114 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
+        logError.create({
+          message: 'Failed saveNewOrdersAutomally 2',
+          error: { message: error.message, order: order, branch: branch }
+        });
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
         reject(msg);
       }
     });
   }
+
   async updateRejectedMessage(rejectedMessages) {
-
-    //Update all platform rejectedMessages to false
-    await rejectedMessageModel.updateMany(
-      {
-        platformId: this._platform.internalCode
-      },
-      {
-        isActive: false
-      }
-    );
-
-    //Upsert each parameter and mark as active
-    const promises = rejectedMessages.map((rejectedMessage) => {
-      const query = {
-        platformId: this._platform.internalCode,
-        id: rejectedMessage.id
-      };
-      const update = {
-        $set: {
-          name: rejectedMessage.name,
-          descriptionES: rejectedMessage.descriptionES,
-          descriptionPT: rejectedMessage.descriptionPT,
-          forRestaurant: rejectedMessage.forRestaurant
-            ? rejectedMessage.forRestaurant
-            : true,
-          forLogistics: rejectedMessage.forLogistics
-            ? rejectedMessage.forLogistics
-            : true,
-          forPickup: rejectedMessage.forPickup
-            ? rejectedMessage.forPickup
-            : true,
-          id: rejectedMessage.id,
-          isActive: true,
+    try {
+      //Update all platform rejectedMessages to false
+      await rejectedMessageModel.updateMany(
+        {
           platformId: this._platform.internalCode
+        },
+        {
+          isActive: false
         }
-      };
-      const options = {
-        upsert: true
-      };
-      return rejectedMessageModel.findOneAndUpdate(query, update, options);
-    });
-    Promise.all(promises);
+      );
+
+      //Upsert each parameter and mark as active
+      const promises = rejectedMessages.map((rejectedMessage) => {
+        const query = {
+          platformId: this._platform.internalCode,
+          id: rejectedMessage.id
+        };
+        const update = {
+          $set: {
+            name: rejectedMessage.name,
+            descriptionES: rejectedMessage.descriptionES,
+            descriptionPT: rejectedMessage.descriptionPT,
+            forRestaurant: rejectedMessage.forRestaurant
+              ? rejectedMessage.forRestaurant
+              : true,
+            forLogistics: rejectedMessage.forLogistics
+              ? rejectedMessage.forLogistics
+              : true,
+            forPickup: rejectedMessage.forPickup
+              ? rejectedMessage.forPickup
+              : true,
+            id: rejectedMessage.id,
+            isActive: true,
+            platformId: this._platform.internalCode
+          }
+        };
+        const options = {
+          upsert: true
+        };
+        return rejectedMessageModel.findOneAndUpdate(query, update, options);
+      });
+      Promise.all(promises);
+    }
+    catch (error) {
+      logError.create({
+        message: 'Failed updateRejectedMessage',
+        error: { message: error.message }
+      });
+    }
   }
 
   async updateDeliveryTimes(deliveryTimes) {
-
-    //Update all platform deliveryTimes to false
-    await deliveryTimeModel.updateMany(
-      {
-        platformId: this._platform.internalCode
-      },
-      {
-        isActive: false
-      }
-    );
-    //Upsert each parameter and mark as active
-    const promises = deliveryTimes.map((deliveryTime) => {
-      const query = {
-        platformId: this._platform.internalCode,
-        id: deliveryTime.id
-      };
-      const update = {
-        $set: {
-          name: deliveryTime.name,
-          description: deliveryTime.description,
-          minMinutes: deliveryTime.minMinutes,
-          maxMinutes: deliveryTime.maxMinutes,
-          order: deliveryTime.order,
-          id: deliveryTime.id,
-          isActive: true,
+    try {
+      //Update all platform deliveryTimes to false
+      await deliveryTimeModel.updateMany(
+        {
           platformId: this._platform.internalCode
+        },
+        {
+          isActive: false
         }
-      };
-      const options = {
-        upsert: true
-      };
+      );
+      //Upsert each parameter and mark as active
+      const promises = deliveryTimes.map((deliveryTime) => {
+        const query = {
+          platformId: this._platform.internalCode,
+          id: deliveryTime.id
+        };
+        const update = {
+          $set: {
+            name: deliveryTime.name,
+            description: deliveryTime.description,
+            minMinutes: deliveryTime.minMinutes,
+            maxMinutes: deliveryTime.maxMinutes,
+            order: deliveryTime.order,
+            id: deliveryTime.id,
+            isActive: true,
+            platformId: this._platform.internalCode
+          }
+        };
+        const options = {
+          upsert: true
+        };
 
-      return deliveryTimeModel.findOneAndUpdate(query, update, options);
-    });
-    Promise.all(promises);
+        return deliveryTimeModel.findOneAndUpdate(query, update, options);
+      });
+      Promise.all(promises);
+    }
+    catch (error) {
+      logError.create({
+        message: 'Failed updateDeliveryTimes',
+        error: { message: error.message }
+      });
+    }
   }
 }
+
 
 export default Platform;

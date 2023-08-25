@@ -85,60 +85,84 @@ const login = async (req, res) => {
 
 const saveOrder = (req, res) => {
   /* TODO: VALIDATE DATA TYPE OF INPUT */
-  const platform = initPlatform(req.token.internalCode, req.uuid);  
-  
-  //verifica si la plataforma esta activa en backoffice
-  if (platform._platform.active != undefined && !platform._platform.active){
-    const msg = 'Platform not active';   
-    res.status(200).json({ error: msg }).end();
-  }
-  
-  if (isArray(req.body)) {
-    req.body.forEach(async (data) => {
-      let result = await req.body.filter((filtro) => filtro.id === data.id);
-      if (result.length > 1)
-        return res
-          .status(400)
-          .json({
-            error: `The array has more than one order with the id:${data.id}`
-          })
-          .end();
-    });
-    const resultProm = req.body.map((data) => platform.validateNewOrders(data));
-    Promise.all(resultProm)
-      .then((resultPromise) => {
-        res.status(200).send(resultPromise).end();
-      })
-      .catch((error) => {
-        res.status(400).json(error).end();
+  try {
+    const platform = initPlatform(req.token.internalCode, req.uuid);
+
+    //verifica si la plataforma esta activa en backoffice
+    if (platform._platform.active != undefined && !platform._platform.active) {
+      const msg = 'Platform not active';
+      res.status(200).json({ error: msg }).end();
+    }
+
+    if (isArray(req.body)) {
+      req.body.forEach(async (data) => {
+        let result = await req.body.filter((filtro) => filtro.id === data.id);
+        if (result.length > 1)
+          return res
+            .status(400)
+            .json({
+              error: `The array has more than one order with the id:${data.id}`
+            })
+            .end();
       });
-  } else
-    platform
-      .validateNewOrders(req.body)
-      .then((ordersSaved) => {
-        res.status(200).send(ordersSaved).end();
-      })
-      .catch((error) => res.status(400).json(error).end());
-};
+      const resultProm = req.body.map((data) => platform.validateNewOrders(data));
+      Promise.all(resultProm)
+        .then((resultPromise) => {
+          res.status(200).send(resultPromise).end();
+        })
+        .catch((error) => {
+          res.status(400).json(error).end();
+        });
+    } else
+      platform
+        .validateNewOrders(req.body)
+        .then((ordersSaved) => {
+          res.status(200).send(ordersSaved).end();
+        })
+        .catch((error) => res.status(400).json(error).end());
+  } catch (error) {
+    try {
+      const errorJson = JSON.stringify(error);
+      logError.create({
+        message: 'Falló saveOrder thirdParty: ',
+        error: { body: req.body }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló saveOrder thirdParty: ',
+        error: { message: 'Error inesperado en saveOrder thirdParty' }
+      });
+    }
+    res.status(400).json({
+    }).end();
+  }
+}
 
 const cancelOrder = async (req, res) => {
   try {
-
-
-
-
-    
     if (!req.body.id || !req.body.branchId) {
       const msg = 'Insuficient parameters.';
       logger.error({ message: msg, meta: { body: req.body } });
       return res.status(400).json({ error: msg }).end();
     }
-  
+
     const setNews = new SetNews(req.token);
     let newToSet = { typeId: NewsTypeSingleton.idByCod('platform_rej_ord') };
     const result = await setNews.setNews(newToSet, req.body.id);
     res.status(200).send(result).end();
   } catch (error) {
+    try {
+      const errorJson = JSON.stringify(error);
+      logError.create({
+        message: 'Falló cancelOrder thirdParty: ',
+        error: { body: req.body }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló cancelOrder thirdParty: ',
+        error: { message: 'Error inesperado en cancelOrder thirdParty' }
+      });
+    }
     return res.status(400).json(error).end();
   }
 };
