@@ -202,7 +202,6 @@ const updateOrder = async (req, res) => {
         ).end();
     } catch (error) {
         try {
-            const errorJson = JSON.stringify(error);
             logError.create({
                 message: 'Falló updateOrder: ' + req.params.remoteOrderId,
                 error: { body: req.body }

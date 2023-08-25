@@ -58,7 +58,7 @@ class Rappi extends Platform {
 
   async loginGetOrders() {
     for (const property in this.baseUrl) {
-       this.loginToAuth0(property)
+      this.loginToAuth0(property)
         .then((xAuth) => {
           this.getOrders(xAuth, this.baseUrl[property]);
         })
@@ -172,13 +172,13 @@ class Rappi extends Platform {
           let url =
             process.env.NODE_ENV == 'production'
               ? this.baseUrl[order.country] +
-                this.urlConfirmOrders +
-                order.id +
-                '/take'
+              this.urlConfirmOrders +
+              order.id +
+              '/take'
               : 'https://microservices.dev.rappi.com' +
-                this.urlConfirmOrders +
-                order.id +
-                '/take';
+              this.urlConfirmOrders +
+              order.id +
+              '/take';
 
           const res = await axios.put(url, {}, options);
           resolve(true);
@@ -227,13 +227,13 @@ class Rappi extends Platform {
           let url =
             process.env.NODE_ENV == 'production'
               ? this.baseUrl[order.country] +
-                this.urlRejectOrders +
-                order.id +
-                '/reject'
+              this.urlRejectOrders +
+              order.id +
+              '/reject'
               : 'https://microservices.dev.rappi.com' +
-                this.urlRejectOrders +
-                order.id +
-                '/reject';
+              this.urlRejectOrders +
+              order.id +
+              '/reject';
 
           const data = {
             reason: rejectDesc
@@ -242,6 +242,10 @@ class Rappi extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        logError.create({
+          message: 'Failed branchRejectOrder',
+          error: { message: error.message, order: order, rejectDesc: rejectDesc }
+        });
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
         if (!error) error = '';

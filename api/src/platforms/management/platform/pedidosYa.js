@@ -89,21 +89,28 @@ class PedidosYa extends Platform {
   }
 
   async peyaLogin() {
-    const dataSend = new URLSearchParams();
-    dataSend.append('username', settings.peyaParams.username);
-    dataSend.append('password', settings.peyaParams.password);
-    dataSend.append('grant_type', settings.peyaParams.grant_type);
-    const configData = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+    try {
+      const dataSend = new URLSearchParams();
+      dataSend.append('username', settings.peyaParams.username);
+      dataSend.append('password', settings.peyaParams.password);
+      dataSend.append('grant_type', settings.peyaParams.grant_type);
+      const configData = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       }
+      await axios.post(`${this._platform.credentials.data.baseUrl}/v2/login`, dataSend.toString(), configData).then(r => {
+
+        this.tokenPeya = r.data.access_token;
+
+      });
     }
-    await axios.post(`${this._platform.credentials.data.baseUrl}/v2/login`, dataSend.toString(), configData).then(r => {
-
-      this.tokenPeya = r.data.access_token;
-
-    });
-
+    catch (error) {
+      logError.create({
+        message: 'Failed peyaLogin',
+        error: { message: error.message }
+      });
+    }
   }
 
   /**
@@ -111,24 +118,39 @@ class PedidosYa extends Platform {
    * @override
    */
   importParser() {
-    return require('../../interfaces/pedidosYa');
+    try {
+      return require('../../interfaces/pedidosYa');
+    } catch (error) {
+      logError.create({
+        message: 'Failed importParser',
+        error: { message: error.message }
+      });
+    }
   }
 
   async getOrders() {
-    await this._api.order.getAll(
-      null,
-      PaginationOptions.create(),
-      (data) => {
-        this.uuid = UUID();
-        this.interactWithOrders(data);
-      },
-      (error) => {
-        const msg = 'Fallo al obtener ordenes de PY.';
-        new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
-          platformError: error.toString()
-        });
-      }
-    );
+    try {
+      await this._api.order.getAll(
+        null,
+        PaginationOptions.create(),
+        (data) => {
+          this.uuid = UUID();
+          this.interactWithOrders(data);
+        },
+        (error) => {
+          const msg = 'Fallo al obtener ordenes de PY.';
+          new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
+            platformError: error.toString()
+          });
+        }
+      );
+    }
+    catch (error) {
+      logError.create({
+        message: 'Failed getOrders SDK',
+        error: { message: error.message }
+      });
+    }
   }
 
 
@@ -137,27 +159,38 @@ class PedidosYa extends Platform {
    * Get platform rejectedMessages
    * */
   getDeliveryTimes() {
-    if (this.statusResponse.deliveryTimes) {
-      return this._api.order.deliveryTime.getAll();
+    try {
+      if (this.statusResponse.deliveryTimes) {
+        return this._api.order.deliveryTime.getAll();
+      }
+      else {
+        return new Promise(async (resolve) => {
+          try {
+            let deliveryTimes = [];
+            deliveryTimes = require('../../../assets/deliveryTimes').generic;
+            deliveryTimes.forEach(
+              (obj) => (obj.platformId = this._platform.internalCode)
+            );
+            resolve(deliveryTimes);
+          } catch (error) {
+            logError.create({
+              message: 'Failed getDeliveryTimes 1',
+              error: { message: error.message }
+            });
+            const msg = 'Can not get parameters of ThirdParty.';
+            const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
+              platformError: error
+            });
+            resolve(err);
+          }
+        });
+      }
     }
-    else {
-      return new Promise(async (resolve) => {
-        try {
-          let deliveryTimes = [];
-          deliveryTimes = require('../../../assets/deliveryTimes').generic;
-          deliveryTimes.forEach(
-            (obj) => (obj.platformId = this._platform.internalCode)
-          );
-          resolve(deliveryTimes);
-        } catch (error) {
-          const msg = 'Can not get parameters of ThirdParty.';
-          const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
-            platformError: error
-          });
-          resolve(err);
-        }
+    catch (error) {
+      logError.create({
+        message: 'Failed getDeliveryTimes 2',
+        error: { message: error.message }
       });
-
     }
   }
 
@@ -185,7 +218,7 @@ class PedidosYa extends Platform {
             require('../../../assets/rejectedMessages').negatives;
           let peyaRejects = require('../../../assets/rejectedMessages').peyaRejects;
           data = data.concat(negatives);
-          data = data.concat(peyaRejects);  
+          data = data.concat(peyaRejects);
           data.forEach((obj) => (obj.platformId = this._platform.internalCode));
           resolve(data);
         } catch (error) {
@@ -420,7 +453,7 @@ class PedidosYa extends Platform {
    * @override
    */
   async confirmOrder(order, deliveryTimeId) {
-    
+
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
@@ -444,7 +477,7 @@ class PedidosYa extends Platform {
           };
 
           const url = `${this._platform.credentials.data.baseUrl}/${this.urlConfirmed}/${fullOrder.order.token}`;
-          
+
           const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
@@ -518,7 +551,7 @@ class PedidosYa extends Platform {
     });
 
     const peyaRejectsToSearch =
-    require('../../../assets/rejectedMessages').peyaRejectsToSearch;
+      require('../../../assets/rejectedMessages').peyaRejectsToSearch;
     let message = peyaRejectsToSearch.find(r => r.id == rejectMessageId);
     if (fullOrder.order.peya) {
       let body = undefined;
@@ -527,7 +560,7 @@ class PedidosYa extends Platform {
           message: message.message,
           reason: message.reason,
           status: "order_rejected"
-        };      
+        };
       else
         body = {
           message: 'Producto no disponible',//rejectMessageNote,
@@ -538,7 +571,7 @@ class PedidosYa extends Platform {
         try {
           const state = NewsStateSingleton.stateByCod('rej');
           await this.updateOrderState(order, state);
-     
+
           const headersConfig = {
             headers: {
               'Authorization': `Bearer ${this.tokenPeya}`,
@@ -565,7 +598,7 @@ class PedidosYa extends Platform {
     }
     return new Promise(async (resolve) => {
       try {
-     
+
         console.log('reject');
         this.updateLastContact();
         const state = NewsStateSingleton.stateByCod('rej');
