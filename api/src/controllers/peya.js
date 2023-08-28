@@ -149,7 +149,7 @@ const saveOrder = async (req, res) => {
                 try {
                     logError.create({
                         message: 'Falló orden: ' + req.body.code,
-                        error: JSON.stringify(error)
+                        error:{ error: error.toString(), message: error.message, stack: error.stack, body: req.body  }
                     });
                 } catch (error) {
                     logError.create({
@@ -165,19 +165,20 @@ const saveOrder = async (req, res) => {
             })
     }
     catch (error) {
-        try {
-            const errorJson = JSON.stringify(error);
+        try {          
             logError.create({
                 message: 'Falló saveOrder: ' + req.body.code,
-                error: error.message
+                error:{ error: error.toString(), message: error.message, stack: error.stack, body: req.body }
             });
         } catch (error) {
             logError.create({
-                message: 'Falló saveOrder: ' + req.body.code,
+                message: 'Falló saveOrder',
                 error: { message: 'Error inesperado en saveOrder' }
             });
         }
         res.status(400).json({
+            reason: 'ERROR',
+            message: 'ERROR RESTAURANT REJECTED'
         }).end();
     }
 }
@@ -201,10 +202,10 @@ const updateOrder = async (req, res) => {
             }
         ).end();
     } catch (error) {
-        try {
+        try {          
             logError.create({
                 message: 'Falló updateOrder: ' + req.params.remoteOrderId,
-                error: { body: req.body }
+                error: {  error: error.toString(), message: error.message, stack: error.stack, req: req, reqString: req.toString() }
             });
         } catch (error) {
             logError.create({
@@ -213,6 +214,8 @@ const updateOrder = async (req, res) => {
             });
         }
         res.status(400).json({
+            reason: 'ERROR',
+            message: 'ERROR RESTAURANT REJECTED'
         }).end();
     }
 };

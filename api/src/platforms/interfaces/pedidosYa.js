@@ -2,6 +2,7 @@ import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
+import logError from '../../models/logError';
  
 const paymentType = {
   DEBIT: {
@@ -41,6 +42,17 @@ module.exports = {
             if (data.order.pickup === null) order.ownDelivery = false;
             return order;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló orderMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló orderMapper peya',
+                    error: { error: 'Error inesperado en orderMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY orderMapper';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -107,6 +119,17 @@ module.exports = {
             paymentNews.note = '';
             return paymentNews;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló paymentenMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló paymentenMapper peya',
+                    error: { error: 'Error inesperado en paymentenMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY. paymentenMapper';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -128,6 +151,17 @@ module.exports = {
             customer.dni = null;
             return customer;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló customerMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló customerMapper peya',
+                    error: { error: 'Error inesperado en customerMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY customerMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -147,6 +181,17 @@ module.exports = {
             };
             return driver;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló driverMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló driverMapper peya',
+                    error: { error: 'Error inesperado en driverMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -194,6 +239,17 @@ module.exports = {
             }
             return details;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló detailsMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló detailsMapper peya',
+                    error: { error: 'Error inesperado en detailsMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY detailsMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -215,6 +271,17 @@ module.exports = {
               country: branch.address.country ? branch.address.country : ''
             };
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló extraDataMapper peya',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló extraDataMapper peya',
+                    error: { error: 'Error inesperado en extraDataMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY extraDataMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -253,6 +320,17 @@ module.exports = {
             
           resolve(news);
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló extraDataMapper peya 2',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló extraDataMapper peya 2',
+                  error: { error: 'Error inesperado en extraDataMapper peya' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de PY extraDataMapper2.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -286,6 +364,17 @@ module.exports = {
             if (data.order.pickup) order.ownDelivery = false;
             return order;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló orderMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló orderMapper peya sdk',
+                    error: { error: 'Error inesperado en orderMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY orderMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -349,6 +438,17 @@ module.exports = {
             paymentNews.note = payment.notes;
             return paymentNews;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló paymentenMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló paymentenMapper peya sdk',
+                    error: { error: 'Error inesperado en paymentenMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY paymentenMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -370,6 +470,17 @@ module.exports = {
             customer.dni = order.user.identityCard;
             return customer;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló customerMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló customerMapper peya sdk',
+                    error: { error: 'Error inesperado en customerMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY customerMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -391,6 +502,17 @@ module.exports = {
             };
             return driver;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló driverMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló driverMapper peya sdk',
+                    error: { error: 'Error inesperado en driverMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY driverMapper.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -536,6 +658,17 @@ module.exports = {
             }
             return details;
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló detailsMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló detailsMapper peya sdk',
+                    error: { error: 'Error inesperado en driverMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -557,6 +690,17 @@ module.exports = {
               country: branch.address.country ? branch.address.country : ''
             };
           } catch (error) {
+            try { 
+              logError.create({
+                  message: 'Falló extraDataMapper peya sdk',
+                  error:{ error: error.toString(), message: error.message, stack: error.stack}
+              });
+            } catch (ex) {
+                logError.create({
+                    message: 'Falló extraDataMapper peya sdk',
+                    error: { error: 'Error inesperado en extraDataMapper peya' }
+                });
+            }
             const msg = 'No se pudo parsear la orden de PY.';
             const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
               data,
@@ -595,6 +739,17 @@ module.exports = {
             (data.order.payment.amountNoDiscount - news.order.payment.discount) + news.order.payment.shipping ;
           resolve(news);
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló extraDataMapper peya sdk 2',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló extraDataMapper peya sdk 2',
+                  error: { error: 'Error inesperado en extraDataMapper peya' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de PY.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,

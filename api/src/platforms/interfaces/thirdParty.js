@@ -2,6 +2,7 @@ import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
+import logError from '../../models/logError';
 
 module.exports = {
   newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
@@ -25,6 +26,17 @@ module.exports = {
 
           return order;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló orderMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló orderMapper thirdParty',
+                  error: { error: 'Error inesperado en orderMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden del ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -50,6 +62,17 @@ module.exports = {
           paymentNews.note = '';
           return paymentNews;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló paymentenMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, payment:payment }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló paymentenMapper thirdParty',
+                  error: { error: 'Error inesperado en paymentenMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -85,6 +108,17 @@ module.exports = {
           };
           return driver;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló driverMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló driverMapper thirdParty',
+                  error: { error: 'Error inesperado en driverMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -106,6 +140,17 @@ module.exports = {
             country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló extraDataMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, branch: branch, platform:platform}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló extraDataMapper thirdParty',
+                  error: { error: 'Error inesperado en extraDataMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de un ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -133,6 +178,17 @@ module.exports = {
           customer.email = order.user.email;
           return customer;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló customerMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló customerMapper thirdParty',
+                  error: { error: 'Error inesperado en customerMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -215,6 +271,17 @@ module.exports = {
           }
           return details;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló detailsMapper thirdParty',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló detailsMapper thirdParty',
+                  error: { error: 'Error inesperado en detailsMapper thirdParty' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de ThirdParty.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -241,6 +308,17 @@ module.exports = {
           (data.order.payment[0].discount ? data.order.payment[0].discount : 0);
         resolve(news);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló Mappers thirdParty',
+              error:{ error: error.toString(), message: error.message, stack: error.stack}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló Mappers thirdParty',
+                error: { error: 'Error inesperado en Mappers thirdParty' }
+            });
+        }
         const msg = 'No se pudo parsear la orden de un ThirdParty.';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,

@@ -3,6 +3,7 @@ import NewsTypeSingleton from '../../../../utils/newsType';
 import NewsStateSingleton from '../../../../utils/newsState';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
 import CustomError from '../../../../utils/errors/customError';
+import logError from '../../../../models/logError';
 
 class DeliveryStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -49,6 +50,17 @@ class DeliveryStrategy extends NewsTypeStrategy {
         }
         resolve();
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló manageNewType DeliveryStrategy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({                        
+                message: 'Falló manageNewType DeliveryStrategy',
+                error: { error: 'Error inesperado en manageNewType' }
+            });
+        } 
         reject(error);
       }
     });

@@ -9,6 +9,7 @@ import NewsTypeSingleton from '../utils/newsType';
 import PlatformSingleton from '../utils/platforms';
 import CustomError from '../utils/errors/customError';
 import { APP_BRANCH } from '../utils/errors/codeError';
+import logError from '../models/logError';
 
 import _ from 'lodash';
 
@@ -24,6 +25,17 @@ async function udpdateLastGetNews(branchId) {
       { new: true, runValidators: true, context: 'query' }
     );
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló udpdateLastGetNews branch',
+        error:{ error: error.toString(), message: error.message, stack: error.stack}
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló udpdateLastGetNews branch',
+        error: { error: 'Error inesperado en udpdateLastGetNews branch' }
+      });
+    } 
     error = { error: error.toString() };
     const msg = `Failed to update lastGetNews.`;
     logger.error({ message: msg, meta: error });
@@ -54,6 +66,17 @@ const getNews = async (req, res) => {
     udpdateLastGetNews(req.token.branchId);
     return res.status(200).json(newsOrders).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló getNews branch',
+        error:{ error: error.toString(), message: error.message, stack: error.stack}
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló getNews branch',
+        error: { error: 'Error inesperado en getNews branch' }
+      });
+    }
     const msg = 'No se pudieron obtener novedades de la sucursal';
     const meta = { error: error.toString() };
     const err = new CustomError(APP_BRANCH.LOGIN, msg, req.uuid, meta);
@@ -91,6 +114,17 @@ const setNews = (req, res) => {
           let setNews = new SetNews(req.token.branchId, req.uuid);
           await setNews.setNews(newToSet);
         } catch (error) {
+          try {      
+            logError.create({
+              message: 'Falló setNews branch',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, newToSet:newToSet}
+            });
+          } catch (error) {
+            logError.create({
+              message: 'Falló setNews branch',
+              error: { error: 'Error inesperado en setNews branch' }
+            });
+          }
           const msg = 'No se pudo procesar la novedad.';
           const meta = { error: error.toString(), newToSet };
           const err = new CustomError(APP_BRANCH.LOGIN, msg, req.uuid, meta);
@@ -105,6 +139,17 @@ const setNews = (req, res) => {
       let setNews = new SetNews(req.token.branchId, req.uuid);
       let res = setNews.setNews(newToSet);
     } catch (error) {
+      try {      
+        logError.create({
+          message: 'Falló setNews branch 2',
+          error:{ error: error.toString(), message: error.message, stack: error.stack, newToSet:newToSet}
+        });
+      } catch (error) {
+        logError.create({
+          message: 'Falló setNews branch 2',
+          error: { error: 'Error inesperado en setNews branch' }
+        });
+      }
       const msg = 'No se pudo procesar la novedad.';
       const meta = { error: error.toString(), newToSet };
       const err = new CustomError(APP_BRANCH.LOGIN, msg, req.uuid, meta);
@@ -129,6 +174,17 @@ const updateDate = async (req, res) => {
     udpdateLastGetNews(req.token.branchId);
     return res.status(200).json({}).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló updateDate branch',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló updateDate branch',
+        error: { error: 'Error inesperado en updateDate branch' }
+      });
+    }
     const msg = 'No se pudieron obtener novedades de la sucursal';
     const meta = { error: error.toString() };
     const err = new CustomError(APP_BRANCH.LOGIN, msg, req.uuid, meta);

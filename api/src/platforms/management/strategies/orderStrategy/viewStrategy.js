@@ -3,6 +3,7 @@ import NewsStateSingleton from '../../../../utils/newsState';
 import NewsTypeStrategy from '../newsTypeStrategy';
 import CustomError from '../../../../utils/errors/customError';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
+import logError from '../../../../models/logError';
 
 class ViewStrategy extends NewsTypeStrategy {
   constructor(newToSet, token) {
@@ -48,6 +49,17 @@ class ViewStrategy extends NewsTypeStrategy {
         }
         resolve();
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló manageNewType ViewStrategy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló manageNewType ViewStrategy',
+                error: { error: 'Error inesperado en manageNewType' }
+            });
+        } 
         reject(error);
       }
     });

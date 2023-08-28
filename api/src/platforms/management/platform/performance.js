@@ -3,6 +3,7 @@ import Platform from '../platform';
 import NewsStateSingleton from '../../../utils/newsState';
 import logger from '../../../config/logger';
 import axios from 'axios';
+import logError from '../../../models/logError';
 
 class Performance extends Platform {
   constructor(platform) {
@@ -59,6 +60,17 @@ class Performance extends Platform {
         // const res = await axios.put('url', body, headers);
         resolve({});
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló confirmOrder perfomance '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, deliveryTimeId:deliveryTimeId }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló confirmOrder perfomance',
+                error: { error: 'Error inesperado en confirmOrder perfomance' }
+            });
+        } 
         console.log('Error Confirm Order');
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
@@ -92,6 +104,17 @@ class Performance extends Platform {
         // const res = await axios.put(url, body, headers);
         resolve({});
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló dispatchOrder perfomance '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló dispatchOrder perfomance',
+                error: { error: 'Error inesperado en dispatchOrder perfomance' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
@@ -124,6 +147,17 @@ class Performance extends Platform {
         // const res = await axios.put(url, body, headers);
         resolve({});
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló deliveryOrder perfomance '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló deliveryOrder perfomance',
+                error: { error: 'Error inesperado en deliveryOrder perfomance' }
+            });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
         const err = new CustomError(APP_PLATFORM.DELIVERY, msg, this.uuid, {

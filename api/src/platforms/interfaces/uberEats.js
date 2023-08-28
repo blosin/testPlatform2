@@ -2,6 +2,7 @@ import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
+import logError from '../../models/logError';
 
 module.exports = {
   newsFromOrders: function (data, platform, newsCode, stateCod, branch, uuid) {
@@ -24,6 +25,17 @@ module.exports = {
             data.order.type == 'DELIVERY_BY_UBER' ? false : true;
           return order;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló orderMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló orderMapper uberEats',
+                  error: { error: 'Error inesperado en orderMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -53,6 +65,17 @@ module.exports = {
           paymentNews.note = '';
           return paymentNews;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló paymentenMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló paymentenMapper uberEats',
+                  error: { error: 'Error inesperado en paymentenMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -68,6 +91,17 @@ module.exports = {
           let driver = null;
           return driver;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló driverMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló driverMapper uberEats',
+                  error: { error: 'Error inesperado en driverMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -90,6 +124,17 @@ module.exports = {
 
           return customer;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló customerMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló customerMapper uberEats',
+                  error: { error: 'Error inesperado en customerMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -146,6 +191,17 @@ module.exports = {
           }
           return details;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló detailsMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló detailsMapper uberEats',
+                  error: { error: 'Error inesperado en detailsMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -167,6 +223,17 @@ module.exports = {
             country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló extraDataMapper uberEats',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló extraDataMapper uberEats',
+                  error: { error: 'Error inesperado en extraDataMapper uberEats' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de UberEats.';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -195,6 +262,17 @@ module.exports = {
           parseFloat(data.order.payment.charges.total.amount) / 100 || 0;
         resolve(news);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló extraDataMapper uberEats 2',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló extraDataMapper uberEats 2',
+                error: { error: 'Error inesperado en extraDataMapper uberEats' }
+            });
+        }
         const msg = 'No se pudo parsear la orden de UberEats.';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,

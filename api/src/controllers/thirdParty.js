@@ -6,6 +6,7 @@ import PlatformSingleton from '../utils/platforms';
 import SetNews from '../platforms/management/strategies/set-news';
 import NewsTypeSingleton from '../utils/newsType';
 import { isArray } from 'lodash';
+import logError from '../models/logError';
 
 const findAll = (req, res) => {
   return _helpers.find(model, req, res);
@@ -74,6 +75,17 @@ const login = async (req, res) => {
     };
     return _helpers.login(model, req, res, findParams, filterParams, undefined);
   } catch (error) {
+    try { 
+      logError.create({
+          message: 'Falló login thirdParty',
+          error:{ error: error.toString(), message: error.message, stack: error.stack}
+      });
+    } catch (ex) {
+        logError.create({
+            message: 'Falló login thirdParty',
+            error: { error: 'Error inesperado en login thirdParty' }
+        });
+    }
     const msg = 'Can not login to the platform.';
     logger.error({
       message: msg,
@@ -121,16 +133,15 @@ const saveOrder = (req, res) => {
         })
         .catch((error) => res.status(400).json(error).end());
   } catch (error) {
-    try {
-      const errorJson = JSON.stringify(error);
+    try {      
       logError.create({
         message: 'Falló saveOrder thirdParty: ',
-        error: { body: req.body }
+        error:{ error: error.toString(), message: error.message, stack: error.stack}
       });
     } catch (error) {
       logError.create({
         message: 'Falló saveOrder thirdParty: ',
-        error: { message: 'Error inesperado en saveOrder thirdParty' }
+        error: { error: 'Error inesperado en saveOrder thirdParty' }
       });
     }
     res.status(400).json({
@@ -151,18 +162,17 @@ const cancelOrder = async (req, res) => {
     const result = await setNews.setNews(newToSet, req.body.id);
     res.status(200).send(result).end();
   } catch (error) {
-    try {
-      const errorJson = JSON.stringify(error);
+    try {      
       logError.create({
         message: 'Falló cancelOrder thirdParty: ',
-        error: { body: req.body }
+        error:{ error: error.toString(), message: error.message, stack: error.stack}
       });
     } catch (error) {
       logError.create({
         message: 'Falló cancelOrder thirdParty: ',
-        error: { message: 'Error inesperado en cancelOrder thirdParty' }
+        error: { error: 'Error inesperado en cancelOrder thirdParty' }
       });
-    }
+    } 
     return res.status(400).json(error).end();
   }
 };

@@ -6,6 +6,7 @@ import CustomError from '../../../utils/errors/customError';
 const { ObjectId } = require('mongodb');
 import axios from 'axios';
 import config from '../../../config/env';
+import logError from '../../../models/logError'
 
 class NewsTypeStrategy {
   constructor(newToSet) {
@@ -28,6 +29,17 @@ class NewsTypeStrategy {
         }
       };
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló createTrace',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló createTrace',
+              error: { error: 'Error inesperado en createTrace' }
+          });
+      } 
       const msg = 'No se pudo generar el objeto trace.';
       const meta = { ...this };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);
@@ -54,6 +66,17 @@ class NewsTypeStrategy {
 
       return { findQuery, updateQuery, options };
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló createObjectsUpdate',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló createObjectsUpdate',
+              error: { error: 'Error inesperado en createObjectsUpdate' }
+          });
+      } 
       const msg = 'No se pudo generar el findQuery o updateQuery.';
       const meta = { ...this.newToSet, error: error.toString() };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);
@@ -68,6 +91,17 @@ class NewsTypeStrategy {
         this.uuid
       );
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló createPlatform',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, platformId: platformId }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló createPlatform',
+              error: { error: 'Error inesperado en createPlatform' }
+          });
+      } 
       const msg = 'No se pudo generar la plataforma.';
       const meta = { ...this };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);
@@ -108,6 +142,17 @@ class NewsTypeStrategy {
         this.createPlatform(this.savedNew.order.platformId);
         return resolve(this.savedNew);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló findNew',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, idNew: idNew }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló findNew',
+                error: { error: 'Error inesperado en findNew' }
+            });
+        } 
         const msg = 'No se pudo obtener la novedad.';
         const meta = { ...this.newToSet, error: error.toString() };
         const err = new CustomError(DB.FINDBYID, msg, this.uuid, meta);
@@ -126,6 +171,17 @@ class NewsTypeStrategy {
         );
         return resolve(updated);
       } catch (err) {
+        try { 
+          logError.create({
+              message: 'Falló updateNew',
+              error:{ error: err.toString(), message: err.message, stack: err.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló updateNew',
+                error: { error: 'Error inesperado en updateNew' }
+            });
+        } 
         console.log('Error updateNew');
         const msg = 'No se pudo actualizar la novedad.';
         const meta = { findQuery, updateQuery, options, err };
@@ -154,6 +210,17 @@ class NewsTypeStrategy {
         }
       );
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló requestLastMile',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, idNew: idNew }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló requestLastMile',
+              error: { error: 'Error inesperado en requestLastMile' }
+          });
+      } 
       console.log('No se pudo solicitar delivery.');
     }
   }

@@ -14,6 +14,7 @@ import OpenRestaurantStrategy from './globalStrategy/openRestaurantStrategy';
 import WarningRestaurantStrategy from './globalStrategy/warningRestaurantStrategy';
 import NewStrategy from './orderStrategy/newStrategy';
 import PlatformRejectStrategy from './orderStrategy/platformRejectStrategy';
+import logError from '../../../models/logError';
 
 class SetNews {
   constructor(branchId, uuid) {
@@ -95,6 +96,17 @@ class SetNews {
       /* Call the platform async */
       return this.strategy.manageNewType();
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló setNews',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, newToSet: newToSet, data: data }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló setNews',
+              error: { error: 'Error inesperado en setNews' }
+          });
+      } 
       const msg = 'No se pudo generar el findQuery o updateQuery.';
       const meta = { ...this.newToSet, error: error.toString() };
       new CustomError(APP_BRANCH.SETNEWS, msg, meta);

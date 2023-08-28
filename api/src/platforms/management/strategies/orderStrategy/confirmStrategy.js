@@ -3,6 +3,7 @@ import NewsTypeSingleton from '../../../../utils/newsType';
 import NewsStateSingleton from '../../../../utils/newsState';
 import CustomError from '../../../../utils/errors/customError';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
+import logError from '../../../../models/logError';
 
 class ConfirmStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -32,6 +33,17 @@ class ConfirmStrategy extends NewsTypeStrategy {
       if (!isValid) delete updateQuery['typeId'], updateQuery['order.statusId'];
       return { findQuery, updateQuery, options };
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló manageNewType ConfirmStrategy',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({                        
+              message: 'Falló manageNewType ConfirmStrategy',
+              error: { error: 'Error inesperado en manageNewType' }
+          });
+      } 
       const msg = 'No se pudo generar el findQuery o updateQuery.';
       const meta = { ...this.newToSet, error: error.toString() };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);

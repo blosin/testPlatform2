@@ -2,6 +2,7 @@ import NewsTypeStrategy from '../newsTypeStrategy';
 import CustomError from '../../../../utils/errors/customError';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
 import NewsTypeSingleton from '../../../../utils/newsType';
+import logError from '../../../../models/logError';
 
 class ReceiveStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -35,6 +36,17 @@ class ReceiveStrategy extends NewsTypeStrategy {
 
       return { findQuery, updateQuery, options };
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló createObjectsUpdate ReceiveStrategy',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló createObjectsUpdate ReceiveStrategy',
+              error: { error: 'Error inesperado en createObjectsUpdate' }
+          });
+      } 
       const msg = 'No se pudo generar el findQuery o updateQuery.';
       const meta = { ...this.newToSet, error: error.toString() };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);
@@ -57,6 +69,17 @@ class ReceiveStrategy extends NewsTypeStrategy {
         await this.updateNew(findQuery, updateQuery, options);
         resolve();
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló manageNewType ReceiveStrategy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló manageNewType ReceiveStrategy',
+                error: { error: 'Error inesperado en manageNewType' }
+            });
+        } 
         reject(error);
       }
     });

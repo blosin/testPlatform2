@@ -1,6 +1,7 @@
 const url = require('url');
 import jwt from 'jsonwebtoken';
 import settings from '../config/settings';
+import logError from '../models/logError';
 
 const logger = require('../config/logger');
 
@@ -30,6 +31,17 @@ const find = async (model, req, res) => {
 
     return res.status(200).json(find).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló find helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló find helper',
+        error: { error: 'Error inesperado en find helper' }
+      });
+    }
     const msg = 'Can not find any object.';
     logger.error({
       message: msg,
@@ -61,6 +73,17 @@ const findById = async (model, req, res) => {
       .sort(sort);
     return res.status(200).json(find).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló findById helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack, params:req.params }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló findById helper',
+        error: { error: 'Error inesperado en findById helper' }
+      });
+    }
     const msg = 'Can not find any object.';
     logger.error({
       message: msg,
@@ -129,6 +152,17 @@ const login = async (
       throw 'Username or password are incorrect.';
     }
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló login helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló login helper',
+        error: { error: 'Error inesperado en login helper' }
+      });
+    }
     logger.error({ message: 'Login failed.', meta: { body: req.body } });
     return res
       .status(401)
@@ -155,6 +189,17 @@ const deleteModel = async (model, req, res) => {
 
     return res.status(200).json(data).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló deleteModel helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló deleteModel helper',
+        error: { error: 'Error inesperado en deleteModel helper' }
+      });
+    }
     const msg = 'Object could not be updated.';
     logger.error({
       message: msg,
@@ -172,6 +217,17 @@ const destroyModel = async (model, req, res) => {
     if (!data) throw `Object could not be found. id: ${_id}`;
     return res.status(200).json(data).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló destroyModel helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló destroyModel helper',
+        error: { error: 'Error inesperado en destroyModel helper' }
+      });
+    }
     const msg = 'Object could not be destroyed.';
     logger.error({ message: msg, meta: { body: req.body } });
     return res.status(400).json({ error: msg }).end();
@@ -191,6 +247,17 @@ const save = async (model, req, res) => {
       return res.status(200).json(data).end();
     }
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló save helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló save helper',
+        error: { error: 'Error inesperado en save helper' }
+      });
+    }
     const msg = 'Object could not be saved.';
     logger.error({
       message: msg,
@@ -213,6 +280,17 @@ const findByIdAndUpdate = async (model, req, res) => {
 
     return res.status(200).json(data).end();
   } catch (error) {
+    try {      
+      logError.create({
+        message: 'Falló findByIdAndUpdate helper',
+        error:{ error: error.toString(), message: error.message, stack: error.stack }
+      });
+    } catch (error) {
+      logError.create({
+        message: 'Falló findByIdAndUpdate helper',
+        error: { error: 'Error inesperado en save helper' }
+      });
+    }
     const msg = 'Object could not be updated.';
     logger.error({
       message: msg,

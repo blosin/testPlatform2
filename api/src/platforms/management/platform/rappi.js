@@ -6,6 +6,7 @@ import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_PLATFORM } from '../../../utils/errors/codeError';
 import UUID from '../../../utils/errors/utils';
+import logError from '../../../models/logError';//VER
 
 class Rappi extends Platform {
   constructor(platform) {
@@ -64,6 +65,17 @@ class Rappi extends Platform {
         })
 
         .catch((error) => {
+          try { 
+            logError.create({
+                message: 'Falló loginGetOrders rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló loginGetOrders rappi',
+                  error: { error: 'Error inesperado en loginGetOrders rappi' }
+              });
+          } 
           if (!error) error = '';
           const msg = 'Failed to login.';
           new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -93,6 +105,17 @@ class Rappi extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
+        /*try { 
+          logError.create({
+              message: 'Falló loginToAuth0 rappi',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló loginToAuth0 rappi',
+                error: { error: 'Error inesperado en loginToAuth0 rappi' }
+            });
+        }*/ 
         console.log('error loginToAuth0');
 
         if (!error) error = '';
@@ -139,6 +162,17 @@ class Rappi extends Platform {
         }
         resolve(result);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getOrders rappi',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getOrders rappi',
+                error: { error: 'Error inesperado en getOrders rappi' }
+            });
+        }
         console.log("error getOrders");
         if (!error) error = '';
         const msg = 'Failed to get orders.';
@@ -184,6 +218,17 @@ class Rappi extends Platform {
           resolve(true);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló receiveOrder rappi',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló receiveOrder rappi',
+                error: { error: 'Error inesperado en receiveOrder rappi' }
+            });
+        } 
         console.log('error send rappi');
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
@@ -242,10 +287,17 @@ class Rappi extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
-        logError.create({
-          message: 'Failed branchRejectOrder',
-          error: { message: error.message, order: order, rejectDesc: rejectDesc }
-        });
+        try { 
+          logError.create({
+              message: 'Falló branchRejectOrder rappi',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló branchRejectOrder rappi',
+                error: { error: 'Error inesperado en branchRejectOrder rappi' }
+            });
+        }       
         /* Reject the order automatically. */
         this.rejectWrongOrderAutomatically(order.id);
         if (!error) error = '';

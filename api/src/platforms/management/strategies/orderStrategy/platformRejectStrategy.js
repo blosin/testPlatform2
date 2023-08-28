@@ -5,6 +5,7 @@ import news from '../../../../models/news';
 import NewsTypeSingleton from '../../../../utils/newsType';
 import Aws from '../../../../platforms/provider/aws';
 import branch from '../../../../models/branch';
+import logError from '../../../../models/logError';
 
 class PlatformRejectStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -94,6 +95,17 @@ class PlatformRejectStrategy extends NewsTypeStrategy {
           });
         return resolve(platformResult);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló manageNewType PlatformRejectStrategy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló manageNewType PlatformRejectStrategy',
+                error: { error: 'Error inesperado en manageNewType' }
+            });
+        } 
         return reject(error);
       }
     });

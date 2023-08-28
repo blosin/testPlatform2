@@ -1,5 +1,6 @@
 import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
+import logError from '../../models/logError';
 
 const paymentType = {
   DEBIT: {
@@ -187,6 +188,17 @@ module.exports = {
           : 0;
         resolve(news);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló glovo',
+              error:{ error: error.toString(), message: error.message, stack: error.stack}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló glovo',
+                error: { error: 'Error inesperado en glovo' }
+            });
+        }
         reject(error);
       }
     });

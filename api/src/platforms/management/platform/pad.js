@@ -4,6 +4,7 @@ import NewsStateSingleton from '../../../utils/newsState';
 import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
+import logError from '../../../models/logError';
 
 class Pad extends Platform {
   constructor(platform) {
@@ -56,6 +57,17 @@ class Pad extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló confirmOrder PAD',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló confirmOrder PAD',
+                error: { error: 'Error inesperado en confirmOrder PAD' }
+            });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -87,6 +99,17 @@ class Pad extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló dispatchOrder PAD',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló dispatchOrder PAD',
+                error: { error: 'Error inesperado en dispatchOrder PAD' }
+            });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
@@ -117,6 +140,17 @@ class Pad extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló deliveryOrder PAD',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló deliveryOrder PAD',
+                error: { error: 'Error inesperado en deliveryOrder PAD' }
+            });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
         const err = new CustomError(APP_PLATFORM.DELIVERY, msg, this.uuid, {
@@ -149,6 +183,17 @@ class Pad extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló branchRejectOrder PAD',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló branchRejectOrder PAD',
+                error: { error: 'Error inesperado en branchRejectOrder PAD' }
+            });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
@@ -186,6 +231,17 @@ class Pad extends Platform {
         data = data.concat(negatives);
         resolve(data);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getRejectedMessages PAD',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getRejectedMessages PAD',
+                error: { error: 'Error inesperado en getRejectedMessages PAD' }
+            });
+        }
         const msg = 'Can not get parameters of PaD.';
         new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error

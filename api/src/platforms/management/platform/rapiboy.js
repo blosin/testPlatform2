@@ -4,6 +4,7 @@ import NewsStateSingleton from '../../../utils/newsState';
 import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
+import logError from '../../../models/logError';//poner rapiboy
 
 class Rapiboy extends Platform {
   constructor(platform) {
@@ -64,6 +65,17 @@ class Rapiboy extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló confirmOrder rapiboy '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, deliveryTimeId:deliveryTimeId }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló confirmOrder rapiboy',
+                error: { error: 'Error inesperado en confirmOrder rapiboy' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -101,6 +113,17 @@ class Rapiboy extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló dispatchOrder rapiboy '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló dispatchOrder rapiboy',
+                error: { error: 'Error inesperado en dispatchOrder rapiboy' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
@@ -138,6 +161,17 @@ class Rapiboy extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló deliveryOrder rapiboy '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló deliveryOrder rapiboy',
+                error: { error: 'Error inesperado en deliveryOrder rapiboy' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
         const err = new CustomError(APP_PLATFORM.DELIVERY, msg, this.uuid, {
@@ -176,6 +210,17 @@ class Rapiboy extends Platform {
           resolve(res.data);
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló branchRejectOrder rapiboy '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, rejectMessageId:rejectMessageId }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló branchRejectOrder rapiboy',
+                error: { error: 'Error inesperado en branchRejectOrder rapiboy' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
@@ -217,6 +262,17 @@ class Rapiboy extends Platform {
         });
         resolve(deliveryTimes);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getDeliveryTimes rapiboy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getDeliveryTimes rapiboy',
+                error: { error: 'Error inesperado en getDeliveryTimes rapiboy' }
+            });
+        } 
         const msg = 'Can not get parameters of PaD.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error
@@ -255,6 +311,17 @@ class Rapiboy extends Platform {
         data = data.concat(negatives);
         resolve(data);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getRejectedMessages rapiboy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getRejectedMessages rapiboy',
+                error: { error: 'Error inesperado en getRejectedMessages rapiboy' }
+            });
+        } 
         const msg = 'Can not get parameters of PaD.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error

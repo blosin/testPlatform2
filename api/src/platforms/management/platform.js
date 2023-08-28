@@ -13,6 +13,7 @@ import NewsTypeSingleton from '../../utils/newsType';
 import RejectedMessagesSingleton from '../../utils/rejectedMessages';
 import Aws from '../provider/aws';
 import orderFailedModel from '../../models/orderFailed';
+import logError from '../../models/logError';
 
 class Platform {
   constructor(platform) {
@@ -67,10 +68,17 @@ class Platform {
       this.updateRejectedMessage(rejectedMessages);
       this.updateDeliveryTimes(deliveryTimes);
     } catch (error) {
-      logError.create({
-        message: 'Falló getPlatformParameters',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló getPlatformParameters',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, internalCode: this._platform.internalCode}
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló getPlatformParameters',
+              error: { error: 'Error inesperado en getPlatformParameters' }
+          });
+      } 
     }
   }
 
@@ -82,10 +90,17 @@ class Platform {
       return Promise.resolve(this.doesNotApply);
     }
     catch (error) {
-      logError.create({
-        message: 'Falló receiveOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló receiveOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branchId: branchId }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló receiveOrder',
+              error: { error: 'Error inesperado en receiveOrder' }
+          });
+      } 
     }
   }
 
@@ -101,10 +116,18 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló viewOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló viewOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branchId: branchId }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló viewOrder',
+              error: { error: 'Error inesperado en viewOrder' }
+          });
+      }
+      throw error;     
     }
   }
   /**
@@ -119,12 +142,19 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló confirmOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló confirmOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branchId: branchId }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló confirmOrder',
+              error: { error: 'Error inesperado en confirmOrder' }
+          });
+      }
+      throw error;     
     }
-
   }
 
   /**
@@ -139,10 +169,18 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló dispatchOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló dispatchOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló dispatchOrder',
+              error: { error: 'Error inesperado en dispatchOrder' }
+          });
+      }
+      throw error;
     }
   }
 
@@ -158,10 +196,18 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló deliveryOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló deliveryOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló deliveryOrder',
+              error: { error: 'Error inesperado en deliveryOrder' }
+          });
+      }
+      throw error;    
     }
   }
 
@@ -177,10 +223,18 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló branchRejectOrder',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló branchRejectOrder',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló branchRejectOrder',
+              error: { error: 'Error inesperado en branchRejectOrder' }
+          });
+      }
+      throw error;
     }
   }
 
@@ -197,10 +251,18 @@ class Platform {
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló retriveDriver',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló retriveDriver',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló retriveDriver',
+              error: { error: 'Error inesperado en retriveDriver' }
+          });
+      }
+      throw error;
     }
   }
 
@@ -243,22 +305,22 @@ class Platform {
         resolve();
       }
       catch (error) {
-        try {
+        try { 
           logError.create({
-            message: 'Falló openRestaurant: ' + branchId,
-            error: error.message
+              message: 'Falló openRestaurant',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, branchId: branchId}
           });
-        } catch (error) {
-          logError.create({
-            message: 'Falló openRestaurant: ' + branchId,
-            error: { message: 'Error inesperado en openRestaurant' }
-          });
-        }
+        } catch (ex) {
+            logError.create({
+                message: 'Falló openRestaurant',
+                error: { error: 'Error inesperado en openRestaurant' }
+            });
+        }   
+        error = { error: error.toString(), platform: this._platform };
+        const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
+        logger.error({ message: msg, meta: error });
+        reject(msg);
       }
-      error = { error: error.toString(), platform: this._platform };
-      const msg = `Failed to openRestaurant. RestaurantCode: ${branchId}.`;
-      logger.error({ message: msg, meta: error });
-      reject(msg);
     });
   }
 
@@ -302,17 +364,17 @@ class Platform {
         );
         resolve();
       } catch (error) {
-        try {
+        try { 
           logError.create({
-            message: 'Falló closeRestaurant: ' + branchId,
-            error: error.message
+              message: 'Falló closeRestaurant',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, branchId: branchId}
           });
-        } catch (error) {
-          logError.create({
-            message: 'Falló closeRestaurant: ' + branchId,
-            error: { message: 'Error inesperado en closeRestaurant' }
-          });
-        }
+        } catch (ex) {
+            logError.create({
+                message: 'Falló closeRestaurant',
+                error: { error: 'Error inesperado en closeRestaurant' }
+            });
+        } 
         error = {
           error: error.toString(),
           branchId,
@@ -355,17 +417,17 @@ class Platform {
         rejectedExtraData
       );
     } catch (error) {
-      try {
+      try { 
         logError.create({
-          message: 'Falló rejectWrongOrderAutomatically: ' + order.id,
-          error: error.message
+            message: 'Falló rejectWrongOrderAutomatically',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
         });
-      } catch (error) {
-        logError.create({
-          message: 'Falló rejectWrongOrderAutomatically: ' + order.id,
-          error: { message: 'Error inesperado en rejectWrongOrderAutomatically' }
-        });
-      }
+      } catch (ex) {
+          logError.create({
+              message: 'Falló rejectWrongOrderAutomatically',
+              error: { error: 'Error inesperado en rejectWrongOrderAutomatically' }
+          });
+      } 
       const msg = `Order: ${order.id}. Failed to reject automatically the order.`;
       error = { error: error.toString(), order };
       logger.error({ message: msg, meta: error });
@@ -391,17 +453,17 @@ class Platform {
         }
       );
     } catch (error) {
-      try {
+      try { 
         logError.create({
-          message: 'Falló updateOrderState: ' + order.id,
-          error: { message: error.message, order: order, state: state }
+            message: 'Falló updateOrderState',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, state: state }
         });
-      } catch (error) {
-        logError.create({
-          message: 'Falló updateOrderState: ' + order.id,
-          error: { message: 'Error inesperado en updateOrderState' }
-        });
-      }
+      } catch (ex) {
+          logError.create({
+              message: 'Falló updateOrderState',
+              error: { error: 'Error inesperado en updateOrderState' }
+          });
+      } 
       const msg = 'Failed to update order state.';
       error = { order, state, error: error.toString() };
       logger.error({ message: msg, meta: error });
@@ -441,18 +503,17 @@ class Platform {
         }
       );
     } catch (error) {
-      try {
+      try { 
         logError.create({
-          message: 'Falló updateNewsState: ' + order.id,
-          error: { message: error.message, order: order }
+            message: 'Falló updateNewsState',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
         });
-      } catch (error) {
-        logError.create({
-          message: 'Falló updateNewsState: ' + order.id,
-          error: { message: 'Error inesperado en updateNewsState' }
-        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló updateNewsState',
+              error: { error: 'Error inesperado en updateNewsState' }
+          });
       }
-
       const msg = 'Failed to update news state.';
       const formatError = {
         order,
@@ -479,10 +540,17 @@ class Platform {
       );
     }
     catch (error) {
-      logError.create({
-        message: 'Falló updateLastContact',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló updateLastContact',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, internalCode: this._platform.internalCode }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló updateLastContact',
+              error: { error: 'Error inesperado en updateLastContact' }
+          });
+      }     
     }
   }
 
@@ -506,10 +574,17 @@ class Platform {
         });
     }
     catch (error) {
-      logError.create({
-        message: 'Falló getOrderById' + id,
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló getOrderById',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, id: id }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló getOrderById',
+              error: { error: 'Error inesperado en getOrderById' }
+          });
+      }
     }
   }
 
@@ -533,10 +608,17 @@ class Platform {
           throw error;
         }
       } catch (message) {
-        logError.create({
-          message: 'Falló rejectPlatformOrder' + orderId,
-          error: { message: error.message }
-        });
+        try { 
+          logError.create({
+              message: 'Falló rejectPlatformOrder',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, orderId: orderId }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló rejectPlatformOrder',
+                error: { error: 'Error inesperado en rejectPlatformOrder' }
+            });
+        }
         logger.error({ message, meta: { originalId } });
         return reject(message);
       }
@@ -566,10 +648,17 @@ class Platform {
           });
         return resolve(savedOrder.order);
       } catch (error) {
-        logError.create({
-          message: 'Falló findOrder' + orderId,
-          error: { message: error.message }
-        });
+        try { 
+          logError.create({
+              message: 'Falló findOrder',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, orderId: orderId }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló findOrder',
+                error: { error: 'Error inesperado en findOrder' }
+            });
+        }
         const errBody = { orderId, error: error.toString() };
         logger.error({ meta: errBody });
         return reject(errBody);
@@ -589,10 +678,17 @@ class Platform {
       );
     }
     catch (error) {
-      logError.create({
-        message: 'Falló getBranchPlatform' + platformId,
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló getBranchPlatform',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, platformId: platformId,platforms:platforms }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló getBranchPlatform',
+              error: { error: 'Error inesperado en getBranchPlatform' }
+          });
+      }
     }
   }
 
@@ -624,10 +720,17 @@ class Platform {
         } else if (diffLastGetNews > timeToClose) closed = true;
         return resolve(!closed);
       } catch (error) {
-        logError.create({
-          message: 'Falló isClosedRestaurant',
-          error: { message: error.message, branchPlatform: branchPlatform, lastGetNew: lastGetNew }
-        });
+        try { 
+          logError.create({
+              message: 'Falló isClosedRestaurant',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, branchPlatform: branchPlatform, lastGetNew: lastGetNew }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló isClosedRestaurant',
+                error: { error: 'Error inesperado en isClosedRestaurant' }
+            });
+        }
         error = { error: error.toString() };
         const msg = `Can not validate if restaurant is closed.`;
         logger.error({ message: msg, meta: error });
@@ -642,10 +745,17 @@ class Platform {
     try {
       return require('../interfaces/thirdParty');
     } catch (error) {
-      logError.create({
-        message: 'Fail importParser',
-        error: { message: error.message }
-      })
+      try { 
+        logError.create({
+            message: 'Falló importParser',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló importParser',
+              error: { error: 'Error inesperado en importParser' }
+          });
+      }
     }
   }
 
@@ -709,84 +819,116 @@ class Platform {
               return resolve(orderSaved);
             })
             .catch((error) => {
+              try { 
+                logError.create({
+                    message: 'Falló validateNewOrders 2',
+                    error:{ error: error.toString(), message: error.message, stack: error.stack, newOrder: newOrder }
+                });
+              } catch (ex) {
+                  logError.create({
+                      message: 'Falló validateNewOrders 2',
+                      error: { error: 'Error inesperado en validateNewOrders' }
+                  });
+              }
               reject(error);
             });
         }
       });
     }
     catch (error) {
-      logError.create({
-        message: 'Fail validateNewOrders',
-        error: { message: error.message, newOrder: newOrder }
-      })
+      try { 
+        logError.create({
+            message: 'Falló validateNewOrders',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, newOrder: newOrder }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló validateNewOrders',
+              error: { error: 'Error inesperado en validateNewOrders' }
+          });
+      }
     }
   }
 
   getOrderBranches(branchReference) {
-    const query = {
-      'platforms.platform': this._platform._id,
-      'platforms.branchReference': branchReference.toString()
-    };
-    return branchModel.aggregate([
-      { $match: query },
-      { $unwind: '$platforms' },
-      { $match: query },
-      {
-        $lookup: {
-          from: 'chains',
-          localField: 'chain',
-          foreignField: '_id',
-          as: 'joinChains'
+    try {
+      const query = {
+        'platforms.platform': this._platform._id,
+        'platforms.branchReference': branchReference.toString()
+      };
+      return branchModel.aggregate([
+        { $match: query },
+        { $unwind: '$platforms' },
+        { $match: query },
+        {
+          $lookup: {
+            from: 'chains',
+            localField: 'chain',
+            foreignField: '_id',
+            as: 'joinChains'
+          }
+        },
+        {
+          $lookup: {
+            from: 'platforms',
+            localField: 'platforms.platform',
+            foreignField: '_id',
+            as: 'joinPlatforms'
+          }
+        },
+        {
+          $lookup: {
+            from: 'clients',
+            localField: 'client',
+            foreignField: '_id',
+            as: 'joinClients'
+          }
+        },
+        {
+          $lookup: {
+            from: 'regions',
+            localField: 'address.region',
+            foreignField: '_id',
+            as: 'joinRegions'
+          }
+        },
+        { $unwind: { path: '$joinChains', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$joinClients', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$joinPlatforms', preserveNullAndEmptyArrays: true } },
+        { $unwind: { path: '$joinRegions', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            name: '$name',
+            branchId: '$branchId',
+            'chain.chain': '$joinChains.chain',
+            'platform.name': '$joinPlatforms.name',
+            'platform.platform': '$joinPlatforms._id',
+            lastGetNews: '$lastGetNews',
+            'platform.progClosed': '$platforms.progClosed',
+            'platform.isActive': '$platforms.isActive',
+            'client.businessName': '$joinClients.businessName',
+            'address.region': '$joinRegions.region',
+            smartfran_sw: '$smartfran_sw',
+            'address.country': '$address.country'
+          }
+        },
+        {
+          $limit: 1
         }
-      },
-      {
-        $lookup: {
-          from: 'platforms',
-          localField: 'platforms.platform',
-          foreignField: '_id',
-          as: 'joinPlatforms'
-        }
-      },
-      {
-        $lookup: {
-          from: 'clients',
-          localField: 'client',
-          foreignField: '_id',
-          as: 'joinClients'
-        }
-      },
-      {
-        $lookup: {
-          from: 'regions',
-          localField: 'address.region',
-          foreignField: '_id',
-          as: 'joinRegions'
-        }
-      },
-      { $unwind: { path: '$joinChains', preserveNullAndEmptyArrays: true } },
-      { $unwind: { path: '$joinClients', preserveNullAndEmptyArrays: true } },
-      { $unwind: { path: '$joinPlatforms', preserveNullAndEmptyArrays: true } },
-      { $unwind: { path: '$joinRegions', preserveNullAndEmptyArrays: true } },
-      {
-        $project: {
-          name: '$name',
-          branchId: '$branchId',
-          'chain.chain': '$joinChains.chain',
-          'platform.name': '$joinPlatforms.name',
-          'platform.platform': '$joinPlatforms._id',
-          lastGetNews: '$lastGetNews',
-          'platform.progClosed': '$platforms.progClosed',
-          'platform.isActive': '$platforms.isActive',
-          'client.businessName': '$joinClients.businessName',
-          'address.region': '$joinRegions.region',
-          smartfran_sw: '$smartfran_sw',
-          'address.country': '$address.country'
-        }
-      },
-      {
-        $limit: 1
+      ]);
+    } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló getOrderBranches',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, branchReference: branchReference }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló getOrderBranches',
+              error: { error: 'Error inesperado en getOrderBranches' }
+          });
       }
-    ]);
+    }    
   }
 
   /**
@@ -831,6 +973,17 @@ class Platform {
             order.state = NewsStateSingleton.stateByCod('rej_closed');
           }
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló saveNewOrders',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló saveNewOrders',
+                  error: { error: 'Error inesperado en saveNewOrders' }
+              });
+          }
           const msg = `Order: ${originalId} can not check if the restaurant is closed.`;
           logger.error({ message: msg, meta: { error: error.toString() } });
           throw { orderId: originalId, error };
@@ -918,6 +1071,17 @@ class Platform {
           orderProccessed = orderCreator;
           newProccessed = newCreator;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló saveNewOrders 2',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló saveNewOrders 2',
+                  error: { error: 'Error inesperado en saveNewOrders' }
+              });
+          }
           const msg = `News: ${originalId} can not be parsed correctly.`;
           const err = logger.error({
             message: msg,
@@ -926,6 +1090,17 @@ class Platform {
           throw err;
         }
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló saveNewOrders 3',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló saveNewOrders 3',
+                error: { error: 'Error inesperado en saveNewOrders' }
+            });
+        }
         const orderFailedCreator = {
           thirdParty: this._platform.name,
           internalCode: this._platform.internalCode,
@@ -943,6 +1118,17 @@ class Platform {
           });
           if (!findOrder) await orderFailedModel.create(orderFailedCreator);
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló saveNewOrders 4',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló saveNewOrders 4',
+                  error: { error: 'Error inesperado en saveNewOrders' }
+              });
+          }
           const msg = `OrderFailed: ${originalId} can not be parsed correctly.`;
           logger.error({
             message: msg,
@@ -975,10 +1161,17 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
-        logError.create({
-          message: 'Failed saveNewOrders',
-          error: { message: error.message, order: order }
-        })
+        try { 
+          logError.create({
+              message: 'Falló saveNewOrders 5',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló saveNewOrders 5',
+                error: { error: 'Error inesperado en saveNewOrders' }
+            });
+        }
         console.log('error al crear orden');
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
@@ -1052,6 +1245,17 @@ class Platform {
           );
           orderProccessed = orderCreator;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló saveNewOrdersAutomally 1',
+                error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branch: branch  }
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló saveNewOrdersAutomally 1',
+                  error: { error: 'Error inesperado en saveNewOrdersAutomally' }
+              });
+          }
           const msg = `News: ${originalId} can not be parsed correctly.`;
           const err = logger.error({
             message: msg,
@@ -1060,10 +1264,17 @@ class Platform {
           throw err;
         }
       } catch (error) {
-        logError.create({
-          message: 'Failed saveNewOrdersAutomally 1',
-          error: { message: error.message, order: order, branch: branch }
-        });
+        try { 
+          logError.create({
+              message: 'Falló saveNewOrdersAutomally 2',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branch: branch  }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló saveNewOrdersAutomally 2',
+                error: { error: 'Error inesperado en saveNewOrdersAutomally' }
+            });
+        }
         reject({
           orderId: originalId,
           error: `Order: ${originalId} can not be proccessed correctly.`
@@ -1085,10 +1296,17 @@ class Platform {
         }
         return resolve(orderProccessed);
       } catch (error) {
-        logError.create({
-          message: 'Failed saveNewOrdersAutomally 2',
-          error: { message: error.message, order: order, branch: branch }
-        });
+        try { 
+          logError.create({
+              message: 'Falló saveNewOrdersAutomally 3',
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, branch: branch  }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló saveNewOrdersAutomally 3',
+                error: { error: 'Error inesperado en saveNewOrdersAutomally' }
+            });
+        } 
         const msg = `Failed to create orders.`;
         logger.error({ message: msg, meta: error.toString() });
         reject(msg);
@@ -1141,8 +1359,19 @@ class Platform {
       Promise.all(promises);
     }
     catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló updateRejectedMessage',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, rejectedMessages: rejectedMessages }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló updateRejectedMessage',
+              error: { error: 'Error inesperado en updateRejectedMessage' }
+          });
+      }
       logError.create({
-        message: 'Failed updateRejectedMessage',
+        message: 'Failed ',
         error: { message: error.message }
       });
     }
@@ -1186,10 +1415,17 @@ class Platform {
       Promise.all(promises);
     }
     catch (error) {
-      logError.create({
-        message: 'Failed updateDeliveryTimes',
-        error: { message: error.message }
-      });
+      try { 
+        logError.create({
+            message: 'Falló updateDeliveryTimes',
+            error:{ error: error.toString(), message: error.message, stack: error.stack, deliveryTimes: deliveryTimes }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló updateDeliveryTimes',
+              error: { error: 'Error inesperado en updateDeliveryTimes' }
+          });
+      }
     }
   }
 }

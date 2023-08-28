@@ -2,6 +2,7 @@ import NewsStateSingleton from '../../utils/newsState';
 import NewsTypeSingleton from '../../utils/newsType';
 import CustomError from '../../utils/errors/customError';
 import { APP_PLATFORM } from '../../utils/errors/codeError';
+import logError from '../../models/logError';
 
 const paymentType = {
   debit: {
@@ -42,6 +43,17 @@ module.exports = {
           paymentNews.note = '';
           return paymentNews;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló paymentenMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló paymentenMapper rappi',
+                  error: { error: 'Error inesperado en paymentenMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi.1';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -57,6 +69,17 @@ module.exports = {
           let driver = null;
           return driver;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló driverMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló driverMapper rappi',
+                  error: { error: 'Error inesperado en driverMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi. 2';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -84,6 +107,17 @@ module.exports = {
 
           return customer;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló customerMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló customerMapper rappi',
+                  error: { error: 'Error inesperado en customerMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi. 3';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -228,6 +262,17 @@ module.exports = {
           }
           return details;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló detailsMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló detailsMapper rappi',
+                  error: { error: 'Error inesperado en detailsMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi. 4';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -255,6 +300,17 @@ module.exports = {
           order.ownDelivery = false;
           return order;
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló orderMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló orderMapper rappi',
+                  error: { error: 'Error inesperado en orderMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi. 5';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -276,6 +332,17 @@ module.exports = {
             country: branch.address.country ? branch.address.country : ''
           };
         } catch (error) {
+          try { 
+            logError.create({
+                message: 'Falló extraDataMapper rappi',
+                error:{ error: error.toString(), message: error.message, stack: error.stack}
+            });
+          } catch (ex) {
+              logError.create({
+                  message: 'Falló extraDataMapper rappi',
+                  error: { error: 'Error inesperado en extraDataMapper rappi' }
+              });
+          }
           const msg = 'No se pudo parsear la orden de Rappi. 6';
           const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
             data,
@@ -307,6 +374,17 @@ module.exports = {
           data.order.order_detail.totals.total_products_with_discount;
         resolve(news);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló extraDataMapper rappi 2',
+              error:{ error: error.toString(), message: error.message, stack: error.stack}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló extraDataMapper rappi 2',
+                error: { error: 'Error inesperado en extraDataMapper rappi' }
+            });
+        }
         const msg = 'No se pudo parsear la orden de Rappi. 7';
         const err = new CustomError(APP_PLATFORM.CREATE, msg, uuid, {
           data,

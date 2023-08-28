@@ -6,6 +6,7 @@ import CustomError from '../../../utils/errors/customError';
 import { APP_PLATFORM } from '../../../utils/errors/codeError';
 import UUID from '../../../utils/errors/utils';
 import NewsStateSingleton from '../../../utils/newsState';
+import logError from '../../../models/logError';
 
 class UberEats extends Platform {
   constructor(platform) {
@@ -54,6 +55,17 @@ class UberEats extends Platform {
         this.getOrders(auth);
       })
       .catch((error) => {
+        try { 
+          logError.create({
+              message: 'Falló loginGetOrders uberEats',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló loginGetOrders uberEats',
+                error: { error: 'Error inesperado en loginGetOrders uberEats' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to login UberEats.';
         new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -83,6 +95,17 @@ class UberEats extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló loginToUberEats uberEats',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló loginToUberEats uberEats',
+                error: { error: 'Error inesperado en loginToUberEats uberEats' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to login. UberEats';
         const err = new CustomError(APP_PLATFORM.LOGIN, msg, this.uuid, {
@@ -129,6 +152,17 @@ class UberEats extends Platform {
         );
         resolve();
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getOrders uberEats',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getOrders uberEats',
+                error: { error: 'Error inesperado en getOrders uberEats' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to get orders.';
         const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
@@ -153,6 +187,17 @@ class UberEats extends Platform {
       let ordersConfirmation = await axios.post(urlToConfirm, payload, options);
       return ordersConfirmation;
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló sendPosConfirmation uberEats',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló sendPosConfirmation uberEats',
+              error: { error: 'Error inesperado en sendPosConfirmation uberEats' }
+          });
+      } 
       if (!error) error = '';
       const msg = 'Failed to confirm orders.';
       const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
@@ -183,6 +228,17 @@ class UberEats extends Platform {
       let ordersDeny = await axios.post(urlToDeny, payload, options);
       return ordersDeny;
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló sendPosDeny uberEats',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({
+              message: 'Falló sendPosDeny uberEats',
+              error: { error: 'Error inesperado en sendPosDeny uberEats' }
+          });
+      }
       if (!error) error = '';
       const msg = 'Failed to confirm orders.';
       const err = new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {

@@ -4,6 +4,7 @@ import NewsStateSingleton from '../../../utils/newsState';
 import axios from 'axios';
 import CustomError from '../../../utils/errors/customError';
 import { APP_BRANCH, APP_PLATFORM } from '../../../utils/errors/codeError';
+import logError from '../../../models/logError';
 
 class ThirdParty extends Platform {
   constructor(platform) {
@@ -89,6 +90,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló receiveOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló receiveOrder thirdParty',
+                error: { error: 'Error inesperado en receiveOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
@@ -134,6 +146,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló viewOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló viewOrder thirdParty',
+                error: { error: 'Error inesperado en viewOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the viewed status.';
         const err = new CustomError(APP_PLATFORM.VIEW, msg, this.uuid, {
@@ -181,6 +204,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló confirmOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, deliveryTimeId:deliveryTimeId}
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló confirmOrder thirdParty',
+                error: { error: 'Error inesperado en confirmOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the confirmed status.';
         const err = new CustomError(APP_PLATFORM.CONFIRM, msg, this.uuid, {
@@ -227,6 +261,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló dispatchOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló dispatchOrder thirdParty',
+                error: { error: 'Error inesperado en dispatchOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the dispatched status.';
         const err = new CustomError(APP_PLATFORM.DISPATCH, msg, this.uuid, {
@@ -273,6 +318,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló deliveryOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló deliveryOrder thirdParty',
+                error: { error: 'Error inesperado en deliveryOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the delivered status.';
         const err = new CustomError(APP_PLATFORM.DELIVERY, msg, this.uuid, {
@@ -325,6 +381,17 @@ class ThirdParty extends Platform {
           }
         } else resolve(false);
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló branchRejectOrder thirdParty '+ order.id,
+              error:{ error: error.toString(), message: error.message, stack: error.stack, order: order, rejectMessageId:rejectMessageId, rejectMessageNote:rejectMessageNote }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló branchRejectOrder thirdParty',
+                error: { error: 'Error inesperado en branchRejectOrder thirdParty' }
+            });
+        } 
         if (!error) error = '';
         const msg = 'Failed to send the rejected status.';
         const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
@@ -385,6 +452,17 @@ class ThirdParty extends Platform {
           resolve(deliveryTimes);
         }
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getDeliveryTimes thirdParty',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getDeliveryTimes thirdParty',
+                error: { error: 'Error inesperado en getDeliveryTimes thirdParty' }
+            });
+        } 
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error
@@ -442,6 +520,17 @@ class ThirdParty extends Platform {
           resolve(data);
         }
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló getRejectedMessages thirdParty',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({
+                message: 'Falló getRejectedMessages thirdParty',
+                error: { error: 'Error inesperado en getRejectedMessages thirdParty' }
+            });
+        } 
         const msg = 'Can not get parameters of ThirdParty.';
         const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
           platformError: error

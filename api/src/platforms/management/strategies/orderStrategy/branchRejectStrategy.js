@@ -3,6 +3,7 @@ import NewsTypeSingleton from '../../../../utils/newsType';
 import NewsStateSingleton from '../../../../utils/newsState';
 import CustomError from '../../../../utils/errors/customError';
 import { APP_BRANCH } from '../../../../utils/errors/codeError';
+import logError from '../../../../models/logError';
 
 class BranchRejectStrategy extends NewsTypeStrategy {
   constructor(newToSet) {
@@ -41,6 +42,17 @@ class BranchRejectStrategy extends NewsTypeStrategy {
       }
       return { findQuery, updateQuery };
     } catch (error) {
+      try { 
+        logError.create({
+            message: 'Falló createObjectsUpdate BranchRejectStrategy',
+            error:{ error: error.toString(), message: error.message, stack: error.stack }
+        });
+      } catch (ex) {
+          logError.create({                        
+              message: 'Falló createObjectsUpdate BranchRejectStrategy',
+              error: { error: 'Error inesperado en createObjectsUpdate' }
+          });
+      }
       const msg = 'No se pudo generar el findQuery o updateQuery.';
       const meta = { ...this.newToSet, error: error.toString() };
       new CustomError(APP_BRANCH.SETNEWS, msg, this.uuid, meta);
@@ -85,6 +97,17 @@ class BranchRejectStrategy extends NewsTypeStrategy {
         }
         resolve();
       } catch (error) {
+        try { 
+          logError.create({
+              message: 'Falló manageNewType BranchRejectStrategy',
+              error:{ error: error.toString(), message: error.message, stack: error.stack }
+          });
+        } catch (ex) {
+            logError.create({                        
+                message: 'Falló manageNewType BranchRejectStrategy',
+                error: { error: 'Error inesperado en manageNewType' }
+            });
+        }
         reject(error);
       }
     });
