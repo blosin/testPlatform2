@@ -1020,17 +1020,17 @@ class PedidosYa extends Platform {
           throw `Can not send the heartbeat.`;
         }
       } catch (error) {
-        try { 
-          logError.create({
-              message: 'Falló callHeartBeat Peya',
-              error:{ error: error.toString(), message: error.message, stack: error.stack, branch:branch }
-          });
-        } catch (ex) {
-            logError.create({
-                message: 'Falló callHeartBeat Peya',
-                error: { error: 'Error inesperado en callHeartBeat Peya' }
-            });
-        }
+        // try { 
+        //   logError.create({
+        //       message: 'Falló callHeartBeat Peya',
+        //       error:{ error: error.toString(), message: error.message, stack: error.stack, branch:branch }
+        //   });
+        // } catch (ex) {
+        //     logError.create({
+        //         message: 'Falló callHeartBeat Peya',
+        //         error: { error: 'Error inesperado en callHeartBeat Peya' }
+        //     });
+        // }
         if (!error) error = '';
         const msg = 'Failed to call the heartbeat.';
         const err = new CustomError(APP_PLATFORM.HEARTBEAT, msg, this.uuid, {
