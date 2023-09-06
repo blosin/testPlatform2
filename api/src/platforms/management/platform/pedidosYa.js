@@ -107,21 +107,17 @@ class PedidosYa extends Platform {
       });
     }
     catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló peyaLogin',
-            error:{ error: error.toString(), message: error.message, stack: error.stack }
+          message: 'Falló peyaLogin',
+          error: { error: error.toString(), message: error.message, stack: error.stack }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló peyaLogin',
-              error: { error: 'Error inesperado en peyaLogin' }
-          });
+        logError.create({
+          message: 'Falló peyaLogin',
+          error: { error: 'Error inesperado en peyaLogin' }
+        });
       }
-      logError.create({
-        message: 'Failed peyaLogin',
-        error: { message: error.message }
-      });
     }
   }
 
@@ -133,18 +129,18 @@ class PedidosYa extends Platform {
     try {
       return require('../../interfaces/pedidosYa');
     } catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló importParser Peya',
-            error:{ error: error.toString(), message: error.message, stack: error.stack }
+          message: 'Falló importParser Peya',
+          error: { error: error.toString(), message: error.message, stack: error.stack }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló importParser Peya',
-              error: { error: 'Error inesperado en importParser Peya' }
-          });
+        logError.create({
+          message: 'Falló importParser Peya',
+          error: { error: 'Error inesperado en importParser Peya' }
+        });
       }
-      throw error;   
+      throw error;
     }
   }
 
@@ -155,7 +151,8 @@ class PedidosYa extends Platform {
         PaginationOptions.create(),
         (data) => {
           this.uuid = UUID();
-          this.interactWithOrders(data);
+          this.interactWithOrders(data)
+
         },
         (error) => {
           const msg = 'Fallo al obtener ordenes de PY.';
@@ -166,17 +163,17 @@ class PedidosYa extends Platform {
       );
     }
     catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló getOrders Peya',
-            error:{ error: error.toString(), message: error.message, stack: error.stack }
+          message: 'Falló getOrders Peya',
+          error: { error: error.toString(), message: error.message, stack: error.stack }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló getOrders Peya',
-              error: { error: 'Error inesperado en getOrders Peya' }
-          });
-      }  
+        logError.create({
+          message: 'Falló getOrders Peya',
+          error: { error: 'Error inesperado en getOrders Peya' }
+        });
+      }
       throw error;
     }
   }
@@ -201,17 +198,17 @@ class PedidosYa extends Platform {
             );
             resolve(deliveryTimes);
           } catch (error) {
-            try { 
+            try {
               logError.create({
-                  message: 'Falló getDeliveryTimes Peya',
-                  error:{ error: error.toString(), message: error.message, stack: error.stack }
+                message: 'Falló getDeliveryTimes Peya',
+                error: { error: error.toString(), message: error.message, stack: error.stack }
               });
             } catch (ex) {
-                logError.create({
-                    message: 'Falló getDeliveryTimes Peya',
-                    error: { error: 'Error inesperado en getDeliveryTimes Peya' }
-                });
-            }    
+              logError.create({
+                message: 'Falló getDeliveryTimes Peya',
+                error: { error: 'Error inesperado en getDeliveryTimes Peya' }
+              });
+            }
             const msg = 'Can not get parameters of ThirdParty.';
             const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
               platformError: error
@@ -222,17 +219,17 @@ class PedidosYa extends Platform {
       }
     }
     catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló getDeliveryTimes Peya 2',
-            error:{ error: error.toString(), message: error.message, stack: error.stack }
+          message: 'Falló getDeliveryTimes Peya 2',
+          error: { error: error.toString(), message: error.message, stack: error.stack }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló getDeliveryTimes Peya 2',
-              error: { error: 'Error inesperado en getDeliveryTimes Peya' }
-          });
-      }    
+        logError.create({
+          message: 'Falló getDeliveryTimes Peya 2',
+          error: { error: 'Error inesperado en getDeliveryTimes Peya' }
+        });
+      }
     }
   }
 
@@ -252,19 +249,19 @@ class PedidosYa extends Platform {
           resolve(data);
         });
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló getRejectedMessages Peya 1',
-              error:{ error: error.toString(), message: error.message, stack: error.stack }
+            message: 'Falló getRejectedMessages Peya 1',
+            error: { error: error.toString(), message: error.message, stack: error.stack }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló getRejectedMessages Peya 1',
-                error: { error: 'Error inesperado en getRejectedMessages Peya' }
-            });
-        } 
+          logError.create({
+            message: 'Falló getRejectedMessages Peya 1',
+            error: { error: 'Error inesperado en getRejectedMessages Peya' }
+          });
+        }
       }
-  
+
     }
     else {
       return new Promise(async (resolve) => {
@@ -279,17 +276,17 @@ class PedidosYa extends Platform {
           data.forEach((obj) => (obj.platformId = this._platform.internalCode));
           resolve(data);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló getRejectedMessages Peya 2',
-                error:{ error: error.toString(), message: error.message, stack: error.stack }
+              message: 'Falló getRejectedMessages Peya 2',
+              error: { error: error.toString(), message: error.message, stack: error.stack }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló getRejectedMessages Peya 2',
-                  error: { error: 'Error inesperado en getRejectedMessages Peya' }
-              });
-          } 
+            logError.create({
+              message: 'Falló getRejectedMessages Peya 2',
+              error: { error: 'Error inesperado en getRejectedMessages Peya' }
+            });
+          }
           const msg = 'Can not get parameters of ThirdParty.';
           const err = new CustomError(APP_BRANCH.PARAMS, msg, this.uuid, {
             platformError: error
@@ -311,17 +308,17 @@ class PedidosYa extends Platform {
         await this._api.event.initialization(version, idRef);
         resolve();
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló initRestaurant Peya',
-              error:{ error: error.toString(), message: error.message, stack: error.stack }
+            message: 'Falló initRestaurant Peya',
+            error: { error: error.toString(), message: error.message, stack: error.stack }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló initRestaurant Peya',
-                error: { error: 'Error inesperado en initRestaurant Peya' }
-            });
-        } 
+          logError.create({
+            message: 'Falló initRestaurant Peya',
+            error: { error: 'Error inesperado en initRestaurant Peya' }
+          });
+        }
         if (!error) error = '';
         const msg = 'No se pudo inicializar el restaurant.';
         const err = new CustomError(APP_PLATFORM.INIT, msg, this.uuid, {
@@ -401,17 +398,17 @@ class PedidosYa extends Platform {
         }
       }
     } catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló interactWithOrders Peya',
-            error:{ error: error.toString(), message: error.message, stack: error.stack, data:data }
+          message: 'Falló interactWithOrders Peya',
+          error: { error: error.toString(), message: error.message, stack: error.stack, data: data }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló interactWithOrders Peya',
-              error: { error: 'Error inesperado en interactWithOrders Peya' }
-          });
-      } 
+        logError.create({
+          message: 'Falló interactWithOrders Peya',
+          error: { error: 'Error inesperado en interactWithOrders Peya' }
+        });
+      }
       const msg = 'No se pudo procesar la orden entrante.';
       new CustomError(APP_PLATFORM.GETORD, msg, this.uuid, {
         orderId: data.id,
@@ -428,7 +425,8 @@ class PedidosYa extends Platform {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
-    if (fullOrder.order.peya) {
+
+    if (fullOrder && fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         resolve(false);
       });
@@ -450,17 +448,17 @@ class PedidosYa extends Platform {
           return resolve(res);
         } else resolve(false);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló receiveOrder Peya '+order.id,
-              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+            message: 'Falló receiveOrder Peya ' + order.id,
+            error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló receiveOrder Peya',
-                error: { error: 'Error inesperado en receiveOrder Peya' }
-            });
-        } 
+          logError.create({
+            message: 'Falló receiveOrder Peya',
+            error: { error: 'Error inesperado en receiveOrder Peya' }
+          });
+        }
         if (!error) error = '';
         const msg = 'Failed to send the received status.';
         const err = new CustomError(APP_PLATFORM.RECEIVE, msg, this.uuid, {
@@ -482,23 +480,23 @@ class PedidosYa extends Platform {
     let fullOrder = await orderModel.findOne({
       'order.code': order.id
     });
-    if (fullOrder.order.peya) {
+    if (fullOrder && fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('view');
           await this.updateOrderState(order, state);
           resolve(false);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló viewOrder Peya '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+              message: 'Falló viewOrder Peya ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló viewOrder Peya',
-                  error: { error: 'Error inesperado en viewOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló viewOrder Peya',
+              error: { error: 'Error inesperado en viewOrder Peya' }
+            });
           }
           if (!error) error = '';
           const msg = 'Failed to send the viewed status.';
@@ -535,16 +533,16 @@ class PedidosYa extends Platform {
           return resolve(res);
         } else resolve(false);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló viewOrder Peya 2 '+order.id,
-              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+            message: 'Falló viewOrder Peya 2 ' + order.id,
+            error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló viewOrder Peya 2',
-                error: { error: 'Error inesperado en viewOrder Peya' }
-            });
+          logError.create({
+            message: 'Falló viewOrder Peya 2',
+            error: { error: 'Error inesperado en viewOrder Peya' }
+          });
         }
         if (!error) error = '';
         let msg = 'Failed to send the viewed status.';
@@ -559,16 +557,16 @@ class PedidosYa extends Platform {
           if (!res) res = true;
           return resolve(res);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló viewOrder Peya 3 '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+              message: 'Falló viewOrder Peya 3 ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló viewOrder Peya 3',
-                  error: { error: 'Error inesperado en viewOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló viewOrder Peya 3',
+              error: { error: 'Error inesperado en viewOrder Peya' }
+            });
           }
           if (!error) error = '';
           msg = 'Failed to send the viewed status. 2 intento';
@@ -592,7 +590,7 @@ class PedidosYa extends Platform {
       'order.code': order.id
     });
 
-    if (fullOrder.order.peya) {
+    if (fullOrder && fullOrder.order.peya) {
       return new Promise(async (resolve) => {
         try {
           const state = NewsStateSingleton.stateByCod('confirm');
@@ -615,16 +613,16 @@ class PedidosYa extends Platform {
           const res = await axios.post(url, body, headersConfig);
           resolve(true);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló confirmOrder Peya '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, deliveryTimeId:deliveryTimeId }
+              message: 'Falló confirmOrder Peya ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order, deliveryTimeId: deliveryTimeId }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló confirmOrder Peya',
-                  error: { error: 'Error inesperado en confirmOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló confirmOrder Peya',
+              error: { error: 'Error inesperado en confirmOrder Peya' }
+            });
           }
           if (!error) error = '';
           const msg = 'Failed to send the confirmed status.';
@@ -655,16 +653,16 @@ class PedidosYa extends Platform {
           return resolve(res);
         } else resolve(false);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló confirmOrder Peya 2 '+order.id,
-              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, deliveryTimeId:deliveryTimeId }
+            message: 'Falló confirmOrder Peya 2 ' + order.id,
+            error: { error: error.toString(), message: error.message, stack: error.stack, order: order, deliveryTimeId: deliveryTimeId }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló confirmOrder Peya 2',
-                error: { error: 'Error inesperado en confirmOrder Peya' }
-            });
+          logError.create({
+            message: 'Falló confirmOrder Peya 2',
+            error: { error: 'Error inesperado en confirmOrder Peya' }
+          });
         }
         if (!error) error = '';
         let msg = 'Failed to send the rejected status.';
@@ -684,16 +682,16 @@ class PedidosYa extends Platform {
           }
           resolve(res);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló confirmOrder Peya 3 '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, deliveryTimeId:deliveryTimeId }
+              message: 'Falló confirmOrder Peya 3 ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order, deliveryTimeId: deliveryTimeId }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló confirmOrder Peya 3',
-                  error: { error: 'Error inesperado en confirmOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló confirmOrder Peya 3',
+              error: { error: 'Error inesperado en confirmOrder Peya' }
+            });
           }
           if (!error) error = '';
           msg = 'Failed to send the rejected status. 2 intento';
@@ -717,11 +715,11 @@ class PedidosYa extends Platform {
       let fullOrder = await orderModel.findOne({
         'order.code': order.id
       });
-  
+
       const peyaRejectsToSearch =
         require('../../../assets/rejectedMessages').peyaRejectsToSearch;
       let message = peyaRejectsToSearch.find(r => r.id == rejectMessageId);
-      if (fullOrder.order.peya) {
+      if (fullOrder && fullOrder.order.peya) {
         let body = undefined;
         if (message)
           body = {
@@ -739,31 +737,31 @@ class PedidosYa extends Platform {
           try {
             const state = NewsStateSingleton.stateByCod('rej');
             await this.updateOrderState(order, state);
-  
+
             const headersConfig = {
               headers: {
                 'Authorization': `Bearer ${this.tokenPeya}`,
                 'Content-Type': 'application/json'
               }
             };
-  
+
             const url = `${this._platform.credentials.data.baseUrl}/${this.urlRejected}/${fullOrder.order.token}`;
             const res = await axios.post(url, body, headersConfig);
             resolve(true);
           } catch (error) {
-            try { 
+            try {
               logError.create({
-                  message: 'Falló branchRejectOrder Peya 1 '+order.id,
-                  error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, rejectMessageId:rejectMessageId, rejectMessageNote:rejectMessageNote }
+                message: 'Falló branchRejectOrder Peya 1 ' + order.id,
+                error: { error: error.toString(), message: error.message, stack: error.stack, order: order, rejectMessageId: rejectMessageId, rejectMessageNote: rejectMessageNote }
               });
             } catch (ex) {
-                logError.create({
-                    message: 'Falló branchRejectOrder Peya 1',
-                    error: { error: 'Error inesperado en branchRejectOrder Peya' }
-                });
+              logError.create({
+                message: 'Falló branchRejectOrder Peya 1',
+                error: { error: 'Error inesperado en branchRejectOrder Peya' }
+              });
             }
             if (!error) error = '';
-  
+
             const msg = 'Failed to send the rejected status.';
             const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
               orderId: order.id ? order.id.toString() : '-',
@@ -777,7 +775,7 @@ class PedidosYa extends Platform {
       }
       return new Promise(async (resolve) => {
         try {
-  
+
           console.log('reject');
           this.updateLastContact();
           const state = NewsStateSingleton.stateByCod('rej');
@@ -799,16 +797,16 @@ class PedidosYa extends Platform {
             resolve(res);
           } else resolve(false);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló branchRejectOrder Peya 2 '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, rejectMessageId:rejectMessageId, rejectMessageNote:rejectMessageNote }
+              message: 'Falló branchRejectOrder Peya 2 ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order, rejectMessageId: rejectMessageId, rejectMessageNote: rejectMessageNote }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló branchRejectOrder Peya 2',
-                  error: { error: 'Error inesperado en branchRejectOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló branchRejectOrder Peya 2',
+              error: { error: 'Error inesperado en branchRejectOrder Peya' }
+            });
           }
           if (!error) error = '';
           let msg = 'Failed to send the rejected status.';
@@ -818,7 +816,7 @@ class PedidosYa extends Platform {
             platformId: order.platformId ? order.platformId.toString() : '-',
             error: error.toString()
           });
-  
+
           try {
             //Se envia de nuevo
             const res = await this._api.order.reject(
@@ -828,16 +826,16 @@ class PedidosYa extends Platform {
             );
             resolve(res);
           } catch (error) {
-            try { 
+            try {
               logError.create({
-                  message: 'Falló branchRejectOrder Peya 3 '+order.id,
-                  error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, rejectMessageId:rejectMessageId, rejectMessageNote:rejectMessageNote }
+                message: 'Falló branchRejectOrder Peya 3 ' + order.id,
+                error: { error: error.toString(), message: error.message, stack: error.stack, order: order, rejectMessageId: rejectMessageId, rejectMessageNote: rejectMessageNote }
               });
             } catch (ex) {
-                logError.create({
-                    message: 'Falló branchRejectOrder Peya 3',
-                    error: { error: 'Error inesperado en branchRejectOrder Peya' }
-                });
+              logError.create({
+                message: 'Falló branchRejectOrder Peya 3',
+                error: { error: 'Error inesperado en branchRejectOrder Peya' }
+              });
             }
             if (!error) error = '';
             msg = 'Failed to send the rejected status. 2 intento';
@@ -849,23 +847,23 @@ class PedidosYa extends Platform {
         }
       });
     } catch (error) {
-      try { 
+      try {
         logError.create({
-            message: 'Falló branchRejectOrder Peya '+order.id,
-            error:{ error: error.toString(), message: error.message, stack: error.stack, order:order, rejectMessageId:rejectMessageId, rejectMessageNote:rejectMessageNote }
+          message: 'Falló branchRejectOrder Peya ' + order.id,
+          error: { error: error.toString(), message: error.message, stack: error.stack, order: order, rejectMessageId: rejectMessageId, rejectMessageNote: rejectMessageNote }
         });
       } catch (ex) {
-          logError.create({
-              message: 'Falló branchRejectOrder Peya',
-              error: { error: 'Error inesperado en branchRejectOrder Peya' }
-          });
+        logError.create({
+          message: 'Falló branchRejectOrder Peya',
+          error: { error: 'Error inesperado en branchRejectOrder Peya' }
+        });
       }
       msg = 'Failed to send the rejected status. 3 intento';
       const err = new CustomError(APP_PLATFORM.REJECT, msg, this.uuid, {
         error: error.toString()
       });
       resolve(err);
-    }    
+    }
   }
 
   /**
@@ -877,7 +875,7 @@ class PedidosYa extends Platform {
       'order.code': order.id
     });
 
-    if (fullOrder.order.peya) {
+    if (fullOrder && fullOrder.order.peya) {
       // const token = fullOrder.order.token.split('-_-');
       // fullOrder.order.token = `${token[0]}-_-${token[1]}`;
 
@@ -906,16 +904,16 @@ class PedidosYa extends Platform {
             resolve(true);
           }
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló dispatchOrder Peya '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+              message: 'Falló dispatchOrder Peya ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló dispatchOrder Peya',
-                  error: { error: 'Error inesperado en dispatchOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló dispatchOrder Peya',
+              error: { error: 'Error inesperado en dispatchOrder Peya' }
+            });
           }
           if (!error) error = '';
           const msg = 'Failed to send the dispatched status.';
@@ -943,16 +941,16 @@ class PedidosYa extends Platform {
           return resolve(res);
         } else resolve(false);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló dispatchOrder Peya 2 '+order.id,
-              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+            message: 'Falló dispatchOrder Peya 2 ' + order.id,
+            error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló dispatchOrder Peya 2',
-                error: { error: 'Error inesperado en dispatchOrder Peya' }
-            });
+          logError.create({
+            message: 'Falló dispatchOrder Peya 2',
+            error: { error: 'Error inesperado en dispatchOrder Peya' }
+          });
         }
         if (!error) error = '';
         let msg = 'Failed to send the dispatched status.';
@@ -973,16 +971,16 @@ class PedidosYa extends Platform {
           }
           return resolve(res);
         } catch (error) {
-          try { 
+          try {
             logError.create({
-                message: 'Falló dispatchOrder Peya 3 '+order.id,
-                error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+              message: 'Falló dispatchOrder Peya 3 ' + order.id,
+              error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
             });
           } catch (ex) {
-              logError.create({
-                  message: 'Falló dispatchOrder Peya 3',
-                  error: { error: 'Error inesperado en dispatchOrder Peya' }
-              });
+            logError.create({
+              message: 'Falló dispatchOrder Peya 3',
+              error: { error: 'Error inesperado en dispatchOrder Peya' }
+            });
           }
           if (!error) error = '';
           msg = 'Failed to send the dispatched status. 2 intento';
@@ -1091,16 +1089,16 @@ class PedidosYa extends Platform {
         this.updateLastContact();
         resolve(opened);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló openRestaurant Peya',
-              error:{ error: error.toString(), message: error.message, stack: error.stack, branchId:branchId }
+            message: 'Falló openRestaurant Peya',
+            error: { error: error.toString(), message: error.message, stack: error.stack, branchId: branchId }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló openRestaurant Peya',
-                error: { error: 'Error inesperado en openRestaurant Peya' }
-            });
+          logError.create({
+            message: 'Falló openRestaurant Peya',
+            error: { error: 'Error inesperado en openRestaurant Peya' }
+          });
         }
         if (!error) error = '';
         error = { error: error.toString() };
@@ -1174,16 +1172,16 @@ class PedidosYa extends Platform {
         this.updateLastContact;
         resolve(closed);
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló closeRestaurant Peya',
-              error:{ error: error.toString(), message: error.message, stack: error.stack, branchId:branchId }
+            message: 'Falló closeRestaurant Peya',
+            error: { error: error.toString(), message: error.message, stack: error.stack, branchId: branchId }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló closeRestaurant Peya',
-                error: { error: 'Error inesperado en closeRestaurant Peya' }
-            });
+          logError.create({
+            message: 'Falló closeRestaurant Peya',
+            error: { error: 'Error inesperado en closeRestaurant Peya' }
+          });
         }
         if (!error) error = '';
         error = { error: error.toString(), branchId, timeToClose, description };
@@ -1214,16 +1212,16 @@ class PedidosYa extends Platform {
           orderTracking = resPY;
         }
       } catch (error) {
-        try { 
+        try {
           logError.create({
-              message: 'Falló retriveDriver Peya',
-              error:{ error: error.toString(), message: error.message, stack: error.stack, order:order }
+            message: 'Falló retriveDriver Peya',
+            error: { error: error.toString(), message: error.message, stack: error.stack, order: order }
           });
         } catch (ex) {
-            logError.create({
-                message: 'Falló retriveDriver Peya',
-                error: { error: 'Error inesperado en retriveDriver Peya' }
-            });
+          logError.create({
+            message: 'Falló retriveDriver Peya',
+            error: { error: 'Error inesperado en retriveDriver Peya' }
+          });
         }
         const msg = 'No se pudo obtener el driver de la orden.';
         new CustomError(APP_PLATFORM.DRIVER, msg, this.uuid, {

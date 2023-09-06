@@ -105,7 +105,7 @@ class Rappi extends Platform {
         this.updateLastContact();
         resolve(response.data.access_token);
       } catch (error) {
-        /*try { 
+        try { 
           logError.create({
               message: 'Falló loginToAuth0 rappi',
               error:{ error: error.toString(), message: error.message, stack: error.stack }
@@ -115,7 +115,7 @@ class Rappi extends Platform {
                 message: 'Falló loginToAuth0 rappi',
                 error: { error: 'Error inesperado en loginToAuth0 rappi' }
             });
-        }*/ 
+        } 
         console.log('error loginToAuth0');
 
         if (!error) error = '';
