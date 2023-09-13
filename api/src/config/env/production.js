@@ -17,7 +17,7 @@ module.exports = {
     '94c5426e3e001bfaef3563ecb6d3e2503df61684cbda87f3d7b36d66eaaaef245bf90a085f5743a3d70f47a9638c05db189d51d14a4709e177625853b4bc45d6',
   baseUrl: process.env.BASE_URL || 'http://localhost',
   apiUrlLastMile: 'http://localhost:3088/api',
-  chainCode: 'Grido', //de momento se usa esta cambiar una vez que se cree el microservicio
+  chainCode: 'LATAMSMARTFRAN0001', //de momento se usa esta cambiar una vez que se cree el microservicio
   port: process.env.NODE_PORT || 3087,
   url: function () {
     return this.baseUrl + ':' + this.port;

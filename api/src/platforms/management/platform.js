@@ -1370,10 +1370,6 @@ class Platform {
               error: { error: 'Error inesperado en updateRejectedMessage' }
           });
       }
-      logError.create({
-        message: 'Failed ',
-        error: { message: error.message }
-      });
     }
   }
 
